@@ -301,6 +301,52 @@
         "btn_text": ""
       }
     },
+    "multicolumn_whySOT": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_fit": {
+          "type": "column",
+          "settings": {
+            "title": "Engineered, not just designed",
+            "text": "<p>Every fit goes through eleven months of pattern revisions before it ships. We treat clothing like a system to be optimized, not a trend to be chased.</p>"
+          }
+        },
+        "column_batch": {
+          "type": "column",
+          "settings": {
+            "title": "Small-batch by design",
+            "text": "<p>Each drop is produced in limited runs of 300 units. No overproduction, no filler &mdash; once a size sells out, it's gone until the next run.</p>"
+          }
+        },
+        "column_quality": {
+          "type": "column",
+          "settings": {
+            "title": "Built to outlast the season",
+            "text": "<p>Premium fabrics and reinforced construction mean these pieces are made for daily wear, wash after wash, year after year.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "column_fit",
+        "column_batch",
+        "column_quality"
+      ],
+      "name": "t:sections.multicolumn.name",
+      "settings": {
+        "title": "Why SOT",
+        "heading_size": "h1",
+        "image_width": "full",
+        "image_ratio": "adapt",
+        "columns_desktop": 3,
+        "column_alignment": "center",
+        "background_style": "none",
+        "color_scheme": "",
+        "columns_mobile": "1",
+        "swipe_on_mobile": false,
+        "padding_top": 44,
+        "padding_bottom": 44
+      }
+    },
     "newsletter_teQRRe": {
       "type": "newsletter",
       "blocks": {
@@ -347,6 +393,7 @@
     "slideshow_DjrgVJ",
     "collage_FU7DU6",
     "reel_grid_C9FQYT",
+    "multicolumn_whySOT",
     "newsletter_teQRRe"
   ]
 }

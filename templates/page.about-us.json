@@ -1,0 +1,188 @@
+
+{
+  "sections": {
+    "image_with_text_hero": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_story": {
+          "type": "heading",
+          "settings": {
+            "heading": "<strong>THREE ENGINEERS. ONE FIT.</strong>",
+            "heading_size": "h0"
+          }
+        },
+        "text_story": {
+          "type": "text",
+          "settings": {
+            "text": "<p>SOT started with a simple frustration: everyday clothing that looked good on a hanger and fell apart in wear. So three engineers did what engineers do &mdash; they treated the problem like a system. Eleven months of pattern revisions later, the first run of three hundred units sold out. We haven't stopped iterating since.</p>",
+            "text_style": "subtitle"
+          }
+        },
+        "button_story": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP THE CURRENT DROP",
+            "button_link": "shopify://collections",
+            "button_style_secondary": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_story",
+        "text_story",
+        "button_story"
+      ],
+      "custom_css": [],
+      "name": "t:sections.image-with-text.presets.name",
+      "settings": {
+        "image": "shopify://shop_images/pexels-cottonbro-5119398.jpg",
+        "height": "medium",
+        "desktop_image_width": "medium",
+        "layout": "text_first",
+        "desktop_content_position": "middle",
+        "desktop_content_alignment": "left",
+        "content_layout": "no-overlap",
+        "section_color_scheme": "scheme-1",
+        "color_scheme": "",
+        "image_behavior": "ambient",
+        "mobile_content_alignment": "left",
+        "padding_top": 36,
+        "padding_bottom": 0
+      }
+    },
+    "rich_text_philosophy": {
+      "type": "rich-text",
+      "blocks": {
+        "caption_philosophy": {
+          "type": "caption",
+          "settings": {
+            "caption": "Our Philosophy",
+            "text_style": "caption-with-letter-spacing",
+            "text_size": "medium"
+          }
+        },
+        "heading_philosophy": {
+          "type": "heading",
+          "settings": {
+            "heading": "Clothing engineered like a product, not chased like a trend",
+            "heading_size": "h1"
+          }
+        },
+        "text_philosophy": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We don't chase seasons or churn out collections to fill a calendar. Every piece earns its place through fit testing, fabric sourcing, and real-world wear before it ever goes into production. If it's not better than what's already in your wardrobe, we don't make it.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "caption_philosophy",
+        "heading_philosophy",
+        "text_philosophy"
+      ],
+      "name": "t:sections.rich-text.presets.name",
+      "settings": {
+        "desktop_content_position": "center",
+        "content_alignment": "center",
+        "color_scheme": "",
+        "full_width": true,
+        "padding_top": 52,
+        "padding_bottom": 36
+      }
+    },
+    "multicolumn_values": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_batch": {
+          "type": "column",
+          "settings": {
+            "title": "Small batches, on purpose",
+            "text": "<p>Every drop is capped at a limited run. It keeps quality control tight and means nothing sits in a warehouse for a clearance rack.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        },
+        "column_fit": {
+          "type": "column",
+          "settings": {
+            "title": "Fit is non-negotiable",
+            "text": "<p>Eleven months of revisions went into our first pattern. We'd rather delay a launch than ship a fit we're not obsessed with.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        },
+        "column_direct": {
+          "type": "column",
+          "settings": {
+            "title": "Built by people who wear it",
+            "text": "<p>We're our own first customers. If it doesn't hold up to how we actually live and work, it doesn't make the cut.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "column_batch",
+        "column_fit",
+        "column_direct"
+      ],
+      "name": "t:sections.multicolumn.name",
+      "settings": {
+        "title": "What we stand for",
+        "heading_size": "h1",
+        "image_width": "full",
+        "image_ratio": "adapt",
+        "columns_desktop": 3,
+        "column_alignment": "center",
+        "background_style": "none",
+        "button_label": "",
+        "button_link": "",
+        "color_scheme": "",
+        "columns_mobile": "1",
+        "swipe_on_mobile": false,
+        "padding_top": 36,
+        "padding_bottom": 44
+      }
+    },
+    "newsletter_about": {
+      "type": "newsletter",
+      "blocks": {
+        "heading_newsletter": {
+          "type": "heading",
+          "settings": {
+            "heading": "Be first to know",
+            "heading_size": "h1"
+          }
+        },
+        "paragraph_newsletter": {
+          "type": "paragraph",
+          "settings": {
+            "text": "<p>Drops sell out. Join the list to hear about the next one before it goes live.</p>"
+          }
+        },
+        "email_form_newsletter": {
+          "type": "email_form",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "heading_newsletter",
+        "paragraph_newsletter",
+        "email_form_newsletter"
+      ],
+      "name": "t:sections.newsletter.presets.name",
+      "settings": {
+        "color_scheme": "",
+        "full_width": true,
+        "padding_top": 40,
+        "padding_bottom": 52
+      }
+    }
+  },
+  "order": [
+    "image_with_text_hero",
+    "rich_text_philosophy",
+    "multicolumn_values",
+    "newsletter_about"
+  ]
+}

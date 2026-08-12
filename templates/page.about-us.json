@@ -105,21 +105,27 @@
           "type": "column",
           "settings": {
             "title": "Small batches, on purpose",
-            "text": "<p>Every drop is capped at a limited run. It keeps quality control tight and means nothing sits in a warehouse for a clearance rack.</p>"
+            "text": "<p>Every drop is capped at a limited run. It keeps quality control tight and means nothing sits in a warehouse for a clearance rack.</p>",
+            "link_label": "",
+            "link": ""
           }
         },
         "column_fit": {
           "type": "column",
           "settings": {
             "title": "Fit is non-negotiable",
-            "text": "<p>Eleven months of revisions went into our first pattern. We'd rather delay a launch than ship a fit we're not obsessed with.</p>"
+            "text": "<p>Eleven months of revisions went into our first pattern. We'd rather delay a launch than ship a fit we're not obsessed with.</p>",
+            "link_label": "",
+            "link": ""
           }
         },
         "column_direct": {
           "type": "column",
           "settings": {
             "title": "Built by people who wear it",
-            "text": "<p>We're our own first customers. If it doesn't hold up to how we actually live and work, it doesn't make the cut.</p>"
+            "text": "<p>We're our own first customers. If it doesn't hold up to how we actually live and work, it doesn't make the cut.</p>",
+            "link_label": "",
+            "link": ""
           }
         }
       },
@@ -137,6 +143,8 @@
         "columns_desktop": 3,
         "column_alignment": "center",
         "background_style": "none",
+        "button_label": "",
+        "button_link": "",
         "color_scheme": "",
         "columns_mobile": "1",
         "swipe_on_mobile": false,

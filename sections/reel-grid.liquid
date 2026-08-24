@@ -38,21 +38,22 @@
     background-color: {{ section.settings.letterbox_color }};
   }
 
-  /* Media wrapper: fills the card, centers its child regardless of fit mode.
-     display:flex + centering is what actually guarantees correct sizing on
-     mobile — it doesn't depend on object-fit support/overrides at all. */
+  /* Media wrapper fills the card and positions its child via flexbox.
+     Flex alignment is what actually holds on mobile — it doesn't depend
+     on object-fit/object-position being respected by anything upstream. */
   .reel-media-{{ section.id }} {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
     display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    align-items: var(--reel-align-y, center) !important;
+    justify-content: var(--reel-align-x, center) !important;
     overflow: hidden !important;
   }
 
-  /* Cover mode: crop to fill, framed by the position sliders */
+  /* Cover: fills the card completely, cropping as needed. Anchor point
+     (what stays in frame) follows the same alignment choice. */
   .reel-video-{{ section.id }}.is-fit-cover {
     width: 100% !important;
     height: 100% !important;
@@ -63,9 +64,8 @@
     display: block !important;
   }
 
-  /* Contain mode: NOT using object-fit at all. Intrinsic sizing constrained
-     by max-width/max-height is the one technique that behaves identically
-     on every mobile browser — it physically cannot crop or zoom. */
+  /* Contain: shows the whole video, sized to the card's width or height
+     (whichever runs out first), then pinned to the chosen edge/corner. */
   .reel-video-{{ section.id }}.is-fit-contain {
     width: auto !important;
     height: auto !important;
@@ -141,13 +141,68 @@
           if fit == 'default'
             assign fit = section.settings.default_video_fit
           endif
+
+          assign position = block.settings.video_position
+          if position == 'default'
+            assign position = section.settings.default_video_position
+          endif
+
+          case position
+            when 'top_left'
+              assign align_x = 'flex-start'
+              assign align_y = 'flex-start'
+              assign pos_x = '0%'
+              assign pos_y = '0%'
+            when 'top_center'
+              assign align_x = 'center'
+              assign align_y = 'flex-start'
+              assign pos_x = '50%'
+              assign pos_y = '0%'
+            when 'top_right'
+              assign align_x = 'flex-end'
+              assign align_y = 'flex-start'
+              assign pos_x = '100%'
+              assign pos_y = '0%'
+            when 'center_left'
+              assign align_x = 'flex-start'
+              assign align_y = 'center'
+              assign pos_x = '0%'
+              assign pos_y = '50%'
+            when 'center_right'
+              assign align_x = 'flex-end'
+              assign align_y = 'center'
+              assign pos_x = '100%'
+              assign pos_y = '50%'
+            when 'bottom_left'
+              assign align_x = 'flex-start'
+              assign align_y = 'flex-end'
+              assign pos_x = '0%'
+              assign pos_y = '100%'
+            when 'bottom_center'
+              assign align_x = 'center'
+              assign align_y = 'flex-end'
+              assign pos_x = '50%'
+              assign pos_y = '100%'
+            when 'bottom_right'
+              assign align_x = 'flex-end'
+              assign align_y = 'flex-end'
+              assign pos_x = '100%'
+              assign pos_y = '100%'
+            else
+              assign align_x = 'center'
+              assign align_y = 'center'
+              assign pos_x = '50%'
+              assign pos_y = '50%'
+          endcase
         -%}
         <div
           class="reel-grid-card-{{ section.id }}"
-          style="--reel-pos-x: {{ block.settings.position_x }}%; --reel-pos-y: {{ block.settings.position_y }}%;"
           {{ block.shopify_attributes }}
         >
-          <div class="reel-media-{{ section.id }}{% if fit == 'contain' and block.settings.blur_backdrop %} has-blur-backdrop{% endif %}">
+          <div
+            class="reel-media-{{ section.id }}{% if fit == 'contain' and block.settings.blur_backdrop %} has-blur-backdrop{% endif %}"
+            style="--reel-align-x: {{ align_x }}; --reel-align-y: {{ align_y }}; --reel-pos-x: {{ pos_x }}; --reel-pos-y: {{ pos_y }};"
+          >
             {% if block.settings.video != blank %}
               {% if fit == 'contain' and block.settings.blur_backdrop %}
                 {{
@@ -242,18 +297,36 @@
     },
     {
       "type": "header",
-      "content": "Video Fit"
+      "content": "Video Display"
     },
     {
       "type": "select",
       "id": "default_video_fit",
       "label": "Default video fit",
-      "info": "Cover fills the card and crops the video. Contain shows the whole video, letterboxed. Each reel can override this.",
+      "info": "Cover: fills the card completely, cropping the video to match the card's shape. Contain: shows the entire video, scaled to fit the card's width or height. Each reel can override this.",
       "options": [
-        { "value": "cover", "label": "Cover (fill, crop)" },
+        { "value": "cover", "label": "Cover (fill card, crop video)" },
         { "value": "contain", "label": "Contain (show full video)" }
       ],
       "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "default_video_position",
+      "label": "Default video alignment",
+      "info": "Which part of the video stays visible/anchored in the card. Each reel can override this.",
+      "options": [
+        { "value": "top_left", "label": "Top left" },
+        { "value": "top_center", "label": "Top center" },
+        { "value": "top_right", "label": "Top right" },
+        { "value": "center_left", "label": "Middle left" },
+        { "value": "center_center", "label": "Middle center" },
+        { "value": "center_right", "label": "Middle right" },
+        { "value": "bottom_left", "label": "Bottom left" },
+        { "value": "bottom_center", "label": "Bottom center" },
+        { "value": "bottom_right", "label": "Bottom right" }
+      ],
+      "default": "center_center"
     },
     {
       "type": "color",
@@ -383,16 +456,34 @@
         },
         {
           "type": "header",
-          "content": "Video position in card"
+          "content": "Video display (this reel)"
         },
         {
           "type": "select",
           "id": "video_fit",
-          "label": "Fit for this reel",
+          "label": "Fit",
           "options": [
             { "value": "default", "label": "Use section default" },
-            { "value": "cover", "label": "Cover (fill, crop)" },
+            { "value": "cover", "label": "Cover (fill card, crop video)" },
             { "value": "contain", "label": "Contain (show full video)" }
+          ],
+          "default": "default"
+        },
+        {
+          "type": "select",
+          "id": "video_position",
+          "label": "Alignment",
+          "options": [
+            { "value": "default", "label": "Use section default" },
+            { "value": "top_left", "label": "Top left" },
+            { "value": "top_center", "label": "Top center" },
+            { "value": "top_right", "label": "Top right" },
+            { "value": "center_left", "label": "Middle left" },
+            { "value": "center_center", "label": "Middle center" },
+            { "value": "center_right", "label": "Middle right" },
+            { "value": "bottom_left", "label": "Bottom left" },
+            { "value": "bottom_center", "label": "Bottom center" },
+            { "value": "bottom_right", "label": "Bottom right" }
           ],
           "default": "default"
         },
@@ -400,30 +491,8 @@
           "type": "checkbox",
           "id": "blur_backdrop",
           "label": "Fill letterbox with blurred video",
-          "info": "Only applies in Contain mode. Replaces the flat letterbox color with a blurred, zoomed copy of the same video.",
+          "info": "Only applies in Contain mode.",
           "default": false
-        },
-        {
-          "type": "range",
-          "id": "position_x",
-          "min": 0,
-          "max": 100,
-          "step": 5,
-          "unit": "%",
-          "label": "Horizontal position (Cover mode only)",
-          "info": "0% = left edge, 50% = center, 100% = right edge",
-          "default": 50
-        },
-        {
-          "type": "range",
-          "id": "position_y",
-          "min": 0,
-          "max": 100,
-          "step": 5,
-          "unit": "%",
-          "label": "Vertical position (Cover mode only)",
-          "info": "0% = top, 50% = center, 100% = bottom. Use this to keep faces/subjects in frame when the card crops the video.",
-          "default": 50
         },
         {
           "type": "header",

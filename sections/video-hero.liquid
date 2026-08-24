@@ -1,0 +1,466 @@
+{%- liquid
+  assign has_video = false
+  if section.settings.video != blank or section.settings.video_url != blank
+    assign has_video = true
+  endif
+
+  assign video_class = 'video-hero__video-' | append: section.id
+  assign overlay_opacity = section.settings.overlay_opacity | divided_by: 100.0
+-%}
+
+{%- style -%}
+  .video-hero-{{ section.id }} {
+    position: relative;
+    display: flex;
+    overflow: hidden;
+    isolation: isolate;
+    align-items: {{ section.settings.content_position }};
+    justify-content: {{ section.settings.content_alignment }};
+    {% if section.settings.full_height %}
+      min-height: 100vh;
+      min-height: 100svh;
+    {% else %}
+      min-height: {{ section.settings.height_mobile }}px;
+    {% endif %}
+  }
+
+  @media screen and (min-width: 750px) {
+    .video-hero-{{ section.id }} {
+      {% if section.settings.full_height %}
+        min-height: 100vh;
+        min-height: 100svh;
+      {% else %}
+        min-height: {{ section.settings.height_desktop }}px;
+      {% endif %}
+    }
+  }
+
+  /* --- BACKGROUND MEDIA ---
+     Absolutely positioned and forced to 100%/100% so the source can never
+     render at its native resolution or overflow the hero box. */
+  .video-hero__media-{{ section.id }} {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background-color: {{ section.settings.background_color }};
+  }
+
+  .video-hero__media-{{ section.id }} video,
+  .video-hero__media-{{ section.id }} img,
+  .video-hero__media-{{ section.id }} svg {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    min-width: 0;
+    min-height: 0;
+    object-fit: cover;
+    object-position: {{ section.settings.video_position }};
+  }
+
+  /* The video paints on top of the fallback image, which stays underneath
+     as the poster while the file buffers. */
+  .video-hero__media-{{ section.id }} video {
+    z-index: 1;
+  }
+
+  /* Overlay sits between the media and the content */
+  .video-hero__overlay-{{ section.id }} {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    {% if section.settings.overlay_style == 'gradient' %}
+      background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0) 0%,
+        {{ section.settings.overlay_color | color_modify: 'alpha', overlay_opacity }} 100%
+      );
+    {% else %}
+      background-color: {{ section.settings.overlay_color | color_modify: 'alpha', overlay_opacity }};
+    {% endif %}
+  }
+
+  .video-hero__content-{{ section.id }} {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: {{ section.settings.content_max_width }}px;
+    padding: {{ section.settings.padding_top }}px 2rem {{ section.settings.padding_bottom }}px;
+    text-align: {{ section.settings.text_alignment }};
+    color: {{ section.settings.text_color }};
+  }
+
+  .video-hero__heading-{{ section.id }} {
+    margin: 0;
+    color: {{ section.settings.text_color }};
+    word-break: break-word;
+  }
+
+  .video-hero__text-{{ section.id }} {
+    margin: 1.5rem 0 0;
+    color: {{ section.settings.text_color }};
+    font-size: {{ section.settings.text_size }}px;
+    line-height: 1.6;
+  }
+
+  .video-hero__text-{{ section.id }} > *:first-child {
+    margin-top: 0;
+  }
+
+  .video-hero__text-{{ section.id }} > *:last-child {
+    margin-bottom: 0;
+  }
+
+  .video-hero__text-{{ section.id }} a {
+    color: inherit;
+  }
+
+  /* --- OUTLINE BUTTON ---
+     Deliberately not using .button so the colors stay readable over moving
+     footage regardless of which colour scheme the section is set to. */
+  .video-hero__button-{{ section.id }} {
+    display: inline-block;
+    margin-top: 2.5rem;
+    padding: 1.2rem 3.2rem;
+    border: {{ section.settings.button_border_width }}px solid {{ section.settings.button_color }};
+    border-radius: {{ section.settings.button_corner_radius }}px;
+    background-color: transparent;
+    color: {{ section.settings.button_color }};
+    font-size: 1.5rem;
+    letter-spacing: 0.06rem;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  .video-hero__button-{{ section.id }}:hover,
+  .video-hero__button-{{ section.id }}:focus-visible {
+    background-color: {{ section.settings.button_color }};
+    color: {{ section.settings.button_hover_text_color }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .video-hero__content-{{ section.id }} {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+
+    .video-hero__button-{{ section.id }} {
+      margin-top: 2rem;
+      padding: 1.1rem 2.6rem;
+    }
+  }
+
+  /* Reduced motion: fall back to the still image instead of looping footage. */
+  @media (prefers-reduced-motion: reduce) {
+    .video-hero__media-{{ section.id }} video {
+      display: none;
+    }
+  }
+{%- endstyle -%}
+
+<div class="video-hero-{{ section.id }} color-{{ section.settings.color_scheme }}">
+  <div class="video-hero__media-{{ section.id }}">
+    {%- comment -%}
+      Rendered first so it sits underneath the video and acts as the poster
+      while the file buffers, and as the only visual when no video is set.
+    {%- endcomment -%}
+    {%- if section.settings.fallback_image != blank -%}
+      {{
+        section.settings.fallback_image
+        | image_url: width: 3840
+        | image_tag:
+          loading: 'eager',
+          sizes: '100vw',
+          widths: '375, 750, 1100, 1500, 1780, 2000, 3000, 3840',
+          alt: section.settings.fallback_image.alt
+      }}
+    {%- elsif has_video == false -%}
+      {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+    {%- endif -%}
+
+    {%- if section.settings.video != blank -%}
+      {{
+        section.settings.video
+        | video_tag:
+          autoplay: true,
+          loop: true,
+          muted: true,
+          playsinline: true,
+          controls: false,
+          image_size: '1500x',
+          class: video_class
+      }}
+    {%- elsif section.settings.video_url != blank -%}
+      <video
+        class="{{ video_class }}"
+        autoplay
+        loop
+        muted
+        playsinline
+        preload="metadata"
+        {% if section.settings.fallback_image != blank %}
+          poster="{{ section.settings.fallback_image | image_url: width: 1500 }}"
+        {% endif %}
+      >
+        <source src="{{ section.settings.video_url | escape }}" type="video/mp4">
+      </video>
+    {%- endif -%}
+  </div>
+
+  {%- if section.settings.overlay_opacity > 0 -%}
+    <div class="video-hero__overlay-{{ section.id }}"></div>
+  {%- endif -%}
+
+  <div class="video-hero__content-{{ section.id }}">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="video-hero__heading-{{ section.id }} inline-richtext {{ section.settings.heading_size }}">
+        {{ section.settings.heading }}
+      </h2>
+    {%- endif -%}
+
+    {%- if section.settings.text != blank -%}
+      <div class="video-hero__text-{{ section.id }} rte">
+        {{ section.settings.text }}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.button_label != blank -%}
+      <a
+        {% if section.settings.button_link != blank %}
+          href="{{ section.settings.button_link }}"
+        {% else %}
+          role="link" aria-disabled="true"
+        {% endif %}
+        class="video-hero__button-{{ section.id }}"
+      >
+        {{ section.settings.button_label | escape }}
+      </a>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Video Hero",
+  "tag": "section",
+  "settings": [
+    { "type": "header", "content": "Background video" },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video",
+      "info": "Uploaded to Shopify. Plays muted and looped in the background."
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "External MP4 URL",
+      "info": "Used only when no video is selected above. Must be a direct .mp4 file link, not a YouTube or Vimeo page."
+    },
+    {
+      "type": "image_picker",
+      "id": "fallback_image",
+      "label": "Fallback image",
+      "info": "Shown while the video loads, and instead of the video for visitors who prefer reduced motion."
+    },
+    {
+      "type": "select",
+      "id": "video_position",
+      "label": "Video focal point",
+      "info": "Which part of the video stays in frame when it is cropped to the hero size.",
+      "options": [
+        { "value": "left top", "label": "Top left" },
+        { "value": "center top", "label": "Top center" },
+        { "value": "right top", "label": "Top right" },
+        { "value": "left center", "label": "Middle left" },
+        { "value": "center center", "label": "Middle center" },
+        { "value": "right center", "label": "Middle right" },
+        { "value": "left bottom", "label": "Bottom left" },
+        { "value": "center bottom", "label": "Bottom center" },
+        { "value": "right bottom", "label": "Bottom right" }
+      ],
+      "default": "center center"
+    },
+    { "type": "color", "id": "background_color", "label": "Background fill", "default": "#000000" },
+    { "type": "header", "content": "Overlay" },
+    {
+      "type": "select",
+      "id": "overlay_style",
+      "label": "Overlay style",
+      "options": [
+        { "value": "solid", "label": "Solid tint" },
+        { "value": "gradient", "label": "Gradient (fades in at the bottom)" }
+      ],
+      "default": "solid"
+    },
+    { "type": "color", "id": "overlay_color", "label": "Overlay color", "default": "#000000" },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay opacity",
+      "default": 35
+    },
+    { "type": "header", "content": "Content" },
+    { "type": "inline_richtext", "id": "heading", "label": "Heading", "default": "Built for the ride ahead" },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        { "value": "h2", "label": "Small" },
+        { "value": "h1", "label": "Medium" },
+        { "value": "h0", "label": "Large" },
+        { "value": "hxl", "label": "Extra large" }
+      ],
+      "default": "h0"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Tell your story in a sentence or two. Keep it short so it stays readable over moving footage.</p>"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Text size",
+      "default": 16
+    },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#FFFFFF" },
+    { "type": "header", "content": "Outline button" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop the collection" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "color", "id": "button_color", "label": "Border and label color", "default": "#FFFFFF" },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "Label color on hover",
+      "info": "Used when the button fills in on hover.",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "button_border_width",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Border thickness",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "button_corner_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Corner radius",
+      "default": 0
+    },
+    { "type": "header", "content": "Layout" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    { "type": "checkbox", "id": "full_height", "label": "Full screen height", "default": false },
+    {
+      "type": "range",
+      "id": "height_desktop",
+      "min": 300,
+      "max": 1000,
+      "step": 20,
+      "unit": "px",
+      "label": "Desktop height",
+      "info": "Ignored when full screen height is turned on.",
+      "default": 640
+    },
+    {
+      "type": "range",
+      "id": "height_mobile",
+      "min": 200,
+      "max": 800,
+      "step": 20,
+      "unit": "px",
+      "label": "Mobile height",
+      "default": 480
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "Vertical position",
+      "options": [
+        { "value": "flex-start", "label": "Top" },
+        { "value": "center", "label": "Middle" },
+        { "value": "flex-end", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Horizontal position",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 400,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "label": "Content width",
+      "default": 700
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 60
+    }
+  ],
+  "presets": [{ "name": "Video Hero" }]
+}
+{% endschema %}

@@ -282,7 +282,7 @@
         "heading": "Watch & Shop Our Reels",
         "heading_alignment": "center",
         "default_video_fit": "contain",
-        "default_video_position": "top_left",
+        "default_video_position": "center_center",
         "letterbox_color": "#000000",
         "default_button_link": "",
         "default_button_label": "Shop Now",

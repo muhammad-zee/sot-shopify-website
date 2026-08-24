@@ -117,7 +117,7 @@
     },
     "featured_collection_rLqA6g": {
       "type": "featured-collection",
-      "name": "t:sections.featured-collection.presets.name",
+      "name": "Sale",
       "settings": {
         "title": "Sale",
         "heading_size": "h1",

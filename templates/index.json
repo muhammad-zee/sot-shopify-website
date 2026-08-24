@@ -221,7 +221,7 @@
           "type": "reel",
           "settings": {
             "video": "shopify://files/videos/WhatsApp Video 2026-08-24 at 2.19.54 PM.mp4",
-            "video_fit": "cover",
+            "video_fit": "contain",
             "blur_backdrop": false,
             "position_x": 50,
             "position_y": 50,
@@ -263,7 +263,7 @@
           "type": "reel",
           "settings": {
             "video": "shopify://files/videos/WhatsApp Video 2026-08-24 at 2.19.53 PM (1).mp4",
-            "video_fit": "default",
+            "video_fit": "contain",
             "blur_backdrop": false,
             "position_x": 50,
             "position_y": 50,

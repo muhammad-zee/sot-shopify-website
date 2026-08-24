@@ -26,7 +26,7 @@
         "text": "<p>Premium everyday wear, obsessively built by three<br/>engineers. Eleven months on a single fit. Three hundred<br/>units in the first run.</p>",
         "text_size": 16,
         "text_color": "#F7F4EE",
-        "button_label": "Shop the collection",
+        "button_label": "Shop Now",
         "button_link": "shopify://collections/all",
         "button_color": "#F7F4EE",
         "button_hover_text_color": "#B8542C",

@@ -78,6 +78,7 @@
         "featured_collection_JB8zgV",
         "featured_collection_QpkLhH"
       ],
+      "disabled": true,
       "name": "t:sections.collection-list.presets.name",
       "settings": {
         "title": "Our Collections",

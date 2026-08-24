@@ -17,7 +17,7 @@
         "video_url": "",
         "fallback_image": "shopify://shop_images/bearded-young-man.jpg",
         "video_position": "center center",
-        "background_color": "#000000",
+        "background_color": "#F7F4EE",
         "overlay_style": "solid",
         "overlay_color": "#000000",
         "overlay_opacity": 35,

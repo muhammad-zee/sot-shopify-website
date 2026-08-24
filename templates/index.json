@@ -25,37 +25,30 @@
             "text": "<p>Premium everyday wear, obsessively built by three engineers. Eleven months on a single fit. Three hundred units in the first run. <em>Worth the wait.</em></p>",
             "text_style": "subtitle"
           }
-        },
-        "button_B74gC7": {
-          "type": "button",
-          "settings": {
-            "button_label": "SHOP TO DROP",
-            "button_link": "shopify://collections",
-            "button_style_secondary": false
-          }
         }
       },
       "block_order": [
         "heading_peNxJ4",
-        "text_qtB6wV",
-        "button_B74gC7"
+        "text_qtB6wV"
       ],
       "custom_css": [],
       "name": "t:sections.image-with-text.presets.name",
       "settings": {
         "image": "shopify://shop_images/clem-onojeghuo-4NAG83bhe6c-unsplash.jpg",
-        "height": "medium",
-        "desktop_image_width": "medium",
-        "layout": "text_first",
-        "desktop_content_position": "middle",
-        "desktop_content_alignment": "left",
-        "content_layout": "no-overlap",
-        "section_color_scheme": "scheme-1",
-        "color_scheme": "",
-        "image_behavior": "ambient",
-        "mobile_content_alignment": "left",
-        "padding_top": 0,
-        "padding_bottom": 0
+        "full_screen": true,
+        "custom_height_mobile": 500,
+        "custom_height_desktop": 700,
+        "content_position": "center",
+        "content_alignment": "center",
+        "overlay_opacity": 30,
+        "overlay_color": "#000000",
+        "text_color": "#ffffff",
+        "badge_color": "#ffffff",
+        "badge_text_color": "#121212",
+        "button_bg_color": "#121212",
+        "button_text_color": "#ffffff",
+        "button_secondary_text_color": "#ffffff",
+        "sticky_mobile_cta": false
       }
     },
     "collection_list_jcDEdA": {

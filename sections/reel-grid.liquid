@@ -45,8 +45,22 @@
     display: block;
   }
 
+  /* Always-present bottom scrim so every card carries the same weight,
+     whether or not it ends up with a button on top of it. */
+  .reel-grid-card-{{ section.id }}::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 46%;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.55) 100%);
+    pointer-events: none;
+  }
+
   .reel-product-overlay-{{ section.id }} {
     position: absolute;
+    z-index: 1;
     bottom: 12px;
     left: 10px;
     right: 10px;
@@ -84,21 +98,27 @@
             assign buy_url = blank
             assign buy_label = blank
 
-            if block.settings.button_link != blank
-              assign buy_url = block.settings.button_link
-            elsif block.settings.product != blank
-              assign buy_url = block.settings.product.url
-            endif
+            unless block.settings.hide_button
+              if block.settings.button_link != blank
+                assign buy_url = block.settings.button_link
+              elsif block.settings.product != blank
+                assign buy_url = block.settings.product.url
+              elsif section.settings.default_button_link != blank
+                assign buy_url = section.settings.default_button_link
+              endif
 
-            if block.settings.button_label != blank
-              assign buy_label = block.settings.button_label
-            elsif section.settings.btn_text != blank
-              assign buy_label = section.settings.btn_text
-            elsif block.settings.product != blank
-              assign buy_label = 'Shop ' | append: block.settings.product.title
-            else
-              assign buy_label = 'Shop Now'
-            endif
+              if buy_url != blank
+                if block.settings.button_label != blank
+                  assign buy_label = block.settings.button_label
+                elsif block.settings.product != blank and block.settings.button_link == blank
+                  assign buy_label = 'Shop ' | append: block.settings.product.title
+                elsif section.settings.default_button_label != blank
+                  assign buy_label = section.settings.default_button_label
+                else
+                  assign buy_label = 'Shop Now'
+                endif
+              endif
+            endunless
           -%}
 
           {% if buy_url != blank %}
@@ -146,6 +166,23 @@
         { "value": "right", "label": "Right" }
       ],
       "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Default Buy Button",
+      "info": "Applied to any reel that doesn't set its own link or product, so every card in the grid looks consistent."
+    },
+    {
+      "type": "url",
+      "id": "default_button_link",
+      "label": "Default button link",
+      "info": "e.g. your 'Shop All' collection. Leave blank to allow buttonless cards."
+    },
+    {
+      "type": "text",
+      "id": "default_button_label",
+      "label": "Default button label",
+      "default": "Shop Now"
     },
     {
       "type": "header",
@@ -237,12 +274,6 @@
       "unit": "px",
       "label": "Card Corner Radius",
       "default": 12
-    },
-    {
-      "type": "text",
-      "id": "btn_text",
-      "label": "Default Button Label",
-      "info": "Used when a reel doesn't set its own label. Leave blank to fall back to 'Shop [Product Title]' or 'Shop Now'."
     }
   ],
   "blocks": [
@@ -263,19 +294,26 @@
           "type": "url",
           "id": "button_link",
           "label": "Button link",
-          "info": "Point this to a product, collection, page, or any URL. Takes priority over the tagged product below."
+          "info": "Product, collection, page, or any URL. Takes priority over the tagged product and the section default."
         },
         {
           "type": "text",
           "id": "button_label",
           "label": "Button label (optional)",
-          "info": "Leave blank to use the section's default label."
+          "info": "Leave blank to use the section default label."
         },
         {
           "type": "product",
           "id": "product",
           "label": "Tagged product (fallback)",
-          "info": "Used as the button link/label only if no link is set above."
+          "info": "Used only if no link is set above."
+        },
+        {
+          "type": "checkbox",
+          "id": "hide_button",
+          "label": "Hide button on this reel",
+          "info": "Overrides everything above, including the section default — use for reels with no CTA at all.",
+          "default": false
         }
       ]
     }

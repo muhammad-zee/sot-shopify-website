@@ -38,39 +38,52 @@
     background-color: {{ section.settings.letterbox_color }};
   }
 
-  /* Media wrapper fills the card and positions its child via flexbox.
-     Flex alignment is what actually holds on mobile — it doesn't depend
-     on object-fit/object-position being respected by anything upstream. */
+  /* Media wrapper always fills the card exactly. No flex here by default —
+     flex is opt-in only for Contain mode, where centering is actually needed. */
   .reel-media-{{ section.id }} {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    display: flex !important;
-    align-items: var(--reel-align-y, center) !important;
-    justify-content: var(--reel-align-x, center) !important;
     overflow: hidden !important;
   }
 
-  /* Cover: fills the card completely, cropping as needed. Anchor point
-     (what stays in frame) follows the same alignment choice. */
+  /* --- COVER MODE ---
+     No flexbox involved at all: the video is absolutely positioned and
+     forced to 100%/100%, so it is physically impossible for it to render
+     at native resolution or overflow the card, regardless of source size. */
   .reel-video-{{ section.id }}.is-fit-cover {
+    position: absolute !important;
+    inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
     max-width: none !important;
     max-height: none !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
     object-fit: cover !important;
     object-position: var(--reel-pos-x, 50%) var(--reel-pos-y, 50%) !important;
     display: block !important;
   }
 
-  /* Contain: shows the whole video, sized to the card's width or height
-     (whichever runs out first), then pinned to the chosen edge/corner. */
+  /* --- CONTAIN MODE ---
+     Needs flex to center the smaller-than-card video, so flex is scoped
+     to only this mode. min-width/min-height: 0 is the actual fix for the
+     bug you found — it removes the browser's default "never shrink below
+     content size" behavior on flex children. */
+  .reel-media-{{ section.id }}.is-contain-mode {
+    display: flex !important;
+    align-items: var(--reel-align-y, center) !important;
+    justify-content: var(--reel-align-x, center) !important;
+  }
   .reel-video-{{ section.id }}.is-fit-contain {
     width: auto !important;
     height: auto !important;
     max-width: 100% !important;
     max-height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    flex-shrink: 1 !important;
     object-fit: contain !important;
     display: block !important;
   }
@@ -91,8 +104,6 @@
     z-index: 1;
   }
 
-  /* Always-present bottom scrim so every card carries the same weight,
-     whether or not it ends up with a button on top of it. */
   .reel-grid-card-{{ section.id }}::after {
     content: '';
     position: absolute;
@@ -195,12 +206,9 @@
               assign pos_y = '50%'
           endcase
         -%}
-        <div
-          class="reel-grid-card-{{ section.id }}"
-          {{ block.shopify_attributes }}
-        >
+        <div class="reel-grid-card-{{ section.id }}" {{ block.shopify_attributes }}>
           <div
-            class="reel-media-{{ section.id }}{% if fit == 'contain' and block.settings.blur_backdrop %} has-blur-backdrop{% endif %}"
+            class="reel-media-{{ section.id }}{% if fit == 'contain' %} is-contain-mode{% endif %}{% if fit == 'contain' and block.settings.blur_backdrop %} has-blur-backdrop{% endif %}"
             style="--reel-align-x: {{ align_x }}; --reel-align-y: {{ align_y }}; --reel-pos-x: {{ pos_x }}; --reel-pos-y: {{ pos_y }};"
           >
             {% if block.settings.video != blank %}
@@ -264,26 +272,10 @@
 {
   "name": "Reels Grid",
   "settings": [
-    {
-      "type": "header",
-      "content": "Theme Styling"
-    },
-    {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "Color scheme",
-      "default": "scheme-1"
-    },
-    {
-      "type": "header",
-      "content": "Content Settings"
-    },
-    {
-      "type": "text",
-      "id": "heading",
-      "label": "Heading",
-      "default": "Watch & Shop Our Reels"
-    },
+    { "type": "header", "content": "Theme Styling" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    { "type": "header", "content": "Content Settings" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Watch & Shop Our Reels" },
     {
       "type": "select",
       "id": "heading_alignment",
@@ -295,15 +287,12 @@
       ],
       "default": "center"
     },
-    {
-      "type": "header",
-      "content": "Video Display"
-    },
+    { "type": "header", "content": "Video Display" },
     {
       "type": "select",
       "id": "default_video_fit",
       "label": "Default video fit",
-      "info": "Cover: fills the card completely, cropping the video to match the card's shape. Contain: shows the entire video, scaled to fit the card's width or height. Each reel can override this.",
+      "info": "Cover: fills the card completely, cropping the video. Contain: shows the entire video, scaled to fit inside the card. Each reel can override this.",
       "options": [
         { "value": "cover", "label": "Cover (fill card, crop video)" },
         { "value": "contain", "label": "Contain (show full video)" }
@@ -314,7 +303,6 @@
       "type": "select",
       "id": "default_video_position",
       "label": "Default video alignment",
-      "info": "Which part of the video stays visible/anchored in the card. Each reel can override this.",
       "options": [
         { "value": "top_left", "label": "Top left" },
         { "value": "top_center", "label": "Top center" },
@@ -328,87 +316,17 @@
       ],
       "default": "center_center"
     },
-    {
-      "type": "color",
-      "id": "letterbox_color",
-      "label": "Letterbox fill color",
-      "info": "Shown behind videos in Contain mode where they don't fill the card.",
-      "default": "#000000"
-    },
-    {
-      "type": "header",
-      "content": "Default Buy Button",
-      "info": "Applied to any reel that doesn't set its own link or product, so every card in the grid looks consistent."
-    },
-    {
-      "type": "url",
-      "id": "default_button_link",
-      "label": "Default button link",
-      "info": "e.g. your 'Shop All' collection. Leave blank to allow buttonless cards."
-    },
-    {
-      "type": "text",
-      "id": "default_button_label",
-      "label": "Default button label",
-      "default": "Shop Now"
-    },
-    {
-      "type": "header",
-      "content": "Layout & Spacing"
-    },
-    {
-      "type": "range",
-      "id": "max_width",
-      "min": 800,
-      "max": 1600,
-      "step": 50,
-      "unit": "px",
-      "label": "Maximum Width",
-      "default": 1200
-    },
-    {
-      "type": "range",
-      "id": "padding_top",
-      "min": 0,
-      "max": 100,
-      "step": 4,
-      "unit": "px",
-      "label": "Top Padding",
-      "default": 40
-    },
-    {
-      "type": "range",
-      "id": "padding_bottom",
-      "min": 0,
-      "max": 100,
-      "step": 4,
-      "unit": "px",
-      "label": "Bottom Padding",
-      "default": 40
-    },
-    {
-      "type": "header",
-      "content": "Grid Columns & Gaps"
-    },
-    {
-      "type": "range",
-      "id": "columns_desktop",
-      "min": 2,
-      "max": 6,
-      "step": 1,
-      "label": "Desktop Columns",
-      "default": 4
-    },
-    {
-      "type": "range",
-      "id": "grid_gap_desktop",
-      "min": 8,
-      "max": 40,
-      "step": 2,
-      "unit": "px",
-      "label": "Desktop Grid Gap",
-      "default": 20
-    },
+    { "type": "color", "id": "letterbox_color", "label": "Letterbox fill color", "default": "#000000" },
+    { "type": "header", "content": "Default Buy Button" },
+    { "type": "url", "id": "default_button_link", "label": "Default button link" },
+    { "type": "text", "id": "default_button_label", "label": "Default button label", "default": "Shop Now" },
+    { "type": "header", "content": "Layout & Spacing" },
+    { "type": "range", "id": "max_width", "min": 800, "max": 1600, "step": 50, "unit": "px", "label": "Maximum Width", "default": 1200 },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 100, "step": 4, "unit": "px", "label": "Top Padding", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "label": "Bottom Padding", "default": 40 },
+    { "type": "header", "content": "Grid Columns & Gaps" },
+    { "type": "range", "id": "columns_desktop", "min": 2, "max": 6, "step": 1, "label": "Desktop Columns", "default": 4 },
+    { "type": "range", "id": "grid_gap_desktop", "min": 8, "max": 40, "step": 2, "unit": "px", "label": "Desktop Grid Gap", "default": 20 },
     {
       "type": "select",
       "id": "columns_mobile",
@@ -419,45 +337,17 @@
       ],
       "default": "2"
     },
-    {
-      "type": "range",
-      "id": "grid_gap_mobile",
-      "min": 4,
-      "max": 24,
-      "step": 2,
-      "unit": "px",
-      "label": "Mobile Grid Gap",
-      "default": 12
-    },
-    {
-      "type": "header",
-      "content": "Card Styling"
-    },
-    {
-      "type": "range",
-      "id": "card_corner_radius",
-      "min": 0,
-      "max": 30,
-      "step": 2,
-      "unit": "px",
-      "label": "Card Corner Radius",
-      "default": 12
-    }
+    { "type": "range", "id": "grid_gap_mobile", "min": 4, "max": 24, "step": 2, "unit": "px", "label": "Mobile Grid Gap", "default": 12 },
+    { "type": "header", "content": "Card Styling" },
+    { "type": "range", "id": "card_corner_radius", "min": 0, "max": 30, "step": 2, "unit": "px", "label": "Card Corner Radius", "default": 12 }
   ],
   "blocks": [
     {
       "type": "reel",
       "name": "Reel Video",
       "settings": [
-        {
-          "type": "video",
-          "id": "video",
-          "label": "Select Vertical MP4 Video"
-        },
-        {
-          "type": "header",
-          "content": "Video display (this reel)"
-        },
+        { "type": "video", "id": "video", "label": "Select Vertical MP4 Video" },
+        { "type": "header", "content": "Video display (this reel)" },
         {
           "type": "select",
           "id": "video_fit",
@@ -487,42 +377,12 @@
           ],
           "default": "default"
         },
-        {
-          "type": "checkbox",
-          "id": "blur_backdrop",
-          "label": "Fill letterbox with blurred video",
-          "info": "Only applies in Contain mode.",
-          "default": false
-        },
-        {
-          "type": "header",
-          "content": "Buy button"
-        },
-        {
-          "type": "url",
-          "id": "button_link",
-          "label": "Button link",
-          "info": "Product, collection, page, or any URL. Takes priority over the tagged product and the section default."
-        },
-        {
-          "type": "text",
-          "id": "button_label",
-          "label": "Button label (optional)",
-          "info": "Leave blank to use the section default label."
-        },
-        {
-          "type": "product",
-          "id": "product",
-          "label": "Tagged product (fallback)",
-          "info": "Used only if no link is set above."
-        },
-        {
-          "type": "checkbox",
-          "id": "hide_button",
-          "label": "Hide button on this reel",
-          "info": "Overrides everything above, including the section default — use for reels with no CTA at all.",
-          "default": false
-        }
+        { "type": "checkbox", "id": "blur_backdrop", "label": "Fill letterbox with blurred video", "default": false },
+        { "type": "header", "content": "Buy button" },
+        { "type": "url", "id": "button_link", "label": "Button link" },
+        { "type": "text", "id": "button_label", "label": "Button label (optional)" },
+        { "type": "product", "id": "product", "label": "Tagged product (fallback)" },
+        { "type": "checkbox", "id": "hide_button", "label": "Hide button on this reel", "default": false }
       ]
     }
   ],

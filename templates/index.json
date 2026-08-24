@@ -220,29 +220,41 @@
         "reel_fPAPeR": {
           "type": "reel",
           "settings": {
-            "video": "shopify://files/videos/file_example_MP4_480_1_5MG.mp4",
-            "product": ""
+            "video": "shopify://files/videos/WhatsApp Video 2026-08-24 at 2.19.54 PM.mp4",
+            "button_link": "shopify://products/basic-tshirt",
+            "button_label": "",
+            "product": "",
+            "hide_button": false
           }
         },
         "reel_WyUDqA": {
           "type": "reel",
           "settings": {
-            "video": "shopify://files/videos/file_example_MP4_480_1_5MG.mp4",
-            "product": ""
+            "video": "shopify://files/videos/WhatsApp Video 2026-08-24 at 2.19.54 PM (1).mp4",
+            "button_link": "",
+            "button_label": "",
+            "product": "",
+            "hide_button": false
           }
         },
         "reel_9mBQgA": {
           "type": "reel",
           "settings": {
-            "video": "shopify://files/videos/file_example_MP4_480_1_5MG.mp4",
-            "product": ""
+            "video": "shopify://files/videos/WhatsApp Video 2026-08-24 at 2.19.52 PM (1).mp4",
+            "button_link": "",
+            "button_label": "",
+            "product": "",
+            "hide_button": false
           }
         },
         "reel_YJw34M": {
           "type": "reel",
           "settings": {
-            "video": "shopify://files/videos/file_example_MP4_480_1_5MG.mp4",
-            "product": ""
+            "video": "shopify://files/videos/WhatsApp Video 2026-08-24 at 2.19.53 PM (1).mp4",
+            "button_link": "",
+            "button_label": "",
+            "product": "",
+            "hide_button": false
           }
         }
       },
@@ -257,6 +269,8 @@
         "color_scheme": "",
         "heading": "Watch & Shop Our Reels",
         "heading_alignment": "center",
+        "default_button_link": "",
+        "default_button_label": "Shop Now",
         "max_width": 1200,
         "padding_top": 40,
         "padding_bottom": 40,
@@ -264,8 +278,7 @@
         "grid_gap_desktop": 20,
         "columns_mobile": "2",
         "grid_gap_mobile": 12,
-        "card_corner_radius": 12,
-        "btn_text": ""
+        "card_corner_radius": 12
       }
     },
     "newsletter_teQRRe": {

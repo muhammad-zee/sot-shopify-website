@@ -221,7 +221,7 @@
           "type": "reel",
           "settings": {
             "video": "shopify://files/videos/WhatsApp Video 2026-08-24 at 2.19.54 PM.mp4",
-            "video_fit": "contain",
+            "video_fit": "cover",
             "blur_backdrop": true,
             "position_x": 50,
             "position_y": 50,
@@ -249,7 +249,7 @@
           "type": "reel",
           "settings": {
             "video": "shopify://files/videos/WhatsApp Video 2026-08-24 at 2.19.52 PM (1).mp4",
-            "video_fit": "contain",
+            "video_fit": "cover",
             "blur_backdrop": true,
             "position_x": 50,
             "position_y": 50,
@@ -263,10 +263,10 @@
           "type": "reel",
           "settings": {
             "video": "shopify://files/videos/WhatsApp Video 2026-08-24 at 2.19.53 PM (1).mp4",
-            "video_fit": "contain",
+            "video_fit": "cover",
             "blur_backdrop": true,
-            "position_x": 50,
-            "position_y": 50,
+            "position_x": 0,
+            "position_y": 0,
             "button_link": "",
             "button_label": "",
             "product": "",

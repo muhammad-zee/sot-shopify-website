@@ -222,7 +222,7 @@
           "settings": {
             "video": "shopify://files/videos/WhatsApp Video 2026-08-24 at 2.19.54 PM.mp4",
             "video_fit": "contain",
-            "blur_backdrop": false,
+            "blur_backdrop": true,
             "position_x": 50,
             "position_y": 50,
             "button_link": "shopify://products/basic-tshirt",
@@ -236,7 +236,7 @@
           "settings": {
             "video": "shopify://files/videos/WhatsApp Video 2026-08-24 at 2.19.54 PM (1).mp4",
             "video_fit": "contain",
-            "blur_backdrop": false,
+            "blur_backdrop": true,
             "position_x": 50,
             "position_y": 50,
             "button_link": "",
@@ -250,7 +250,7 @@
           "settings": {
             "video": "shopify://files/videos/WhatsApp Video 2026-08-24 at 2.19.52 PM (1).mp4",
             "video_fit": "contain",
-            "blur_backdrop": false,
+            "blur_backdrop": true,
             "position_x": 50,
             "position_y": 50,
             "button_link": "",
@@ -264,7 +264,7 @@
           "settings": {
             "video": "shopify://files/videos/WhatsApp Video 2026-08-24 at 2.19.53 PM (1).mp4",
             "video_fit": "contain",
-            "blur_backdrop": false,
+            "blur_backdrop": true,
             "position_x": 50,
             "position_y": 50,
             "button_link": "",

@@ -35,8 +35,8 @@
       "name": "t:sections.image-with-text.presets.name",
       "settings": {
         "image": "shopify://shop_images/bearded-young-man.jpg",
-        "full_screen": true,
-        "custom_height_mobile": 500,
+        "full_screen": false,
+        "custom_height_mobile": 660,
         "custom_height_desktop": 700,
         "content_position": "center",
         "content_alignment": "left",

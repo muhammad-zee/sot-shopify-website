@@ -166,6 +166,7 @@
         "slide_Vbbymy",
         "slide_UDdYpW"
       ],
+      "disabled": true,
       "name": "t:sections.slideshow.presets.name",
       "settings": {
         "layout": "grid",
@@ -207,6 +208,7 @@
         "product_QjWGQP",
         "collection_qn6JmJ"
       ],
+      "disabled": true,
       "name": "t:sections.collage.presets.name",
       "settings": {
         "heading": "Sale",

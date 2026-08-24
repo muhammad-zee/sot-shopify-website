@@ -221,8 +221,10 @@
           "type": "reel",
           "settings": {
             "video": "shopify://files/videos/WhatsApp Video 2026-08-24 at 2.19.54 PM.mp4",
-            "position_x": 15,
-            "position_y": 0,
+            "video_fit": "contain",
+            "blur_backdrop": false,
+            "position_x": 50,
+            "position_y": 50,
             "button_link": "shopify://products/basic-tshirt",
             "button_label": "",
             "product": "",
@@ -233,6 +235,8 @@
           "type": "reel",
           "settings": {
             "video": "shopify://files/videos/WhatsApp Video 2026-08-24 at 2.19.54 PM (1).mp4",
+            "video_fit": "contain",
+            "blur_backdrop": false,
             "position_x": 50,
             "position_y": 50,
             "button_link": "",
@@ -245,6 +249,8 @@
           "type": "reel",
           "settings": {
             "video": "shopify://files/videos/WhatsApp Video 2026-08-24 at 2.19.52 PM (1).mp4",
+            "video_fit": "contain",
+            "blur_backdrop": false,
             "position_x": 50,
             "position_y": 50,
             "button_link": "",
@@ -257,6 +263,8 @@
           "type": "reel",
           "settings": {
             "video": "shopify://files/videos/WhatsApp Video 2026-08-24 at 2.19.53 PM (1).mp4",
+            "video_fit": "default",
+            "blur_backdrop": false,
             "position_x": 50,
             "position_y": 50,
             "button_link": "",
@@ -277,6 +285,8 @@
         "color_scheme": "",
         "heading": "Watch & Shop Our Reels",
         "heading_alignment": "center",
+        "default_video_fit": "cover",
+        "letterbox_color": "#000000",
         "default_button_link": "",
         "default_button_label": "Shop Now",
         "max_width": 1200,

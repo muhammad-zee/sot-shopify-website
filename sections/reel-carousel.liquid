@@ -1,0 +1,775 @@
+{%- liquid
+  assign gap_desktop = section.settings.gap_desktop
+  assign gap_mobile = section.settings.gap_mobile
+-%}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  .reel-carousel-wrapper-{{ section.id }} {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .reel-carousel-header-{{ section.id }} {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .reel-carousel-title-{{ section.id }} {
+    margin: 0;
+    text-align: {{ section.settings.heading_alignment }};
+    color: rgb(var(--color-foreground));
+    flex: 1 1 auto;
+  }
+
+  /* --- TRACK ---
+     Native horizontal scrolling with snap points. No JS is required to
+     scroll it; the arrow buttons below are a progressive enhancement. */
+  .reel-carousel-track-{{ section.id }} {
+    --reel-cards: {{ section.settings.cards_mobile }};
+    --reel-gap: {{ gap_mobile }}px;
+
+    display: flex;
+    gap: var(--reel-gap);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: {% if section.settings.hide_scrollbar %}0{% else %}12px{% endif %};
+  }
+
+  {%- if section.settings.hide_scrollbar -%}
+    .reel-carousel-track-{{ section.id }} {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .reel-carousel-track-{{ section.id }}::-webkit-scrollbar {
+      display: none;
+    }
+  {%- endif -%}
+
+  @media screen and (min-width: 750px) {
+    .reel-carousel-track-{{ section.id }} {
+      --reel-cards: {{ section.settings.cards_desktop }};
+      --reel-gap: {{ gap_desktop }}px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reel-carousel-track-{{ section.id }} {
+      scroll-behavior: auto;
+    }
+  }
+
+  /* Fractional card counts (e.g. 1.5) leave the next card peeking, which is
+     what signals "this scrolls" without needing an arrow. */
+  .reel-carousel-card-{{ section.id }} {
+    flex: 0 0 calc((100% - (var(--reel-cards) - 1) * var(--reel-gap)) / var(--reel-cards));
+    scroll-snap-align: start;
+    position: relative;
+    aspect-ratio: 9 / 16;
+    border-radius: {{ section.settings.card_corner_radius }}px;
+    overflow: hidden;
+    background-color: {{ section.settings.letterbox_color }};
+  }
+
+  /* Media wrapper always fills the card exactly. Flex is opt-in for Contain
+     mode only, where centering is actually needed. */
+  .reel-media-{{ section.id }} {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  /* Safety net: whatever markup video_tag emits, any media inside the wrapper
+     is forced to the card box. Prevents native-resolution overflow. */
+  .reel-media-{{ section.id }} > video,
+  .reel-media-{{ section.id }} > img,
+  .reel-media-{{ section.id }} > div,
+  .reel-media-{{ section.id }} > div > video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+  }
+
+  .reel-video-{{ section.id }}.is-fit-cover {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    object-fit: cover !important;
+    object-position: var(--reel-pos-x, 50%) var(--reel-pos-y, 50%) !important;
+    display: block !important;
+  }
+
+  .reel-media-{{ section.id }}.is-contain-mode {
+    display: flex !important;
+    align-items: var(--reel-align-y, center) !important;
+    justify-content: var(--reel-align-x, center) !important;
+  }
+
+  .reel-video-{{ section.id }}.is-fit-contain {
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    flex-shrink: 1 !important;
+    object-fit: contain !important;
+    display: block !important;
+  }
+
+  .reel-video-backdrop-{{ section.id }} {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    filter: blur(24px) brightness(0.6);
+    transform: scale(1.15);
+    z-index: 0;
+  }
+
+  .reel-media-{{ section.id }}.has-blur-backdrop .reel-video-{{ section.id }}.is-fit-contain {
+    position: relative;
+    z-index: 1;
+  }
+
+  .reel-carousel-card-{{ section.id }}::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 46%;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.55) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .reel-product-overlay-{{ section.id }} {
+    position: absolute;
+    z-index: 3;
+    bottom: 12px;
+    left: 10px;
+    right: 10px;
+    background-color: rgb(var(--color-button));
+    color: rgb(var(--color-button-text));
+    padding: 8px 12px;
+    border-radius: 20px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  .reel-product-overlay-{{ section.id }}:hover {
+    transform: scale(1.03);
+  }
+
+  /* --- ARROWS ---
+     Hidden until JS confirms it can drive them, so no-JS visitors are not
+     shown controls that do nothing. Native scrolling still works for them. */
+  .reel-carousel-buttons-{{ section.id }} {
+    display: none;
+    gap: 8px;
+    flex: 0 0 auto;
+  }
+
+  .reel-carousel-buttons-{{ section.id }}.is-enabled {
+    display: flex;
+  }
+
+  .reel-carousel-button-{{ section.id }} {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(var(--color-foreground), 0.35);
+    border-radius: 50%;
+    background-color: transparent;
+    color: rgb(var(--color-foreground));
+    cursor: pointer;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+  }
+
+  .reel-carousel-button-{{ section.id }}:hover:not([disabled]) {
+    background-color: rgba(var(--color-foreground), 0.08);
+  }
+
+  .reel-carousel-button-{{ section.id }}[disabled] {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  .reel-carousel-button-{{ section.id }} svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+  }
+
+  .reel-carousel-button-{{ section.id }}--prev svg {
+    transform: rotate(90deg);
+  }
+
+  .reel-carousel-button-{{ section.id }}--next svg {
+    transform: rotate(-90deg);
+  }
+{%- endstyle -%}
+
+<div class="color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding">
+  <div class="reel-carousel-wrapper-{{ section.id }}">
+    {%- if section.settings.heading != blank or section.settings.show_arrows -%}
+      <div class="reel-carousel-header-{{ section.id }}">
+        {%- if section.settings.heading != blank -%}
+          <h2 class="reel-carousel-title-{{ section.id }}">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+
+        {%- if section.settings.show_arrows -%}
+          <div class="reel-carousel-buttons-{{ section.id }}" data-reel-carousel-buttons>
+            <button
+              type="button"
+              class="reel-carousel-button-{{ section.id }} reel-carousel-button-{{ section.id }}--prev"
+              data-reel-prev
+              aria-controls="ReelCarousel-{{ section.id }}"
+              aria-label="{{ 'general.slider.previous_slide' | t }}"
+            >
+              {% render 'icon-caret' %}
+            </button>
+            <button
+              type="button"
+              class="reel-carousel-button-{{ section.id }} reel-carousel-button-{{ section.id }}--next"
+              data-reel-next
+              aria-controls="ReelCarousel-{{ section.id }}"
+              aria-label="{{ 'general.slider.next_slide' | t }}"
+            >
+              {% render 'icon-caret' %}
+            </button>
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%}
+      role="region" + tabindex makes the overflow container reachable and
+      scrollable by keyboard, which a bare div with overflow-x is not.
+    {%- endcomment -%}
+    <div
+      class="reel-carousel-track-{{ section.id }}"
+      id="ReelCarousel-{{ section.id }}"
+      role="region"
+      tabindex="0"
+      aria-label="{{ section.settings.heading | default: 'Reels' | strip_html | escape }}"
+    >
+      {% for block in section.blocks %}
+        {%- liquid
+          assign fit = block.settings.video_fit
+          if fit == 'default'
+            assign fit = section.settings.default_video_fit
+          endif
+
+          assign position = block.settings.video_position
+          if position == 'default'
+            assign position = section.settings.default_video_position
+          endif
+
+          assign video_class = 'reel-video-' | append: section.id | append: ' is-fit-' | append: fit
+          assign backdrop_class = 'reel-video-backdrop-' | append: section.id
+
+          case position
+            when 'top_left'
+              assign align_x = 'flex-start'
+              assign align_y = 'flex-start'
+              assign pos_x = '0%'
+              assign pos_y = '0%'
+            when 'top_center'
+              assign align_x = 'center'
+              assign align_y = 'flex-start'
+              assign pos_x = '50%'
+              assign pos_y = '0%'
+            when 'top_right'
+              assign align_x = 'flex-end'
+              assign align_y = 'flex-start'
+              assign pos_x = '100%'
+              assign pos_y = '0%'
+            when 'center_left'
+              assign align_x = 'flex-start'
+              assign align_y = 'center'
+              assign pos_x = '0%'
+              assign pos_y = '50%'
+            when 'center_right'
+              assign align_x = 'flex-end'
+              assign align_y = 'center'
+              assign pos_x = '100%'
+              assign pos_y = '50%'
+            when 'bottom_left'
+              assign align_x = 'flex-start'
+              assign align_y = 'flex-end'
+              assign pos_x = '0%'
+              assign pos_y = '100%'
+            when 'bottom_center'
+              assign align_x = 'center'
+              assign align_y = 'flex-end'
+              assign pos_x = '50%'
+              assign pos_y = '100%'
+            when 'bottom_right'
+              assign align_x = 'flex-end'
+              assign align_y = 'flex-end'
+              assign pos_x = '100%'
+              assign pos_y = '100%'
+            else
+              assign align_x = 'center'
+              assign align_y = 'center'
+              assign pos_x = '50%'
+              assign pos_y = '50%'
+          endcase
+        -%}
+        <div
+          class="reel-carousel-card-{{ section.id }}"
+          {%- if block.settings.video_title != blank %}
+            role="group"
+            aria-label="{{ block.settings.video_title | strip_html | escape }}"
+          {%- endif %}
+          {{ block.shopify_attributes }}
+        >
+          <div
+            class="reel-media-{{ section.id }}{% if fit == 'contain' %} is-contain-mode{% endif %}{% if fit == 'contain' and block.settings.blur_backdrop %} has-blur-backdrop{% endif %}"
+            style="--reel-align-x: {{ align_x }}; --reel-align-y: {{ align_y }}; --reel-pos-x: {{ pos_x }}; --reel-pos-y: {{ pos_y }};"
+          >
+            {% if block.settings.video != blank %}
+              {% if fit == 'contain' and block.settings.blur_backdrop %}
+                {{
+                  block.settings.video
+                  | video_tag: autoplay: false, loop: true, muted: true, playsinline: true, controls: false, class: backdrop_class
+                }}
+              {% endif %}
+              {{
+                block.settings.video
+                | video_tag:
+                  autoplay: false,
+                  loop: true,
+                  muted: true,
+                  playsinline: true,
+                  controls: false,
+                  class: video_class
+              }}
+            {% endif %}
+          </div>
+
+          {%- liquid
+            assign buy_url = blank
+            assign buy_label = blank
+
+            unless block.settings.hide_button
+              if block.settings.button_link != blank
+                assign buy_url = block.settings.button_link
+              elsif block.settings.product != blank
+                assign buy_url = block.settings.product.url
+              elsif section.settings.default_button_link != blank
+                assign buy_url = section.settings.default_button_link
+              endif
+
+              if buy_url != blank
+                if block.settings.button_label != blank
+                  assign buy_label = block.settings.button_label
+                elsif block.settings.product != blank and block.settings.button_link == blank
+                  assign buy_label = 'Shop ' | append: block.settings.product.title
+                elsif section.settings.default_button_label != blank
+                  assign buy_label = section.settings.default_button_label
+                else
+                  assign buy_label = 'Shop Now'
+                endif
+              endif
+            endunless
+          -%}
+
+          {% if buy_url != blank %}
+            <a href="{{ buy_url }}" class="reel-product-overlay-{{ section.id }}">
+              <span>{{ buy_label }}</span>
+            </a>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var track = document.getElementById('ReelCarousel-{{ section.id }}');
+    if (!track) return;
+
+    var buttons = document.querySelector(
+      '.reel-carousel-wrapper-{{ section.id }} [data-reel-carousel-buttons]'
+    );
+    var prev = buttons && buttons.querySelector('[data-reel-prev]');
+    var next = buttons && buttons.querySelector('[data-reel-next]');
+
+    // --- Arrow controls -------------------------------------------------
+    // Only revealed once JS is running, so no-JS visitors never see dead
+    // controls. Native scroll and swipe work regardless.
+    if (buttons && prev && next) {
+      buttons.classList.add('is-enabled');
+
+      var step = function () {
+        var card = track.querySelector('.reel-carousel-card-{{ section.id }}');
+        if (!card) return track.clientWidth;
+        var styles = window.getComputedStyle(track);
+        var gap = parseFloat(styles.columnGap || styles.gap) || 0;
+        return card.getBoundingClientRect().width + gap;
+      };
+
+      prev.addEventListener('click', function () {
+        track.scrollBy({ left: -step(), behavior: 'smooth' });
+      });
+
+      next.addEventListener('click', function () {
+        track.scrollBy({ left: step(), behavior: 'smooth' });
+      });
+
+      var syncButtons = function () {
+        // 2px of slack absorbs sub-pixel rounding at the scroll extremes.
+        var maxScroll = track.scrollWidth - track.clientWidth;
+        prev.disabled = track.scrollLeft <= 2;
+        next.disabled = track.scrollLeft >= maxScroll - 2;
+      };
+
+      track.addEventListener('scroll', syncButtons, { passive: true });
+      window.addEventListener('resize', syncButtons);
+      syncButtons();
+    }
+
+    // --- Lazy playback --------------------------------------------------
+    var videos = track.querySelectorAll('video');
+    if (!videos.length) return;
+
+    videos.forEach(function (video) {
+      video.preload = 'none';
+      video.muted = true;
+      video.setAttribute('muted', '');
+      video.playsInline = true;
+    });
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    if (!('IntersectionObserver' in window)) {
+      videos.forEach(function (video) {
+        video.preload = 'metadata';
+        var attempt = video.play();
+        if (attempt && attempt.catch) attempt.catch(function () {});
+      });
+      return;
+    }
+
+    // root: track means "visible within the carousel viewport", so cards
+    // scrolled off to the side stop playing even though the section itself
+    // is still on screen.
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          var video = entry.target;
+          if (entry.isIntersecting) {
+            if (video.preload !== 'auto') video.preload = 'auto';
+            var attempt = video.play();
+            if (attempt && attempt.catch) attempt.catch(function () {});
+          } else if (!video.paused) {
+            video.pause();
+          }
+        });
+      },
+      { root: track, threshold: 0.4 }
+    );
+
+    videos.forEach(function (video) {
+      observer.observe(video);
+    });
+  })();
+</script>
+
+{%- comment -%}
+  One VideoObject per reel. Skipped per block unless the block supplies the
+  four properties Google requires, so an incompletely configured reel simply
+  contributes no markup rather than invalid markup.
+{%- endcomment -%}
+{%- if section.settings.enable_video_schema and section.settings.videos_upload_date != blank -%}
+  {%- for block in section.blocks -%}
+    {%- liquid
+      assign reel_name = block.settings.video_title | strip_html | strip_newlines | strip
+      assign reel_desc = block.settings.video_description | strip_html | strip_newlines | strip
+      assign reel_thumb = block.settings.video.preview_image
+
+      assign reel_ready = false
+      if block.settings.video != blank and reel_thumb != blank
+        if reel_name != blank and reel_desc != blank
+          assign reel_ready = true
+        endif
+      endif
+    -%}
+    {%- if reel_ready -%}
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "VideoObject",
+          "name": {{ reel_name | json }},
+          "description": {{ reel_desc | json }},
+          "thumbnailUrl": [{{ reel_thumb | image_url: width: 1080 | prepend: 'https:' | json }}],
+          "uploadDate": {{ section.settings.videos_upload_date | json }}
+          {%- for source in block.settings.video.sources -%}
+            {%- if source.format == 'mp4' -%}
+              ,"contentUrl": {{ source.url | json }}
+              {%- break -%}
+            {%- endif -%}
+          {%- endfor -%}
+        }
+      </script>
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Reels Carousel",
+  "tag": "section",
+  "settings": [
+    { "type": "header", "content": "Theme Styling" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    { "type": "header", "content": "Content Settings" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Watch & Shop Our Reels" },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    { "type": "header", "content": "Carousel" },
+    {
+      "type": "select",
+      "id": "cards_desktop",
+      "label": "Cards visible on desktop",
+      "info": "Half values leave the next reel peeking, which signals the row scrolls.",
+      "options": [
+        { "value": "3", "label": "3" },
+        { "value": "3.5", "label": "3.5 (peek)" },
+        { "value": "4", "label": "4" },
+        { "value": "4.5", "label": "4.5 (peek)" },
+        { "value": "5", "label": "5" },
+        { "value": "6", "label": "6" }
+      ],
+      "default": "4.5"
+    },
+    {
+      "type": "select",
+      "id": "cards_mobile",
+      "label": "Cards visible on mobile",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "1.2", "label": "1.2 (peek)" },
+        { "value": "1.5", "label": "1.5 (peek)" },
+        { "value": "2", "label": "2" },
+        { "value": "2.5", "label": "2.5 (peek)" }
+      ],
+      "default": "1.5"
+    },
+    { "type": "checkbox", "id": "show_arrows", "label": "Show arrow buttons", "default": true },
+    { "type": "checkbox", "id": "hide_scrollbar", "label": "Hide scrollbar", "default": true },
+    {
+      "type": "range",
+      "id": "gap_desktop",
+      "min": 8,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Desktop gap",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "gap_mobile",
+      "min": 4,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "Mobile gap",
+      "default": 12
+    },
+    { "type": "header", "content": "Video Display" },
+    {
+      "type": "select",
+      "id": "default_video_fit",
+      "label": "Default video fit",
+      "info": "Cover: fills the card completely, cropping the video. Contain: shows the entire video, scaled to fit inside the card. Each reel can override this.",
+      "options": [
+        { "value": "cover", "label": "Cover (fill card, crop video)" },
+        { "value": "contain", "label": "Contain (show full video)" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "default_video_position",
+      "label": "Default video alignment",
+      "options": [
+        { "value": "top_left", "label": "Top left" },
+        { "value": "top_center", "label": "Top center" },
+        { "value": "top_right", "label": "Top right" },
+        { "value": "center_left", "label": "Middle left" },
+        { "value": "center_center", "label": "Middle center" },
+        { "value": "center_right", "label": "Middle right" },
+        { "value": "bottom_left", "label": "Bottom left" },
+        { "value": "bottom_center", "label": "Bottom center" },
+        { "value": "bottom_right", "label": "Bottom right" }
+      ],
+      "default": "center_center"
+    },
+    { "type": "color", "id": "letterbox_color", "label": "Letterbox fill color", "default": "#000000" },
+    { "type": "header", "content": "Default Buy Button" },
+    { "type": "url", "id": "default_button_link", "label": "Default button link" },
+    { "type": "text", "id": "default_button_label", "label": "Default button label", "default": "Shop Now" },
+    { "type": "header", "content": "Video SEO (structured data)" },
+    {
+      "type": "checkbox",
+      "id": "enable_video_schema",
+      "label": "Add VideoObject structured data",
+      "info": "Each reel needs a title and description below to be included.",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "videos_upload_date",
+      "label": "Videos upload date",
+      "info": "ISO 8601 format, e.g. 2026-08-24. Required by Google for video rich results."
+    },
+    { "type": "header", "content": "Layout & Spacing" },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Maximum Width",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 40
+    },
+    { "type": "header", "content": "Card Styling" },
+    {
+      "type": "range",
+      "id": "card_corner_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Card Corner Radius",
+      "default": 12
+    }
+  ],
+  "blocks": [
+    {
+      "type": "reel",
+      "name": "Reel Video",
+      "settings": [
+        { "type": "video", "id": "video", "label": "Select Vertical MP4 Video" },
+        { "type": "header", "content": "Video display (this reel)" },
+        {
+          "type": "select",
+          "id": "video_fit",
+          "label": "Fit",
+          "options": [
+            { "value": "default", "label": "Use section default" },
+            { "value": "cover", "label": "Cover (fill card, crop video)" },
+            { "value": "contain", "label": "Contain (show full video)" }
+          ],
+          "default": "default"
+        },
+        {
+          "type": "select",
+          "id": "video_position",
+          "label": "Alignment",
+          "options": [
+            { "value": "default", "label": "Use section default" },
+            { "value": "top_left", "label": "Top left" },
+            { "value": "top_center", "label": "Top center" },
+            { "value": "top_right", "label": "Top right" },
+            { "value": "center_left", "label": "Middle left" },
+            { "value": "center_center", "label": "Middle center" },
+            { "value": "center_right", "label": "Middle right" },
+            { "value": "bottom_left", "label": "Bottom left" },
+            { "value": "bottom_center", "label": "Bottom center" },
+            { "value": "bottom_right", "label": "Bottom right" }
+          ],
+          "default": "default"
+        },
+        { "type": "checkbox", "id": "blur_backdrop", "label": "Fill letterbox with blurred video", "default": false },
+        { "type": "header", "content": "Video SEO" },
+        { "type": "text", "id": "video_title", "label": "Video title" },
+        { "type": "textarea", "id": "video_description", "label": "Video description" },
+        { "type": "header", "content": "Buy button" },
+        { "type": "url", "id": "button_link", "label": "Button link" },
+        { "type": "text", "id": "button_label", "label": "Button label (optional)" },
+        { "type": "product", "id": "product", "label": "Tagged product (fallback)" },
+        { "type": "checkbox", "id": "hide_button", "label": "Hide button on this reel", "default": false }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Reels Carousel",
+      "blocks": [
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -504,7 +504,7 @@
         "width_mode": "contained",
         "edge_padding_desktop": 56,
         "edge_padding_mobile": 15,
-        "max_width": 1600,
+        "max_width": 1550,
         "padding_top": 40,
         "padding_bottom": 40,
         "card_corner_radius": 12

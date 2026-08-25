@@ -501,10 +501,10 @@
         "default_button_label": "Shop Now",
         "enable_video_schema": false,
         "videos_upload_date": "",
-        "width_mode": "full_width",
+        "width_mode": "contained",
         "edge_padding_desktop": 20,
         "edge_padding_mobile": 15,
-        "max_width": 1500,
+        "max_width": 1200,
         "padding_top": 40,
         "padding_bottom": 40,
         "card_corner_radius": 12

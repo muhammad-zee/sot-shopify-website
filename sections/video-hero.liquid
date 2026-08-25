@@ -4,6 +4,11 @@
     assign has_video = true
   endif
 
+  assign heading_tag = section.settings.heading_tag | default: 'h2'
+  unless heading_tag == 'h1' or heading_tag == 'h2' or heading_tag == 'h3'
+    assign heading_tag = 'h2'
+  endunless
+
   assign video_class = 'video-hero__video-' | append: section.id
   assign overlay_opacity = section.settings.overlay_opacity | divided_by: 100.0
 -%}
@@ -220,9 +225,9 @@
 
   <div class="video-hero__content-{{ section.id }}">
     {%- if section.settings.heading != blank -%}
-      <h2 class="video-hero__heading-{{ section.id }} inline-richtext {{ section.settings.heading_size }}">
+      <{{ heading_tag }} class="video-hero__heading-{{ section.id }} inline-richtext {{ section.settings.heading_size }}">
         {{ section.settings.heading }}
-      </h2>
+      </{{ heading_tag }}>
     {%- endif -%}
 
     {%- if section.settings.text != blank -%}
@@ -245,6 +250,66 @@
     {%- endif -%}
   </div>
 </div>
+
+{%- comment -%}
+  VideoObject structured data. Google requires name, description, thumbnailUrl
+  and uploadDate for video rich results, so this only renders when all four are
+  actually available — partial markup fails validation rather than helping.
+{%- endcomment -%}
+{%- liquid
+  assign schema_thumb = section.settings.fallback_image | default: section.settings.video.preview_image
+  assign schema_name = section.settings.heading | strip_html | strip_newlines | strip
+  assign schema_desc = section.settings.video_description | default: section.settings.text
+  assign schema_desc = schema_desc | strip_html | strip_newlines | strip
+
+  assign schema_ready = false
+  if section.settings.enable_video_schema and schema_thumb != blank
+    if schema_name != blank and schema_desc != blank
+      if section.settings.video_upload_date != blank
+        assign schema_ready = true
+      endif
+    endif
+  endif
+-%}
+{%- if schema_ready -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoObject",
+      "name": {{ schema_name | json }},
+      "description": {{ schema_desc | json }},
+      "thumbnailUrl": [{{ schema_thumb | image_url: width: 1920 | prepend: 'https:' | json }}],
+      "uploadDate": {{ section.settings.video_upload_date | json }}
+      {%- if section.settings.video != blank -%}
+        {%- for source in section.settings.video.sources -%}
+          {%- if source.format == 'mp4' -%}
+            ,"contentUrl": {{ source.url | json }}
+            {%- break -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- elsif section.settings.video_url != blank -%}
+        ,"contentUrl": {{ section.settings.video_url | json }}
+      {%- endif %}
+    }
+  </script>
+{%- endif -%}
+
+<script>
+  (function () {
+    // The CSS hides the video under reduced motion; this also stops it
+    // downloading and decoding a file the visitor will never see.
+    var hero = document.querySelector('.video-hero-{{ section.id }}');
+    if (!hero) return;
+    var video = hero.querySelector('video');
+    if (!video) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      video.autoplay = false;
+      video.preload = 'none';
+      video.removeAttribute('autoplay');
+      video.pause();
+    }
+  })();
+</script>
 
 {% schema %}
 {
@@ -315,6 +380,18 @@
     { "type": "inline_richtext", "id": "heading", "label": "Heading", "default": "Built for the ride ahead" },
     {
       "type": "select",
+      "id": "heading_tag",
+      "label": "Heading HTML tag",
+      "info": "Use H1 only if this is the first section on the page and no other section uses H1. One H1 per page.",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "select",
       "id": "heading_size",
       "label": "Heading size",
       "options": [
@@ -342,6 +419,26 @@
       "default": 16
     },
     { "type": "color", "id": "text_color", "label": "Text color", "default": "#FFFFFF" },
+    { "type": "header", "content": "Video SEO (structured data)" },
+    {
+      "type": "checkbox",
+      "id": "enable_video_schema",
+      "label": "Add VideoObject structured data",
+      "info": "Makes the video eligible for video rich results. Needs a fallback image, a heading, a description and an upload date — the markup is skipped unless all four are set.",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "video_upload_date",
+      "label": "Video upload date",
+      "info": "ISO 8601 format, e.g. 2026-08-24. Required by Google for video rich results."
+    },
+    {
+      "type": "textarea",
+      "id": "video_description",
+      "label": "Video description for search engines",
+      "info": "Optional. Falls back to the Text field above when empty."
+    },
     { "type": "header", "content": "Outline button" },
     { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop the collection" },
     { "type": "url", "id": "button_link", "label": "Button link" },

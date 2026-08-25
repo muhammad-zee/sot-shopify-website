@@ -232,13 +232,13 @@
               {% if fit == 'contain' and block.settings.blur_backdrop %}
                 {{
                   block.settings.video
-                  | video_tag: autoplay: true, loop: true, muted: true, playsinline: true, controls: false, class: backdrop_class
+                  | video_tag: autoplay: false, loop: true, muted: true, playsinline: true, controls: false, class: backdrop_class
                 }}
               {% endif %}
               {{
                 block.settings.video
                 | video_tag:
-                  autoplay: true,
+                  autoplay: false,
                   loop: true,
                   muted: true,
                   playsinline: true,
@@ -285,6 +285,98 @@
     </div>
   </div>
 </div>
+
+<script>
+  (function () {
+    var root = document.querySelector('.reel-grid-{{ section.id }}');
+    if (!root) return;
+
+    var videos = root.querySelectorAll('video');
+    if (!videos.length) return;
+
+    // Nothing above the fold needs these bytes. Hold the network until the
+    // card is actually near the viewport.
+    videos.forEach(function (video) {
+      video.preload = 'none';
+      video.muted = true;
+      video.setAttribute('muted', '');
+      video.playsInline = true;
+    });
+
+    // Reduced motion: leave the poster frame in place and never play.
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (reduceMotion.matches) return;
+
+    if (!('IntersectionObserver' in window)) {
+      videos.forEach(function (video) {
+        video.preload = 'metadata';
+        video.play().catch(function () {});
+      });
+      return;
+    }
+
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          var video = entry.target;
+          if (entry.isIntersecting) {
+            if (video.preload !== 'auto') video.preload = 'auto';
+            // Muted + playsinline, so this is allowed without a user gesture.
+            var attempt = video.play();
+            if (attempt && attempt.catch) attempt.catch(function () {});
+          } else if (!video.paused) {
+            video.pause();
+          }
+        });
+      },
+      { rootMargin: '200px 0px', threshold: 0.25 }
+    );
+
+    videos.forEach(function (video) {
+      observer.observe(video);
+    });
+  })();
+</script>
+
+{%- comment -%}
+  One VideoObject per reel. Skipped per block unless the block supplies the
+  four properties Google requires, so an incompletely configured reel simply
+  contributes no markup rather than invalid markup.
+{%- endcomment -%}
+{%- if section.settings.enable_video_schema and section.settings.videos_upload_date != blank -%}
+  {%- for block in section.blocks -%}
+    {%- liquid
+      assign reel_name = block.settings.video_title | strip_html | strip_newlines | strip
+      assign reel_desc = block.settings.video_description | strip_html | strip_newlines | strip
+      assign reel_thumb = block.settings.video.preview_image
+
+      assign reel_ready = false
+      if block.settings.video != blank and reel_thumb != blank
+        if reel_name != blank and reel_desc != blank
+          assign reel_ready = true
+        endif
+      endif
+    -%}
+    {%- if reel_ready -%}
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "VideoObject",
+          "name": {{ reel_name | json }},
+          "description": {{ reel_desc | json }},
+          "thumbnailUrl": [{{ reel_thumb | image_url: width: 1080 | prepend: 'https:' | json }}],
+          "uploadDate": {{ section.settings.videos_upload_date | json }}
+          {%- for source in block.settings.video.sources -%}
+            {%- if source.format == 'mp4' -%}
+              ,"contentUrl": {{ source.url | json }}
+              {%- break -%}
+            {%- endif -%}
+          {%- endfor -%}
+        }
+      </script>
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
 
 {% schema %}
 {
@@ -356,6 +448,20 @@
       "default": "2"
     },
     { "type": "range", "id": "grid_gap_mobile", "min": 4, "max": 24, "step": 2, "unit": "px", "label": "Mobile Grid Gap", "default": 12 },
+    { "type": "header", "content": "Video SEO (structured data)" },
+    {
+      "type": "checkbox",
+      "id": "enable_video_schema",
+      "label": "Add VideoObject structured data",
+      "info": "Each reel needs a title and description below to be included.",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "videos_upload_date",
+      "label": "Videos upload date",
+      "info": "ISO 8601 format, e.g. 2026-08-24. Required by Google for video rich results."
+    },
     { "type": "header", "content": "Card Styling" },
     { "type": "range", "id": "card_corner_radius", "min": 0, "max": 30, "step": 2, "unit": "px", "label": "Card Corner Radius", "default": 12 }
   ],
@@ -396,6 +502,9 @@
           "default": "default"
         },
         { "type": "checkbox", "id": "blur_backdrop", "label": "Fill letterbox with blurred video", "default": false },
+        { "type": "header", "content": "Video SEO" },
+        { "type": "text", "id": "video_title", "label": "Video title" },
+        { "type": "textarea", "id": "video_description", "label": "Video description" },
         { "type": "header", "content": "Buy button" },
         { "type": "url", "id": "button_link", "label": "Button link" },
         { "type": "text", "id": "button_label", "label": "Button label (optional)" },

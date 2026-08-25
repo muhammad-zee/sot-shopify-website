@@ -9,11 +9,44 @@
     padding-bottom: {{ section.settings.padding_bottom }}px;
   }
 
+  /* --- WIDTH MODES ---
+     contained: sits inside the theme's normal centered column.
+     full_width: fills whatever parent the section renders in (edge-to-edge
+       only if that parent already is — matches Dawn's default section
+       behavior, no extra CSS trick needed).
+     screen_width: true 100vw breakout regardless of parent padding/margins,
+       using the standard left:50%/margin-left:-50vw technique. Needed when
+       the theme wraps sections in a padded/contained layout container. */
   .reel-carousel-wrapper-{{ section.id }} {
+    padding-left: {{ section.settings.edge_padding_mobile }}px;
+    padding-right: {{ section.settings.edge_padding_mobile }}px;
+  }
+
+  .reel-carousel-wrapper-{{ section.id }}.width-contained {
     max-width: {{ section.settings.max_width }}px;
-    margin: 0 auto;
-    padding-left: 15px;
-    padding-right: 15px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .reel-carousel-wrapper-{{ section.id }}.width-full {
+    max-width: 100%;
+  }
+
+  .reel-carousel-wrapper-{{ section.id }}.width-screen {
+    width: 100vw;
+    max-width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+  }
+
+  @media screen and (min-width: 750px) {
+    .reel-carousel-wrapper-{{ section.id }} {
+      padding-left: {{ section.settings.edge_padding_desktop }}px;
+      padding-right: {{ section.settings.edge_padding_desktop }}px;
+    }
   }
 
   .reel-carousel-header-{{ section.id }} {
@@ -39,6 +72,7 @@
     --reel-gap: {{ gap_mobile }}px;
 
     display: flex;
+    justify-content: flex-start;
     gap: var(--reel-gap);
     overflow-x: auto;
     overscroll-behavior-x: contain;
@@ -46,6 +80,12 @@
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     padding-bottom: {% if section.settings.hide_scrollbar %}0{% else %}12px{% endif %};
+  }
+
+  /* Applied by JS only when the row's cards don't fill the container, so a
+     short set of reels sits centered instead of stranded on the left. */
+  .reel-carousel-track-{{ section.id }}.is-centered {
+    justify-content: center;
   }
 
   {%- if section.settings.hide_scrollbar -%}
@@ -81,6 +121,13 @@
     border-radius: {{ section.settings.card_corner_radius }}px;
     overflow: hidden;
     background-color: {{ section.settings.letterbox_color }};
+  }
+
+  /* When the track is centered (content narrower than the container),
+     snap-align start would still yank the first card leftward on load.
+     Center alignment is more correct once the row isn't actually scrolling. */
+  .reel-carousel-track-{{ section.id }}.is-centered .reel-carousel-card-{{ section.id }} {
+    scroll-snap-align: center;
   }
 
   /* Media wrapper always fills the card exactly. Flex is opt-in for Contain
@@ -326,7 +373,7 @@
 {%- endstyle -%}
 
 <div class="color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding">
-  <div class="reel-carousel-wrapper-{{ section.id }}">
+  <div class="reel-carousel-wrapper-{{ section.id }} width-{% if section.settings.width_mode == 'contained' %}contained{% elsif section.settings.width_mode == 'full_width' %}full{% else %}screen{% endif %}">
     {%- if section.settings.heading != blank or section.settings.show_arrows -%}
       <div class="reel-carousel-header-{{ section.id }}">
         {%- if section.settings.heading != blank -%}
@@ -554,6 +601,12 @@
 
     function maxScroll() {
       return track.scrollWidth - track.clientWidth;
+    }
+
+    // Centers the row instead of stranding a short set of cards on the
+    // left when they don't fill the container's width.
+    function syncCentering() {
+      track.classList.toggle('is-centered', maxScroll() <= SLACK);
     }
 
     // --- Scroll stops ---------------------------------------------------
@@ -790,6 +843,7 @@
     );
 
     window.addEventListener('resize', function () {
+      syncCentering();
       canAutoplay = autoplayOn && !reduceMotion.matches && maxScroll() > SLACK;
       buildDots();
       syncUi();
@@ -797,6 +851,7 @@
       else if (!userPaused) play();
     });
 
+    syncCentering();
     buildDots();
     syncUi();
     play();
@@ -996,6 +1051,39 @@
     },
     { "type": "header", "content": "Layout & Spacing" },
     {
+      "type": "select",
+      "id": "width_mode",
+      "label": "Width",
+      "info": "Contained: sits inside the theme's normal centered column. Full width: fills the section's own container. Screen width: breaks out to the true edge of the browser window, even if the theme normally centers sections.",
+      "options": [
+        { "value": "contained", "label": "Contained (centered column)" },
+        { "value": "full_width", "label": "Full width (section container)" },
+        { "value": "screen_width", "label": "Screen width (edge to edge)" }
+      ],
+      "default": "screen_width"
+    },
+    {
+      "type": "range",
+      "id": "edge_padding_desktop",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Edge spacing (desktop)",
+      "info": "Space kept clear on the left and right in Full width / Screen width modes.",
+      "default": 24
+    },
+  {
+  "type": "range",
+  "id": "edge_padding_mobile",
+  "min": 0,
+  "max": 60,
+  "step": 5,
+  "unit": "px",
+  "label": "Edge spacing (mobile)",
+  "default": 15
+},
+    {
       "type": "range",
       "id": "max_width",
       "min": 800,
@@ -1003,6 +1091,7 @@
       "step": 50,
       "unit": "px",
       "label": "Maximum Width",
+      "info": "Only applies in Contained mode.",
       "default": 1200
     },
     {

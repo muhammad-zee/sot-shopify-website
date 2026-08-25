@@ -550,41 +550,53 @@
     var autoplayOn = {% if section.settings.autoplay %}true{% else %}false{% endif %};
     var interval = {{ section.settings.autoplay_interval | default: 5 }} * 1000;
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-    // --- Geometry -------------------------------------------------------
-    function gap() {
-      var s = window.getComputedStyle(track);
-      return parseFloat(s.columnGap || s.gap) || 0;
-    }
-
-    function cardStep() {
-      return cards[0].getBoundingClientRect().width + gap();
-    }
-
-    // One "slide" is however many cards the merchant chose to advance by.
-    function slideStep() {
-      return cardStep() * perSlide;
-    }
+    var SLACK = 2; // absorbs sub-pixel rounding at the scroll extremes
 
     function maxScroll() {
       return track.scrollWidth - track.clientWidth;
     }
 
-    // 2px of slack absorbs sub-pixel rounding at the scroll extremes.
-    function atEnd() {
-      return track.scrollLeft >= maxScroll() - 2;
+    // --- Scroll stops ---------------------------------------------------
+    // Derived from real card positions, because scroll-snap will only let
+    // the track rest on a card boundary. Computing stops arithmetically
+    // (i * cardWidth) produces targets the track can never actually hold.
+    function stops() {
+      var max = maxScroll();
+      var out = [0];
+      if (max <= SLACK) return out;
+
+      var trackLeft = track.getBoundingClientRect().left;
+      for (var i = perSlide; i < cards.length; i += perSlide) {
+        var offset = cards[i].getBoundingClientRect().left - trackLeft + track.scrollLeft;
+        var pos = Math.min(Math.round(offset), max);
+
+        // Skip a stop that is indistinguishable from the previous one —
+        // this is what used to render an unreachable extra dot.
+        if (pos - out[out.length - 1] <= SLACK) continue;
+
+        out.push(pos);
+        if (pos >= max - SLACK) return out;
+      }
+
+      // The final card may still be partly out of view; the track can always
+      // rest flush against its right edge, so that is a genuine last stop.
+      if (max - out[out.length - 1] > SLACK) out.push(max);
+      return out;
     }
 
-    function pageCount() {
-      var step = slideStep();
-      if (step <= 0) return 1;
-      return Math.max(1, Math.ceil(maxScroll() / step) + 1);
-    }
-
-    function currentPage() {
-      var step = slideStep();
-      if (step <= 0) return 0;
-      return Math.min(pageCount() - 1, Math.round(track.scrollLeft / step));
+    // Nearest stop wins, so every dot is reachable AND highlightable.
+    function currentIndex(list) {
+      var s = list || stops();
+      var best = 0;
+      var bestDist = Infinity;
+      for (var i = 0; i < s.length; i++) {
+        var dist = Math.abs(s[i] - track.scrollLeft);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = i;
+        }
+      }
+      return best;
     }
 
     function goTo(left) {
@@ -595,14 +607,16 @@
     }
 
     function advance() {
+      var s = stops();
+      var i = currentIndex(s);
       // Wrap to the start instead of stalling, so autoplay keeps cycling.
-      if (atEnd()) goTo(0);
-      else goTo(track.scrollLeft + slideStep());
+      goTo(i >= s.length - 1 ? 0 : s[i + 1]);
     }
 
     function retreat() {
-      if (track.scrollLeft <= 2) goTo(maxScroll());
-      else goTo(track.scrollLeft - slideStep());
+      var s = stops();
+      var i = currentIndex(s);
+      goTo(i <= 0 ? s[s.length - 1] : s[i - 1]);
     }
 
     // --- Arrows ---------------------------------------------------------
@@ -619,19 +633,17 @@
     }
 
     // --- Dots -----------------------------------------------------------
-    // Built from measured geometry rather than block count, so a peeking
-    // layout doesn't produce dots that scroll nowhere.
     var dots = [];
 
     function buildDots() {
       if (!dotsWrap) return;
-      var total = pageCount();
+      var s = stops();
+      var total = s.length < 2 ? 0 : s.length;
       if (dots.length === total) return;
 
       dotsWrap.innerHTML = '';
       dots = [];
-
-      if (total < 2) return;
+      if (!total) return;
 
       for (var i = 0; i < total; i++) {
         var dot = document.createElement('button');
@@ -641,7 +653,7 @@
         dot.setAttribute('aria-label', 'Go to slide ' + (i + 1) + ' of ' + total);
         (function (index) {
           dot.addEventListener('click', function () {
-            goTo(Math.min(index * slideStep(), maxScroll()));
+            goTo(stops()[index]);
             restart();
           });
         })(i);
@@ -651,26 +663,19 @@
     }
 
     function syncUi() {
-      if (prev) prev.disabled = false;
-      if (next) next.disabled = false;
-
-      var active = currentPage();
+      var active = currentIndex();
       for (var i = 0; i < dots.length; i++) {
         dots[i].setAttribute('aria-current', i === active ? 'true' : 'false');
       }
-
       if (nav) {
-        var worthShowing = dots.length > 1 || !!pauseBtn;
-        nav.classList.toggle('is-enabled', worthShowing);
+        nav.classList.toggle('is-enabled', dots.length > 1 || !!pauseBtn);
       }
     }
 
     // --- Autoplay -------------------------------------------------------
     var timer = null;
     var userPaused = false;
-
-    // Only one card in total means there is nothing to rotate to.
-    var canAutoplay = autoplayOn && !reduceMotion.matches && maxScroll() > 2;
+    var canAutoplay = autoplayOn && !reduceMotion.matches && maxScroll() > SLACK;
 
     function play() {
       if (!canAutoplay || userPaused || timer) return;
@@ -694,8 +699,8 @@
     }
 
     function restart() {
-      // Keeps a full interval after any manual interaction rather than
-      // yanking the carousel onward a moment later.
+      // Keeps a full interval after manual interaction rather than yanking
+      // the carousel onward a moment later.
       if (!timer) return;
       stop(false);
       play();
@@ -785,7 +790,7 @@
     );
 
     window.addEventListener('resize', function () {
-      canAutoplay = autoplayOn && !reduceMotion.matches && maxScroll() > 2;
+      canAutoplay = autoplayOn && !reduceMotion.matches && maxScroll() > SLACK;
       buildDots();
       syncUi();
       if (!canAutoplay) stop(false);

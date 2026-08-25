@@ -238,6 +238,70 @@
   .reel-carousel-button-{{ section.id }}--next svg {
     transform: rotate(-90deg);
   }
+  /* --- BOTTOM NAV (dots + pause) --- */
+  .reel-carousel-nav-{{ section.id }} {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 18px;
+  }
+
+  .reel-carousel-nav-{{ section.id }}.is-enabled {
+    display: flex;
+  }
+
+  .reel-carousel-dots-{{ section.id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .reel-carousel-dot-{{ section.id }} {
+    width: {{ section.settings.dot_size }}px;
+    height: {{ section.settings.dot_size }}px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background-color: rgba(var(--color-foreground), 0.25);
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .reel-carousel-dot-{{ section.id }}:hover {
+    background-color: rgba(var(--color-foreground), 0.5);
+  }
+
+  .reel-carousel-dot-{{ section.id }}[aria-current='true'] {
+    background-color: rgb(var(--color-foreground));
+    transform: scale(1.3);
+  }
+
+  .reel-carousel-pause-{{ section.id }} {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid rgba(var(--color-foreground), 0.35);
+    border-radius: 50%;
+    background-color: transparent;
+    color: rgb(var(--color-foreground));
+    cursor: pointer;
+  }
+
+  .reel-carousel-pause-{{ section.id }}:hover {
+    background-color: rgba(var(--color-foreground), 0.08);
+  }
+
+  .reel-carousel-pause-{{ section.id }} svg {
+    width: 10px;
+    height: 10px;
+    fill: currentColor;
+  }
+
 {%- endstyle -%}
 
 <div class="color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding">
@@ -414,6 +478,32 @@
         </div>
       {% endfor %}
     </div>
+
+    {%- if section.settings.show_dots or section.settings.autoplay -%}
+      {%- comment -%}
+        Populated by JS: dot count depends on how many scroll pages the track
+        actually has, which is only knowable after layout.
+      {%- endcomment -%}
+      <div class="reel-carousel-nav-{{ section.id }}" data-reel-nav>
+        {%- if section.settings.show_dots -%}
+          <div
+            class="reel-carousel-dots-{{ section.id }}"
+            data-reel-dots
+            role="tablist"
+            aria-label="Carousel pages"
+          ></div>
+        {%- endif -%}
+
+        {%- if section.settings.autoplay -%}
+          <button
+            type="button"
+            class="reel-carousel-pause-{{ section.id }}"
+            data-reel-pause
+            aria-controls="ReelCarousel-{{ section.id }}"
+          ></button>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
   </div>
 </div>
 
@@ -422,49 +512,203 @@
     var track = document.getElementById('ReelCarousel-{{ section.id }}');
     if (!track) return;
 
-    var buttons = document.querySelector(
-      '.reel-carousel-wrapper-{{ section.id }} [data-reel-carousel-buttons]'
-    );
+    var wrapper = track.closest('.reel-carousel-wrapper-{{ section.id }}');
+    if (!wrapper) return;
+
+    var buttons = wrapper.querySelector('[data-reel-carousel-buttons]');
     var prev = buttons && buttons.querySelector('[data-reel-prev]');
     var next = buttons && buttons.querySelector('[data-reel-next]');
+    var nav = wrapper.querySelector('[data-reel-nav]');
+    var dotsWrap = wrapper.querySelector('[data-reel-dots]');
+    var pauseBtn = wrapper.querySelector('[data-reel-pause]');
 
-    // --- Arrow controls -------------------------------------------------
-    // Only revealed once JS is running, so no-JS visitors never see dead
-    // controls. Native scroll and swipe work regardless.
+    var cards = track.querySelectorAll('.reel-carousel-card-{{ section.id }}');
+    if (!cards.length) return;
+
+    var perSlide = {{ section.settings.cards_per_slide | default: 1 }};
+    var autoplayOn = {% if section.settings.autoplay %}true{% else %}false{% endif %};
+    var interval = {{ section.settings.autoplay_interval | default: 5 }} * 1000;
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    // --- Geometry -------------------------------------------------------
+    function gap() {
+      var s = window.getComputedStyle(track);
+      return parseFloat(s.columnGap || s.gap) || 0;
+    }
+
+    function cardStep() {
+      return cards[0].getBoundingClientRect().width + gap();
+    }
+
+    // One "slide" is however many cards the merchant chose to advance by.
+    function slideStep() {
+      return cardStep() * perSlide;
+    }
+
+    function maxScroll() {
+      return track.scrollWidth - track.clientWidth;
+    }
+
+    // 2px of slack absorbs sub-pixel rounding at the scroll extremes.
+    function atEnd() {
+      return track.scrollLeft >= maxScroll() - 2;
+    }
+
+    function pageCount() {
+      var step = slideStep();
+      if (step <= 0) return 1;
+      return Math.max(1, Math.ceil(maxScroll() / step) + 1);
+    }
+
+    function currentPage() {
+      var step = slideStep();
+      if (step <= 0) return 0;
+      return Math.min(pageCount() - 1, Math.round(track.scrollLeft / step));
+    }
+
+    function goTo(left) {
+      track.scrollTo({
+        left: left,
+        behavior: reduceMotion.matches ? 'auto' : 'smooth'
+      });
+    }
+
+    function advance() {
+      // Wrap to the start instead of stalling, so autoplay keeps cycling.
+      if (atEnd()) goTo(0);
+      else goTo(track.scrollLeft + slideStep());
+    }
+
+    function retreat() {
+      if (track.scrollLeft <= 2) goTo(maxScroll());
+      else goTo(track.scrollLeft - slideStep());
+    }
+
+    // --- Arrows ---------------------------------------------------------
     if (buttons && prev && next) {
       buttons.classList.add('is-enabled');
-
-      var step = function () {
-        var card = track.querySelector('.reel-carousel-card-{{ section.id }}');
-        if (!card) return track.clientWidth;
-        var styles = window.getComputedStyle(track);
-        var gap = parseFloat(styles.columnGap || styles.gap) || 0;
-        return card.getBoundingClientRect().width + gap;
-      };
-
       prev.addEventListener('click', function () {
-        track.scrollBy({ left: -step(), behavior: 'smooth' });
+        retreat();
+        restart();
       });
-
       next.addEventListener('click', function () {
-        track.scrollBy({ left: step(), behavior: 'smooth' });
+        advance();
+        restart();
       });
+    }
 
-      var syncButtons = function () {
-        // 2px of slack absorbs sub-pixel rounding at the scroll extremes.
-        var maxScroll = track.scrollWidth - track.clientWidth;
-        prev.disabled = track.scrollLeft <= 2;
-        next.disabled = track.scrollLeft >= maxScroll - 2;
-      };
+    // --- Dots -----------------------------------------------------------
+    // Built from measured geometry rather than block count, so a peeking
+    // layout doesn't produce dots that scroll nowhere.
+    var dots = [];
 
-      track.addEventListener('scroll', syncButtons, { passive: true });
-      window.addEventListener('resize', syncButtons);
-      syncButtons();
+    function buildDots() {
+      if (!dotsWrap) return;
+      var total = pageCount();
+      if (dots.length === total) return;
+
+      dotsWrap.innerHTML = '';
+      dots = [];
+
+      if (total < 2) return;
+
+      for (var i = 0; i < total; i++) {
+        var dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'reel-carousel-dot-{{ section.id }}';
+        dot.setAttribute('role', 'tab');
+        dot.setAttribute('aria-label', 'Go to slide ' + (i + 1) + ' of ' + total);
+        (function (index) {
+          dot.addEventListener('click', function () {
+            goTo(Math.min(index * slideStep(), maxScroll()));
+            restart();
+          });
+        })(i);
+        dotsWrap.appendChild(dot);
+        dots.push(dot);
+      }
+    }
+
+    function syncUi() {
+      if (prev) prev.disabled = false;
+      if (next) next.disabled = false;
+
+      var active = currentPage();
+      for (var i = 0; i < dots.length; i++) {
+        dots[i].setAttribute('aria-current', i === active ? 'true' : 'false');
+      }
+
+      if (nav) {
+        var worthShowing = dots.length > 1 || !!pauseBtn;
+        nav.classList.toggle('is-enabled', worthShowing);
+      }
+    }
+
+    // --- Autoplay -------------------------------------------------------
+    var timer = null;
+    var userPaused = false;
+
+    // Only one card in total means there is nothing to rotate to.
+    var canAutoplay = autoplayOn && !reduceMotion.matches && maxScroll() > 2;
+
+    function play() {
+      if (!canAutoplay || userPaused || timer) return;
+      timer = setInterval(advance, interval);
+      if (pauseBtn) {
+        pauseBtn.textContent = '❚❚';
+        pauseBtn.setAttribute('aria-label', 'Pause carousel');
+      }
+    }
+
+    function stop(isUser) {
+      if (isUser) userPaused = true;
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+      if (isUser && pauseBtn) {
+        pauseBtn.textContent = '▶';
+        pauseBtn.setAttribute('aria-label', 'Play carousel');
+      }
+    }
+
+    function restart() {
+      // Keeps a full interval after any manual interaction rather than
+      // yanking the carousel onward a moment later.
+      if (!timer) return;
+      stop(false);
+      play();
+    }
+
+    if (pauseBtn) {
+      pauseBtn.textContent = '❚❚';
+      pauseBtn.setAttribute('aria-label', 'Pause carousel');
+      pauseBtn.addEventListener('click', function () {
+        if (timer) {
+          stop(true);
+        } else {
+          userPaused = false;
+          play();
+        }
+      });
+    }
+
+    if (canAutoplay) {
+      // WCAG 2.2.2: moving content must be pausable, and must not fight the
+      // visitor while they are reading, hovering or tabbing through it.
+      track.addEventListener('mouseenter', function () { stop(false); });
+      track.addEventListener('mouseleave', function () { if (!userPaused) play(); });
+      track.addEventListener('focusin', function () { stop(false); });
+      track.addEventListener('focusout', function () { if (!userPaused) play(); });
+      track.addEventListener('touchstart', function () { stop(false); }, { passive: true });
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) stop(false);
+        else if (!userPaused) play();
+      });
     }
 
     // --- Lazy playback --------------------------------------------------
     var videos = track.querySelectorAll('video');
-    if (!videos.length) return;
 
     videos.forEach(function (video) {
       video.preload = 'none';
@@ -473,39 +717,63 @@
       video.playsInline = true;
     });
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    if (!('IntersectionObserver' in window)) {
-      videos.forEach(function (video) {
-        video.preload = 'metadata';
-        var attempt = video.play();
-        if (attempt && attempt.catch) attempt.catch(function () {});
-      });
-      return;
+    if (videos.length && !reduceMotion.matches) {
+      if (!('IntersectionObserver' in window)) {
+        videos.forEach(function (video) {
+          video.preload = 'metadata';
+          var attempt = video.play();
+          if (attempt && attempt.catch) attempt.catch(function () {});
+        });
+      } else {
+        // root: track means "visible within the carousel viewport", so cards
+        // scrolled off to the side stop playing even though the section
+        // itself is still on screen.
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              var video = entry.target;
+              if (entry.isIntersecting) {
+                if (video.preload !== 'auto') video.preload = 'auto';
+                var attempt = video.play();
+                if (attempt && attempt.catch) attempt.catch(function () {});
+              } else if (!video.paused) {
+                video.pause();
+              }
+            });
+          },
+          { root: track, threshold: 0.4 }
+        );
+        videos.forEach(function (video) {
+          observer.observe(video);
+        });
+      }
     }
 
-    // root: track means "visible within the carousel viewport", so cards
-    // scrolled off to the side stop playing even though the section itself
-    // is still on screen.
-    var observer = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          var video = entry.target;
-          if (entry.isIntersecting) {
-            if (video.preload !== 'auto') video.preload = 'auto';
-            var attempt = video.play();
-            if (attempt && attempt.catch) attempt.catch(function () {});
-          } else if (!video.paused) {
-            video.pause();
-          }
+    // --- Wiring ---------------------------------------------------------
+    var scrollTick = null;
+    track.addEventListener(
+      'scroll',
+      function () {
+        if (scrollTick) return;
+        scrollTick = window.requestAnimationFrame(function () {
+          scrollTick = null;
+          syncUi();
         });
       },
-      { root: track, threshold: 0.4 }
+      { passive: true }
     );
 
-    videos.forEach(function (video) {
-      observer.observe(video);
+    window.addEventListener('resize', function () {
+      canAutoplay = autoplayOn && !reduceMotion.matches && maxScroll() > 2;
+      buildDots();
+      syncUi();
+      if (!canAutoplay) stop(false);
+      else if (!userPaused) play();
     });
+
+    buildDots();
+    syncUi();
+    play();
   })();
 </script>
 
@@ -599,6 +867,39 @@
       "default": "1.5"
     },
     { "type": "checkbox", "id": "show_arrows", "label": "Show arrow buttons", "default": true },
+    {
+      "type": "range",
+      "id": "cards_per_slide",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Cards to advance per slide",
+      "info": "How far the arrows, dots and auto-rotate move each step.",
+      "default": 1
+    },
+    { "type": "checkbox", "id": "show_dots", "label": "Show dots", "default": true },
+    {
+      "type": "range",
+      "id": "dot_size",
+      "min": 6,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Dot size",
+      "default": 9
+    },
+    { "type": "checkbox", "id": "autoplay", "label": "Auto-rotate", "default": false },
+    {
+      "type": "range",
+      "id": "autoplay_interval",
+      "min": 2,
+      "max": 15,
+      "step": 1,
+      "unit": "s",
+      "label": "Auto-rotate interval",
+      "info": "Pauses on hover, focus and touch, and is skipped for visitors who prefer reduced motion.",
+      "default": 5
+    },
     { "type": "checkbox", "id": "hide_scrollbar", "label": "Hide scrollbar", "default": true },
     {
       "type": "range",

@@ -278,22 +278,43 @@
     transform: scale(1.3);
   }
 
+  /* Pause control is visually hidden but stays in the tab order, so mouse
+     visitors never see it while keyboard/AT users keep a way to stop the
+     rotation (WCAG 2.2.2). It reveals itself on keyboard focus. */
   .reel-carousel-pause-{{ section.id }} {
-    width: 32px;
-    height: 32px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    position: absolute;
+    width: 1px;
+    height: 1px;
     padding: 0;
-    border: 1px solid rgba(var(--color-foreground), 0.35);
-    border-radius: 50%;
+    margin: -1px;
+    border: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
     background-color: transparent;
     color: rgb(var(--color-foreground));
     cursor: pointer;
   }
 
-  .reel-carousel-pause-{{ section.id }}:hover {
-    background-color: rgba(var(--color-foreground), 0.08);
+  .reel-carousel-pause-{{ section.id }}:focus-visible {
+    position: static;
+    width: 32px;
+    height: 32px;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    clip-path: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(var(--color-foreground), 0.35);
+    border-radius: 50%;
+  }
+
+  /* Without visible dots the nav row collapses, so drop its spacing too. */
+  .reel-carousel-nav-{{ section.id }}:not(:has(.reel-carousel-dot-{{ section.id }})) {
+    margin-top: 0;
   }
 
   .reel-carousel-pause-{{ section.id }} svg {

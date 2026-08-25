@@ -9,6 +9,9 @@
     assign heading_tag = 'h2'
   endunless
 
+  assign hero_image_alt = section.settings.fallback_image_alt | default: section.settings.fallback_image.alt
+  assign hero_image_alt = hero_image_alt | strip_html | strip_newlines | strip
+
   assign video_class = 'video-hero__video-' | append: section.id
   assign overlay_opacity = section.settings.overlay_opacity | divided_by: 100.0
 -%}
@@ -184,7 +187,7 @@
           loading: 'eager',
           sizes: '100vw',
           widths: '375, 750, 1100, 1500, 1780, 2000, 3000, 3840',
-          alt: section.settings.fallback_image.alt
+          alt: hero_image_alt
       }}
     {%- elsif has_video == false -%}
       {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
@@ -334,6 +337,12 @@
       "id": "fallback_image",
       "label": "Fallback image",
       "info": "Shown while the video loads, and instead of the video for visitors who prefer reduced motion."
+    },
+    {
+      "type": "text",
+      "id": "fallback_image_alt",
+      "label": "Fallback image alt text",
+      "info": "Describes the image for screen readers and search engines. Falls back to the alt text set on the file in Content > Files. Leave both empty only if the image is purely decorative."
     },
     {
       "type": "select",

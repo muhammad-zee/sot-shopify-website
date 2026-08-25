@@ -501,7 +501,7 @@
         "default_button_label": "Shop Now",
         "enable_video_schema": false,
         "videos_upload_date": "",
-        "width_mode": "contained",
+        "width_mode": "full_width",
         "edge_padding_desktop": 56,
         "edge_padding_mobile": 15,
         "max_width": 1550,

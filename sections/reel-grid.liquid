@@ -223,7 +223,14 @@
               assign pos_y = '50%'
           endcase
         -%}
-        <div class="reel-grid-card-{{ section.id }}" {{ block.shopify_attributes }}>
+        <div
+          class="reel-grid-card-{{ section.id }}"
+          {%- if block.settings.video_title != blank %}
+            role="group"
+            aria-label="{{ block.settings.video_title | strip_html | escape }}"
+          {%- endif %}
+          {{ block.shopify_attributes }}
+        >
           <div
             class="reel-media-{{ section.id }}{% if fit == 'contain' %} is-contain-mode{% endif %}{% if fit == 'contain' and block.settings.blur_backdrop %} has-blur-backdrop{% endif %}"
             style="--reel-align-x: {{ align_x }}; --reel-align-y: {{ align_y }}; --reel-pos-x: {{ pos_x }}; --reel-pos-y: {{ pos_y }};"

@@ -106,7 +106,7 @@
     "badge_position": "top right",
     "badge_corner_radius": 40,
     "sale_badge_color_scheme": "scheme-1",
-    "sold_out_badge_color_scheme": "scheme-4",
+    "sold_out_badge_color_scheme": "scheme-2",
     "brand_headline": "",
     "brand_description": "<p>MOST WANTED AND MOST LOVED</p>",
     "brand_image": "shopify://shop_images/Screenshot_2026-08-11_132908-removebg-preview.png",
@@ -178,11 +178,6 @@
         "settings": {
           "widget_type": "review-widget"
         }
-      },
-      "6749635694321457561": {
-        "type": "shopify://apps/stockify/blocks/app-embed/fe0b1a15-c32f-430a-818f-cf2a8929e650",
-        "disabled": false,
-        "settings": {}
       }
     },
     "color_schemes": {

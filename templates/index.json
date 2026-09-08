@@ -208,7 +208,6 @@
         "slide_UDdYpW": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/pexels-kaip-996329.jpg",
             "heading": "SALE",
             "heading_size": "h1",
             "subheading": "<strong>UPTO 50% OFF ON SELECTED STYLES</strong>",
@@ -247,9 +246,7 @@
       "blocks": {
         "image_pdqDCr": {
           "type": "image",
-          "settings": {
-            "image": "shopify://shop_images/pexels-nietjuhart-934070.jpg"
-          }
+          "settings": {}
         },
         "product_QjWGQP": {
           "type": "product",

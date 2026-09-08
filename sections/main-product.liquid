@@ -459,7 +459,7 @@
                 {%- liquid
                   assign is_coming_soon = false
                   for tag in product.tags
-                    if tag == 'coming-soon'
+                    if tag == 'coming soon'
                       assign is_coming_soon = true
                       break
                   endif

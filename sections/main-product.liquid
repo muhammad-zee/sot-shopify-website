@@ -455,13 +455,39 @@
               {%- when 'variant_picker' -%}
                 {% render 'product-variant-picker', product: product, block: block, product_form_id: product_form_id %}
               {%- when 'buy_buttons' -%}
+                {%- when 'buy_buttons' -%}
+                {%- liquid
+                  assign is_coming_soon = false
+                  for tag in product.tags
+                    if tag == 'coming-soon'
+                      assign is_coming_soon = true
+                      break
+                  endif
+                endfor
+              -%}
+
+              {%- if is_coming_soon -%}
+                <div class="product-form" {{ block.shopify_attributes }}>
+                  <div class="product-form__buttons">
+                    <button
+                      type="button"
+                      class="product-form__submit button button--full-width button--secondary"
+                      disabled
+                      style="cursor: not-allowed; opacity: 0.8;"
+                    >
+                      Coming Soon
+                    </button>
+                  </div>
+                </div>
+              {%- else -%}
                 {%- render 'buy-buttons',
                   block: block,
                   product: product,
                   product_form_id: product_form_id,
                   section_id: section.id,
                   show_pickup_availability: true
-                -%}
+              -%}
+              {%- endif -%}
               {%- when 'rating' -%}
                 {%- if product.metafields.reviews.rating.value != blank -%}
                   <div class="rating-wrapper">

@@ -13,7 +13,7 @@
       "type": "video-hero",
       "name": "Hero Video Section",
       "settings": {
-        "video": "shopify://files/videos/download.mp4",
+        "video": "shopify://files/videos/download (1).mp4",
         "video_url": "",
         "fallback_image": "shopify://shop_images/bearded-young-man.jpg",
         "fallback_image_alt": "",

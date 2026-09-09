@@ -14,39 +14,23 @@
     "announcement-bar": {
       "type": "announcement-bar",
       "blocks": {
-        "announcement_KpPKN7": {
+        "announcement_Q8qDF7": {
           "type": "announcement",
           "settings": {
-            "text": "Welcome to our store",
-            "link": ""
-          }
-        },
-        "announcement_yYpBeD": {
-          "type": "announcement",
-          "settings": {
-            "text": "Welcome to our store",
-            "link": ""
-          }
-        },
-        "announcement-bar-0": {
-          "type": "announcement",
-          "settings": {
-            "text": "Welcome to OSLO",
+            "text": "Welcome to S.O.T - Source of Truth",
             "link": ""
           }
         },
         "announcement_tfPk7t": {
           "type": "announcement",
           "settings": {
-            "text": "Flat Shipping Charges PKR 100 Nationwide",
+            "text": "Batch - 01 Coming Soon",
             "link": ""
           }
         }
       },
       "block_order": [
-        "announcement_KpPKN7",
-        "announcement_yYpBeD",
-        "announcement-bar-0",
+        "announcement_Q8qDF7",
         "announcement_tfPk7t"
       ],
       "settings": {

@@ -31,7 +31,7 @@
       class="announcement-bar-marquee{% if section.settings.pause_on_hover %} announcement-bar-marquee--pause-on-hover{% endif %}"
       role="region"
       aria-label="{{ 'sections.header.announcement' | t }}"
-      style="--marquee-duration: {{ section.settings.marquee_speed | times: block_count | times: repeat_count }}s;"
+      style="--marquee-duration: {{ section.settings.marquee_speed | times: block_count | times: repeat_count }}s; --marquee-item-spacing: {{ section.settings.item_spacing }}rem;"
     >
       <div class="announcement-bar-marquee__track">
         {%- comment -%}
@@ -56,8 +56,16 @@
                   if i == 1 and r == 1
                     assign attrs = block.shopify_attributes
                   endif
+
+                  assign item_classes = 'announcement-bar-marquee__item'
+                  if block.settings.highlight
+                    assign item_classes = item_classes | append: ' announcement-bar-marquee__item--highlight color-' | append: block.settings.highlight_color_scheme
+                    if block.settings.highlight_animate
+                      assign item_classes = item_classes | append: ' announcement-bar-marquee__item--animate'
+                    endif
+                  endif
                 -%}
-                <div class="announcement-bar-marquee__item" {{ attrs }}{% if item_hidden %} aria-hidden="true"{% endif %}>
+                <div class="{{ item_classes }}" {{ attrs }}{% if item_hidden %} aria-hidden="true"{% endif %}>
                   {%- if block.settings.text != blank -%}
                     {%- if block.settings.link != blank -%}
                       <a
@@ -200,13 +208,35 @@
   .announcement-bar-marquee__item {
     display: flex;
     align-items: center;
-    padding: 0 3rem;
+    padding: 0 var(--marquee-item-spacing, 3rem);
     white-space: nowrap;
   }
 
   .announcement-bar-marquee__item .announcement-bar__message {
     margin: 0;
     white-space: nowrap;
+  }
+
+  .announcement-bar-marquee__item--highlight .announcement-bar__message {
+    padding: 0.5rem 1.5rem;
+    border-radius: var(--badge-corner-radius, 4rem);
+    background-color: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+    font-weight: 700;
+  }
+
+  .announcement-bar-marquee__item--animate .announcement-bar__message {
+    animation: announcement-bar-marquee-pulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes announcement-bar-marquee-pulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.06);
+    }
   }
 
   .announcement-bar-marquee--pause-on-hover:hover .announcement-bar-marquee__track,
@@ -225,6 +255,9 @@
 
   @media (prefers-reduced-motion: reduce) {
     .announcement-bar-marquee__track {
+      animation: none;
+    }
+    .announcement-bar-marquee__item--animate .announcement-bar__message {
       animation: none;
     }
     .announcement-bar-marquee {
@@ -287,6 +320,16 @@
       "default": true
     },
     {
+      "type": "range",
+      "id": "item_spacing",
+      "min": 1,
+      "max": 8,
+      "step": 0.5,
+      "unit": "rem",
+      "label": "Space between announcements",
+      "default": 3
+    },
+    {
       "type": "header",
       "content": "t:sections.announcement-bar.settings.header__3.content",
       "info": "t:sections.announcement-bar.settings.header__3.info"
@@ -324,6 +367,29 @@
           "type": "url",
           "id": "link",
           "label": "t:sections.announcement-bar.blocks.announcement.settings.link.label"
+        },
+        {
+          "type": "header",
+          "content": "Attention styling"
+        },
+        {
+          "type": "checkbox",
+          "id": "highlight",
+          "label": "Highlight this announcement",
+          "info": "Style this announcement to stand out from the others, e.g. for a big sale.",
+          "default": false
+        },
+        {
+          "type": "color_scheme",
+          "id": "highlight_color_scheme",
+          "label": "Highlight color scheme",
+          "default": "scheme-1"
+        },
+        {
+          "type": "checkbox",
+          "id": "highlight_animate",
+          "label": "Pulse animation",
+          "default": true
         }
       ]
     }

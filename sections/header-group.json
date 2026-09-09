@@ -29,8 +29,8 @@
           "settings": {
             "text": "Batch - 01 Coming Soon",
             "link": "",
-            "highlight": false,
-            "highlight_color_scheme": "",
+            "highlight": true,
+            "highlight_color_scheme": "scheme-1",
             "highlight_animate": true
           }
         }
@@ -45,7 +45,8 @@
         "show_social": false,
         "marquee_speed": 6,
         "pause_on_hover": true,
-        "item_spacing": 4,
+        "item_spacing_mobile": 2,
+        "item_spacing_desktop": 3,
         "enable_country_selector": false,
         "enable_language_selector": false
       }

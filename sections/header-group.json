@@ -29,8 +29,8 @@
           "settings": {
             "text": "Batch - 01 Coming Soon",
             "link": "",
-            "highlight": false,
-            "highlight_color_scheme": "",
+            "highlight": true,
+            "highlight_color_scheme": "scheme-2",
             "highlight_animate": true
           }
         }
@@ -40,7 +40,7 @@
         "announcement_tfPk7t"
       ],
       "settings": {
-        "color_scheme": "scheme-2",
+        "color_scheme": "scheme-1",
         "show_line_separator": true,
         "show_social": false,
         "marquee_speed": 6,

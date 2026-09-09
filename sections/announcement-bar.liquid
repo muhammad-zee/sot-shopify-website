@@ -56,16 +56,8 @@
                   if i == 1 and r == 1
                     assign attrs = block.shopify_attributes
                   endif
-
-                  assign item_classes = 'announcement-bar-marquee__item'
-                  if block.settings.highlight
-                    assign item_classes = item_classes | append: ' announcement-bar-marquee__item--highlight color-' | append: block.settings.highlight_color_scheme
-                    if block.settings.highlight_animate
-                      assign item_classes = item_classes | append: ' announcement-bar-marquee__item--animate'
-                    endif
-                  endif
                 -%}
-                <div class="{{ item_classes }}" {{ attrs }}{% if item_hidden %} aria-hidden="true"{% endif %}>
+                <div class="announcement-bar-marquee__item" {{ attrs }}{% if item_hidden %} aria-hidden="true"{% endif %}>
                   {%- if block.settings.text != blank -%}
                     {%- if block.settings.link != blank -%}
                       <a
@@ -75,11 +67,7 @@
                       >
                     {%- endif -%}
                     <p class="announcement-bar__message h5">
-                      {%- if block.settings.highlight -%}
-                        <span class="badge announcement-bar-marquee__badge">{{ block.settings.text | escape }}</span>
-                      {%- else -%}
-                        <span>{{ block.settings.text | escape }}</span>
-                      {%- endif -%}
+                      <span>{{ block.settings.text | escape }}</span>
                       {%- if block.settings.link != blank -%}
                         {% render 'icon-arrow' %}
                       {%- endif -%}
@@ -228,35 +216,6 @@
     white-space: nowrap;
   }
 
-  /* The highlighted text renders as an actual .badge (the same compact tag
-     component used for Sale/Sold out elsewhere on the site), sized by its own
-     small built-in padding — not by the item or message wrapper. The message
-     wrapper's default padding is zeroed here so nothing stacks on top of the
-     badge's own size, and the row's height stays governed by the plain-text
-     items around it (align-items: center on the group centers the smaller
-     badge inside that row automatically). */
-  .announcement-bar-marquee__item--highlight .announcement-bar__message {
-    padding: 0;
-  }
-
-  .announcement-bar-marquee__badge {
-    white-space: nowrap;
-  }
-
-  .announcement-bar-marquee__item--animate {
-    animation: announcement-bar-marquee-pulse 1.6s ease-in-out infinite;
-  }
-
-  @keyframes announcement-bar-marquee-pulse {
-    0%,
-    100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.06);
-    }
-  }
-
   .announcement-bar-marquee--pause-on-hover:hover .announcement-bar-marquee__track,
   .announcement-bar-marquee--pause-on-hover:focus-within .announcement-bar-marquee__track {
     animation-play-state: paused;
@@ -273,9 +232,6 @@
 
   @media (prefers-reduced-motion: reduce) {
     .announcement-bar-marquee__track {
-      animation: none;
-    }
-    .announcement-bar-marquee__item--animate {
       animation: none;
     }
     .announcement-bar-marquee {

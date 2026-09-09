@@ -224,19 +224,19 @@
     white-space: nowrap;
   }
 
+  /* A minor 0.2rem vertical padding gives the chip its own edge around the
+     text, and the message's default 1rem is trimmed to 0.8rem to absorb it —
+     so the two combined still total exactly what a normal item uses (2rem),
+     and the bar's row height never grows because of the highlight. */
   .announcement-bar-marquee__item--highlight {
-    margin: 0.3rem 0;
-    padding: 0.3rem var(--marquee-item-spacing, 3rem);
+    padding: 0.2rem var(--marquee-item-spacing, 3rem);
     border-radius: var(--badge-corner-radius, 4rem);
     background-color: rgb(var(--color-background));
     color: rgb(var(--color-foreground));
   }
 
-  /* .announcement-bar__message has its own 1rem top/bottom padding (base.css).
-     Reduced here so it doesn't stack with the highlight's own margin + padding
-     above and inflate the whole bar's height. */
   .announcement-bar-marquee__item--highlight .announcement-bar__message {
-    padding: 0.4rem 0;
+    padding: 0.8rem 0;
     font-weight: 700;
   }
 

@@ -18,14 +18,20 @@
           "type": "announcement",
           "settings": {
             "text": "Welcome to S.O.T - Source of Truth",
-            "link": ""
+            "link": "",
+            "highlight": false,
+            "highlight_color_scheme": "",
+            "highlight_animate": true
           }
         },
         "announcement_tfPk7t": {
           "type": "announcement",
           "settings": {
             "text": "Batch - 01 Coming Soon",
-            "link": ""
+            "link": "",
+            "highlight": false,
+            "highlight_color_scheme": "",
+            "highlight_animate": true
           }
         }
       },
@@ -39,6 +45,7 @@
         "show_social": false,
         "marquee_speed": 6,
         "pause_on_hover": true,
+        "item_spacing": 4,
         "enable_country_selector": false,
         "enable_language_selector": false
       }

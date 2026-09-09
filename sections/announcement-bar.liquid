@@ -75,7 +75,11 @@
                       >
                     {%- endif -%}
                     <p class="announcement-bar__message h5">
-                      <span>{{ block.settings.text | escape }}</span>
+                      {%- if block.settings.highlight -%}
+                        <span class="badge announcement-bar-marquee__badge">{{ block.settings.text | escape }}</span>
+                      {%- else -%}
+                        <span>{{ block.settings.text | escape }}</span>
+                      {%- endif -%}
                       {%- if block.settings.link != blank -%}
                         {% render 'icon-arrow' %}
                       {%- endif -%}
@@ -224,20 +228,19 @@
     white-space: nowrap;
   }
 
-  /* A minor 0.2rem vertical padding gives the chip its own edge around the
-     text, and the message's default 1rem is trimmed to 0.8rem to absorb it —
-     so the two combined still total exactly what a normal item uses (2rem),
-     and the bar's row height never grows because of the highlight. */
-  .announcement-bar-marquee__item--highlight {
-    padding: 0.2rem var(--marquee-item-spacing, 3rem);
-    border-radius: var(--badge-corner-radius, 4rem);
-    background-color: rgb(var(--color-background));
-    color: rgb(var(--color-foreground));
+  /* The highlighted text renders as an actual .badge (the same compact tag
+     component used for Sale/Sold out elsewhere on the site), sized by its own
+     small built-in padding — not by the item or message wrapper. The message
+     wrapper's default padding is zeroed here so nothing stacks on top of the
+     badge's own size, and the row's height stays governed by the plain-text
+     items around it (align-items: center on the group centers the smaller
+     badge inside that row automatically). */
+  .announcement-bar-marquee__item--highlight .announcement-bar__message {
+    padding: 0;
   }
 
-  .announcement-bar-marquee__item--highlight .announcement-bar__message {
-    padding: 0.8rem 0;
-    font-weight: 700;
+  .announcement-bar-marquee__badge {
+    white-space: nowrap;
   }
 
   .announcement-bar-marquee__item--animate {

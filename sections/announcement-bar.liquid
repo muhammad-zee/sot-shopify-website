@@ -21,7 +21,7 @@
   {%- if section.blocks.size > 0 -%}
     {%- liquid
       assign block_count = section.blocks.size
-      assign min_items_per_group = 24
+      assign min_items_per_group = 10
       assign repeat_count = min_items_per_group | times: 1.0 | divided_by: block_count | ceil
       if repeat_count < 1
         assign repeat_count = 1
@@ -185,6 +185,7 @@
     overflow: hidden;
     position: relative;
     width: 100%;
+    contain: layout paint;
     -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 3rem, #000 calc(100% - 3rem), transparent 100%);
     mask-image: linear-gradient(90deg, transparent 0, #000 3rem, #000 calc(100% - 3rem), transparent 100%);
     --marquee-item-spacing: var(--marquee-item-spacing-mobile, 2rem);

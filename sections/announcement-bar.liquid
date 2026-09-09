@@ -8,9 +8,6 @@
   if section.settings.enable_country_selector or section.settings.enable_language_selector
     assign language_country_selector = true
   endif
-  if section.blocks.size > 0
-    assign announcement_bar = true
-  endif
 -%}
 
 {% if social_icons %}
@@ -21,36 +18,52 @@
   class="utility-bar color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_line_separator and section.blocks.size > 0 %} utility-bar--bottom-border{% elsif section.settings.show_line_separator and section.settings.show_social and social_icons%} utility-bar--bottom-border-social-only{% endif %}{% if section.settings.enable_country_selector or section.settings.enable_language_selector %} header-localization{% endif %}"
   {{ block.shopify_attributes }}
 >
-  <div class="page-width utility-bar__grid{% if announcement_bar and language_country_selector or section.settings.show_social and social_icons %} utility-bar__grid--3-col{% elsif language_country_selector or section.settings.show_social and social_icons %} utility-bar__grid--2-col{% endif %}">
-    {%- if section.settings.show_social and social_icons -%}
-      {%- render 'social-icons' -%}
-    {%- endif -%}
-
-    {%- if section.blocks.size > 0 -%}
-      <div
-        class="announcement-bar-marquee{% if section.settings.pause_on_hover %} announcement-bar-marquee--pause-on-hover{% endif %}"
-        role="region"
-        aria-label="{{ 'sections.header.announcement' | t }}"
-        style="--marquee-duration: {{ section.settings.marquee_speed | times: section.blocks.size }}s;"
-      >
-        <div class="announcement-bar-marquee__track">
-          {%- comment -%} Render the block set twice, back-to-back, for a seamless -50% loop {%- endcomment -%}
-          {%- for i in (1..2) -%}
-            <div class="announcement-bar-marquee__group" {% if i == 2 %}aria-hidden="true"{% endif %}>
+  {%- if section.blocks.size > 0 -%}
+    {%- liquid
+      assign block_count = section.blocks.size
+      assign min_items_per_group = 24
+      assign repeat_count = min_items_per_group | times: 1.0 | divided_by: block_count | ceil
+      if repeat_count < 1
+        assign repeat_count = 1
+      endif
+    -%}
+    <div
+      class="announcement-bar-marquee{% if section.settings.pause_on_hover %} announcement-bar-marquee--pause-on-hover{% endif %}"
+      role="region"
+      aria-label="{{ 'sections.header.announcement' | t }}"
+      style="--marquee-duration: {{ section.settings.marquee_speed | times: block_count | times: repeat_count }}s;"
+    >
+      <div class="announcement-bar-marquee__track">
+        {%- comment -%}
+          Render the block set twice, back-to-back, for a seamless -50% loop.
+          Each group repeats the block list enough times that a single group's
+          width always exceeds the viewport, so the loop never shows a gap
+          or a visible restart. Only the first real copy is exposed to
+          assistive tech; every filler/mirrored copy is aria-hidden.
+        {%- endcomment -%}
+        {%- for i in (1..2) -%}
+          <div class="announcement-bar-marquee__group">
+            {%- for r in (1..repeat_count) -%}
+              {%- liquid
+                assign item_hidden = false
+                if i == 2 or r > 1
+                  assign item_hidden = true
+                endif
+              -%}
               {%- for block in section.blocks -%}
                 {%- liquid
                   assign attrs = ''
-                  if i == 1
+                  if i == 1 and r == 1
                     assign attrs = block.shopify_attributes
                   endif
                 -%}
-                <div class="announcement-bar-marquee__item" {{ attrs }}>
+                <div class="announcement-bar-marquee__item" {{ attrs }}{% if item_hidden %} aria-hidden="true"{% endif %}>
                   {%- if block.settings.text != blank -%}
                     {%- if block.settings.link != blank -%}
                       <a
                         href="{{ block.settings.link }}"
                         class="announcement-bar__link link link--text focus-inset animate-arrow"
-                        {% if i == 2 %}tabindex="-1"{% endif %}
+                        {% if item_hidden %}tabindex="-1"{% endif %}
                       >
                     {%- endif -%}
                     <p class="announcement-bar__message h5">
@@ -65,13 +78,20 @@
                   {%- endif -%}
                 </div>
               {%- endfor -%}
-            </div>
-          {%- endfor -%}
-        </div>
+            {%- endfor -%}
+          </div>
+        {%- endfor -%}
       </div>
-    {%- endif -%}
+    </div>
+  {%- endif -%}
 
-    <div class="localization-wrapper">
+  {%- if section.settings.show_social and social_icons or language_country_selector -%}
+    <div class="page-width utility-bar__grid{% if section.settings.show_social and social_icons and language_country_selector %} utility-bar__grid--2-col{% endif %}">
+      {%- if section.settings.show_social and social_icons -%}
+        {%- render 'social-icons' -%}
+      {%- endif -%}
+
+      <div class="localization-wrapper">
       {%- if section.settings.enable_country_selector and localization.available_countries.size > 1 -%}
         <noscript class="small-hide medium-hide">
           {%- form 'localization', id: 'AnnouncementCountryMobileFormNoScript', class: 'localization-form' -%}
@@ -151,8 +171,9 @@
           {%- endform -%}
         </localization-form>
       {%- endif -%}
+      </div>
     </div>
-  </div>
+  {%- endif -%}
 </div>
 
 {% style %}

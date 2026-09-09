@@ -31,7 +31,7 @@
       class="announcement-bar-marquee{% if section.settings.pause_on_hover %} announcement-bar-marquee--pause-on-hover{% endif %}"
       role="region"
       aria-label="{{ 'sections.header.announcement' | t }}"
-      style="--marquee-duration: {{ section.settings.marquee_speed | times: block_count | times: repeat_count }}s; --marquee-item-spacing: {{ section.settings.item_spacing }}rem;"
+      style="--marquee-duration: {{ section.settings.marquee_speed | times: block_count | times: repeat_count }}s; --marquee-item-spacing-mobile: {{ section.settings.item_spacing_mobile }}rem; --marquee-item-spacing-desktop: {{ section.settings.item_spacing_desktop }}rem;"
     >
       <div class="announcement-bar-marquee__track">
         {%- comment -%}
@@ -191,6 +191,13 @@
     width: 100%;
     -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 3rem, #000 calc(100% - 3rem), transparent 100%);
     mask-image: linear-gradient(90deg, transparent 0, #000 3rem, #000 calc(100% - 3rem), transparent 100%);
+    --marquee-item-spacing: var(--marquee-item-spacing-mobile, 2rem);
+  }
+
+  @media screen and (min-width: 750px) {
+    .announcement-bar-marquee {
+      --marquee-item-spacing: var(--marquee-item-spacing-desktop, 3rem);
+    }
   }
 
   .announcement-bar-marquee__track {
@@ -218,14 +225,18 @@
   }
 
   .announcement-bar-marquee__item--highlight {
-    margin: 0.6rem 0;
-    padding: 0.6rem var(--marquee-item-spacing, 3rem);
+    margin: 0.3rem 0;
+    padding: 0.3rem var(--marquee-item-spacing, 3rem);
     border-radius: var(--badge-corner-radius, 4rem);
     background-color: rgb(var(--color-background));
     color: rgb(var(--color-foreground));
   }
 
+  /* .announcement-bar__message has its own 1rem top/bottom padding (base.css).
+     Reduced here so it doesn't stack with the highlight's own margin + padding
+     above and inflate the whole bar's height. */
   .announcement-bar-marquee__item--highlight .announcement-bar__message {
+    padding: 0.4rem 0;
     font-weight: 700;
   }
 
@@ -325,12 +336,22 @@
     },
     {
       "type": "range",
-      "id": "item_spacing",
+      "id": "item_spacing_mobile",
       "min": 1,
       "max": 8,
       "step": 0.5,
       "unit": "rem",
-      "label": "Space between announcements",
+      "label": "Space between announcements (mobile)",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "item_spacing_desktop",
+      "min": 1,
+      "max": 8,
+      "step": 0.5,
+      "unit": "rem",
+      "label": "Space between announcements (desktop)",
       "default": 3
     },
     {

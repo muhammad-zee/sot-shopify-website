@@ -66,8 +66,12 @@
                         {% if item_hidden %}tabindex="-1"{% endif %}
                       >
                     {%- endif -%}
-                    <p class="announcement-bar__message h5">
-                      <span>{{ block.settings.text | escape }}</span>
+                    <p class="announcement-bar__message h5{% if block.settings.highlight %} announcement-bar__message--badge{% endif %}">
+                      {%- if block.settings.highlight -%}
+                        <span class="badge color-{{ block.settings.highlight_color_scheme }}">{{ block.settings.text | escape }}</span>
+                      {%- else -%}
+                        <span>{{ block.settings.text | escape }}</span>
+                      {%- endif -%}
                       {%- if block.settings.link != blank -%}
                         {% render 'icon-arrow' %}
                       {%- endif -%}
@@ -214,6 +218,20 @@
   .announcement-bar-marquee__item .announcement-bar__message {
     margin: 0;
     white-space: nowrap;
+  }
+
+  /* .announcement-bar__message normally has its own 1rem top/bottom padding
+     (base.css). The .badge inside already has its own padding, so this is
+     zeroed here to avoid stacking both. It's also made a flex container so
+     the badge (inline-block by default, which aligns to its text line's
+     baseline rather than true center) is centered with exact flexbox math
+     instead — this stays reliable regardless of the surrounding line-height.
+     It doesn't grow to fill the item's width, since it's still sized by its
+     own flex-grow: 0 as a child of .announcement-bar-marquee__item. */
+  .announcement-bar__message--badge {
+    display: flex;
+    align-items: center;
+    padding: 0;
   }
 
   .announcement-bar-marquee--pause-on-hover:hover .announcement-bar-marquee__track,

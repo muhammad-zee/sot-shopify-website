@@ -220,6 +220,8 @@
                     </div>
                   </details>
                 </div>
+              {%- when 'size_fit_guide' -%}
+                {% render 'size-fit-guide', block: block, section: section %}
               {%- when 'quantity_selector' -%}
                 <div
                   id="Quantity-Form-{{ section.id }}"
@@ -1220,6 +1222,140 @@
           "type": "page",
           "id": "page",
           "label": "t:sections.main-product.blocks.collapsible_tab.settings.page.label"
+        }
+      ]
+    },
+    {
+      "type": "size_fit_guide",
+      "name": "Size & Fit Guide",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "default": "Size & Fit Guide",
+          "label": "Heading"
+        },
+        {
+          "type": "select",
+          "id": "unit_display",
+          "label": "Units to display",
+          "options": [
+            { "value": "in", "label": "Inches only" },
+            { "value": "cm", "label": "Centimeters only" },
+            { "value": "both", "label": "Inches and centimeters" }
+          ],
+          "default": "both"
+        },
+        {
+          "type": "header",
+          "content": "Size S measurements (in)"
+        },
+        {
+          "type": "number",
+          "id": "s_chest",
+          "label": "Chest",
+          "default": 38
+        },
+        {
+          "type": "number",
+          "id": "s_length",
+          "label": "Length",
+          "default": 27
+        },
+        {
+          "type": "number",
+          "id": "s_shoulder",
+          "label": "Shoulder",
+          "default": 17
+        },
+        {
+          "type": "header",
+          "content": "Size M measurements (in)"
+        },
+        {
+          "type": "number",
+          "id": "m_chest",
+          "label": "Chest",
+          "default": 40
+        },
+        {
+          "type": "number",
+          "id": "m_length",
+          "label": "Length",
+          "default": 28
+        },
+        {
+          "type": "number",
+          "id": "m_shoulder",
+          "label": "Shoulder",
+          "default": 18
+        },
+        {
+          "type": "header",
+          "content": "Size L measurements (in)"
+        },
+        {
+          "type": "number",
+          "id": "l_chest",
+          "label": "Chest",
+          "default": 42
+        },
+        {
+          "type": "number",
+          "id": "l_length",
+          "label": "Length",
+          "default": 29
+        },
+        {
+          "type": "number",
+          "id": "l_shoulder",
+          "label": "Shoulder",
+          "default": 19
+        },
+        {
+          "type": "header",
+          "content": "Size XL measurements (in)"
+        },
+        {
+          "type": "number",
+          "id": "xl_chest",
+          "label": "Chest",
+          "default": 44
+        },
+        {
+          "type": "number",
+          "id": "xl_length",
+          "label": "Length",
+          "default": 30
+        },
+        {
+          "type": "number",
+          "id": "xl_shoulder",
+          "label": "Shoulder",
+          "default": 20
+        },
+        {
+          "type": "header",
+          "content": "Fit note"
+        },
+        {
+          "type": "text",
+          "id": "model_height",
+          "label": "Model height",
+          "default": "6'1\" (185cm)"
+        },
+        {
+          "type": "text",
+          "id": "model_size",
+          "label": "Model is wearing",
+          "default": "size M"
+        },
+        {
+          "type": "text",
+          "id": "fit_type",
+          "label": "Fit type",
+          "default": "Oversized, boxy fit"
         }
       ]
     },

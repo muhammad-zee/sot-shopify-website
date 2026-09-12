@@ -1,6 +1,12 @@
 {% comment %}
   Renders the "Size & Fit Guide" collapsible accordion block on the product page.
 
+  Data source: if the current product has a 'custom.size_chart' metafield
+  (a reference to a 'size_chart' metaobject) assigned in Admin, its values are
+  used so different products can show different charts while sharing one
+  reusable chart entry. If no chart is assigned, falls back to this block's
+  own settings, so the block still works with zero setup.
+
   Accepts:
   - block: {Object} the 'size_fit_guide' block from main-product.liquid
   - section: {Object} the enclosing section
@@ -9,13 +15,32 @@
   {% render 'size-fit-guide', block: block, section: section %}
 {% endcomment %}
 
+{%- liquid
+  assign chart = product.metafields.custom.size_chart.value
+
+  assign heading = block.settings.heading
+  assign unit_display = block.settings.unit_display
+  assign model_height = block.settings.model_height
+  assign model_size = block.settings.model_size
+  assign fit_type = block.settings.fit_type
+
+  if chart
+    if chart.unit_display.value != blank
+      assign unit_display = chart.unit_display.value
+    endif
+    assign model_height = chart.model_height.value
+    assign model_size = chart.model_size.value
+    assign fit_type = chart.fit_type.value
+  endif
+-%}
+
 <div class="product__accordion accordion size-fit-guide quick-add-hidden" {{ block.shopify_attributes }}>
   <details id="Details-{{ block.id }}-{{ section.id }}">
     <summary>
       <div class="summary__title">
         {% render 'icon-accordion', icon: 'ruler' %}
         <h2 class="h4 accordion__title">
-          {{ block.settings.heading | escape }}
+          {{ heading | escape }}
         </h2>
       </div>
       {% render 'icon-caret' %}
@@ -28,15 +53,15 @@
               <th scope="col">Size</th>
               <th scope="col">
                 Chest
-                {%- if block.settings.unit_display == 'both' %} (in / cm){% elsif block.settings.unit_display == 'cm' %} (cm){% else %} (in){% endif -%}
+                {%- if unit_display == 'both' %} (in / cm){% elsif unit_display == 'cm' %} (cm){% else %} (in){% endif -%}
               </th>
               <th scope="col">
                 Length
-                {%- if block.settings.unit_display == 'both' %} (in / cm){% elsif block.settings.unit_display == 'cm' %} (cm){% else %} (in){% endif -%}
+                {%- if unit_display == 'both' %} (in / cm){% elsif unit_display == 'cm' %} (cm){% else %} (in){% endif -%}
               </th>
               <th scope="col">
                 Shoulder
-                {%- if block.settings.unit_display == 'both' %} (in / cm){% elsif block.settings.unit_display == 'cm' %} (cm){% else %} (in){% endif -%}
+                {%- if unit_display == 'both' %} (in / cm){% elsif unit_display == 'cm' %} (cm){% else %} (in){% endif -%}
               </th>
             </tr>
           </thead>
@@ -52,18 +77,25 @@
                 assign chest_key = code | append: '_chest'
                 assign length_key = code | append: '_length'
                 assign shoulder_key = code | append: '_shoulder'
-                assign chest_in = block.settings[chest_key]
-                assign length_in = block.settings[length_key]
-                assign shoulder_in = block.settings[shoulder_key]
+
+                if chart
+                  assign chest_in = chart[chest_key].value
+                  assign length_in = chart[length_key].value
+                  assign shoulder_in = chart[shoulder_key].value
+                else
+                  assign chest_in = block.settings[chest_key]
+                  assign length_in = block.settings[length_key]
+                  assign shoulder_in = block.settings[shoulder_key]
+                endif
 
                 assign chest_display = chest_in
                 assign length_display = length_in
                 assign shoulder_display = shoulder_in
-                if block.settings.unit_display == 'cm'
+                if unit_display == 'cm'
                   assign chest_display = chest_in | times: 2.54 | round: 1
                   assign length_display = length_in | times: 2.54 | round: 1
                   assign shoulder_display = shoulder_in | times: 2.54 | round: 1
-                elsif block.settings.unit_display == 'both'
+                elsif unit_display == 'both'
                   assign chest_cm = chest_in | times: 2.54 | round: 1
                   assign length_cm = length_in | times: 2.54 | round: 1
                   assign shoulder_cm = shoulder_in | times: 2.54 | round: 1
@@ -82,11 +114,11 @@
           </tbody>
         </table>
       </div>
-      {%- if block.settings.model_height != blank or block.settings.model_size != blank or block.settings.fit_type != blank -%}
+      {%- if model_height != blank or model_size != blank or fit_type != blank -%}
         <p class="size-fit-guide__note">
-          {%- if block.settings.model_height != blank -%}Model height: {{ block.settings.model_height }}.{% endif -%}
-          {%- if block.settings.model_size != blank %} Wearing size {{ block.settings.model_size }}.{% endif -%}
-          {%- if block.settings.fit_type != blank %} Fit: {{ block.settings.fit_type }}.{% endif -%}
+          {%- if model_height != blank -%}Model height: {{ model_height }}.{% endif -%}
+          {%- if model_size != blank %} Wearing size {{ model_size }}.{% endif -%}
+          {%- if fit_type != blank %} Fit: {{ fit_type }}.{% endif -%}
         </p>
       {%- endif -%}
     </div>

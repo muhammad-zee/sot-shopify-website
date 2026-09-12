@@ -49,6 +49,28 @@
           "type": "description",
           "settings": {}
         },
+        "size_fit_guide_whchAk": {
+          "type": "size_fit_guide",
+          "settings": {
+            "heading": "Size & Fit Guide",
+            "unit_display": "both",
+            "s_chest": 38,
+            "s_length": 27,
+            "s_shoulder": 17,
+            "m_chest": 40,
+            "m_length": 28,
+            "m_shoulder": 18,
+            "l_chest": 42,
+            "l_length": 29,
+            "l_shoulder": 19,
+            "xl_chest": 44,
+            "xl_length": 30,
+            "xl_shoulder": 20,
+            "model_height": "6'1\" (185cm)",
+            "model_size": "size M",
+            "fit_type": "Oversized, boxy fit"
+          }
+        },
         "share": {
           "type": "share",
           "settings": {
@@ -64,6 +86,7 @@
         "quantity_selector",
         "buy_buttons",
         "description",
+        "size_fit_guide_whchAk",
         "share"
       ],
       "settings": {

@@ -1,11 +1,19 @@
 {% comment %}
   Renders the "Size & Fit Guide" collapsible accordion block on the product page.
 
-  Data source: if the current product has a 'custom.size_chart' metafield
-  (a reference to a 'size_chart' metaobject) assigned in Admin, its values are
-  used so different products can show different charts while sharing one
-  reusable chart entry. If no chart is assigned, falls back to this block's
-  own settings, so the block still works with zero setup.
+  Data source: the current product's 'custom.size_chart' metafield (a
+  reference to a 'size_chart' metaobject). If the product has no chart
+  assigned, this snippet renders nothing — the accordion is hidden entirely
+  rather than showing a generic/default chart.
+
+  Measurements per size: Body Length, Chest, Shoulder, and Sleeve Length.
+  Sleeve Length is optional per chart — if none of the 4 sizes have a value
+  for it (e.g. a sleeveless garment), the whole column is omitted.
+
+  Units: when the chart's "Units to display" is "in" or "cm", the table just
+  shows that one unit. When it's "both", a small IN / CM toggle is rendered
+  above the table (top-right) and the visitor can switch units live via
+  CSS only (:has()), no JavaScript involved.
 
   Accepts:
   - block: {Object} the 'size_fit_guide' block from main-product.liquid
@@ -17,153 +25,237 @@
 
 {%- liquid
   assign chart = product.metafields.custom.size_chart.value
+-%}
 
-  assign heading = block.settings.heading
-  assign unit_display = block.settings.unit_display
-  assign model_height = block.settings.model_height
-  assign model_size = block.settings.model_size
-  assign fit_type = block.settings.fit_type
-
-  if chart
+{%- if chart -%}
+  {%- liquid
+    assign heading = block.settings.heading
+    assign unit_display = block.settings.unit_display
     if chart.unit_display.value != blank
       assign unit_display = chart.unit_display.value
     endif
     assign model_height = chart.model_height.value
     assign model_size = chart.model_size.value
     assign fit_type = chart.fit_type.value
-  endif
--%}
 
-<div class="product__accordion accordion size-fit-guide quick-add-hidden" {{ block.shopify_attributes }}>
-  <details id="Details-{{ block.id }}-{{ section.id }}">
-    <summary>
-      <div class="summary__title">
-        {% render 'icon-accordion', icon: 'ruler' %}
-        <h2 class="h4 accordion__title">
-          {{ heading | escape }}
-        </h2>
-      </div>
-      {% render 'icon-caret' %}
-    </summary>
-    <div class="accordion__content rte" id="ProductAccordion-{{ block.id }}-{{ section.id }}">
-      <div class="size-fit-guide__table-wrapper">
-        <table class="size-fit-guide__table">
-          <thead>
-            <tr>
-              <th scope="col">Size</th>
-              <th scope="col">
-                Chest
-                {%- if unit_display == 'both' %} (in / cm){% elsif unit_display == 'cm' %} (cm){% else %} (in){% endif -%}
-              </th>
-              <th scope="col">
-                Length
-                {%- if unit_display == 'both' %} (in / cm){% elsif unit_display == 'cm' %} (cm){% else %} (in){% endif -%}
-              </th>
-              <th scope="col">
-                Shoulder
-                {%- if unit_display == 'both' %} (in / cm){% elsif unit_display == 'cm' %} (cm){% else %} (in){% endif -%}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {%- liquid
-              assign size_codes = 's,m,l,xl' | split: ','
-              assign size_labels = 'S,M,L,XL' | split: ','
-            -%}
-            {%- for code in size_codes -%}
-              {%- liquid
-                assign idx = forloop.index0
-                assign label = size_labels[idx]
-                assign chest_key = code | append: '_chest'
-                assign length_key = code | append: '_length'
-                assign shoulder_key = code | append: '_shoulder'
+    assign has_sleeve = false
+    if chart.s_sleeve_length.value != blank or chart.m_sleeve_length.value != blank or chart.l_sleeve_length.value != blank or chart.xl_sleeve_length.value != blank
+      assign has_sleeve = true
+    endif
 
-                if chart
-                  assign chest_in = chart[chest_key].value
-                  assign length_in = chart[length_key].value
-                  assign shoulder_in = chart[shoulder_key].value
-                else
-                  assign chest_in = block.settings[chest_key]
-                  assign length_in = block.settings[length_key]
-                  assign shoulder_in = block.settings[shoulder_key]
-                endif
-
-                assign chest_display = chest_in
-                assign length_display = length_in
-                assign shoulder_display = shoulder_in
-                if unit_display == 'cm'
-                  assign chest_display = chest_in | times: 2.54 | round: 1
-                  assign length_display = length_in | times: 2.54 | round: 1
-                  assign shoulder_display = shoulder_in | times: 2.54 | round: 1
-                elsif unit_display == 'both'
-                  assign chest_cm = chest_in | times: 2.54 | round: 1
-                  assign length_cm = length_in | times: 2.54 | round: 1
-                  assign shoulder_cm = shoulder_in | times: 2.54 | round: 1
-                  assign chest_display = chest_in | append: ' / ' | append: chest_cm
-                  assign length_display = length_in | append: ' / ' | append: length_cm
-                  assign shoulder_display = shoulder_in | append: ' / ' | append: shoulder_cm
-                endif
-              -%}
+    assign show_toggle = false
+    assign unit_suffix = ' (in)'
+    if unit_display == 'cm'
+      assign unit_suffix = ' (cm)'
+    elsif unit_display == 'both'
+      assign show_toggle = true
+      assign unit_suffix = ''
+    endif
+  -%}
+  <div class="product__accordion accordion size-fit-guide quick-add-hidden" {{ block.shopify_attributes }}>
+    <details id="Details-{{ block.id }}-{{ section.id }}">
+      <summary>
+        <div class="summary__title">
+          {% render 'icon-accordion', icon: 'ruler' %}
+          <h2 class="h4 accordion__title">
+            {{ heading | escape }}
+          </h2>
+        </div>
+        {% render 'icon-caret' %}
+      </summary>
+      <div class="accordion__content rte" id="ProductAccordion-{{ block.id }}-{{ section.id }}">
+        {%- if show_toggle -%}
+          <div class="size-fit-guide__unit-toggle">
+            <input type="radio" name="size-fit-guide-unit-{{ block.id }}" id="size-fit-guide-unit-in-{{ block.id }}" checked>
+            <label for="size-fit-guide-unit-in-{{ block.id }}">In</label>
+            <input type="radio" name="size-fit-guide-unit-{{ block.id }}" id="size-fit-guide-unit-cm-{{ block.id }}">
+            <label for="size-fit-guide-unit-cm-{{ block.id }}">Cm</label>
+          </div>
+        {%- endif -%}
+        <div class="size-fit-guide__table-wrapper">
+          <table class="size-fit-guide__table">
+            <thead>
               <tr>
-                <th scope="row">{{ label }}</th>
-                <td>{{ chest_display }}</td>
-                <td>{{ length_display }}</td>
-                <td>{{ shoulder_display }}</td>
+                <th scope="col">Size</th>
+                <th scope="col">Body length{{ unit_suffix }}</th>
+                <th scope="col">Chest{{ unit_suffix }}</th>
+                <th scope="col">Shoulder{{ unit_suffix }}</th>
+                {%- if has_sleeve -%}
+                  <th scope="col">Sleeve length{{ unit_suffix }}</th>
+                {%- endif -%}
               </tr>
-            {%- endfor -%}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {%- liquid
+                assign size_codes = 's,m,l,xl' | split: ','
+                assign size_labels = 'S,M,L,XL' | split: ','
+              -%}
+              {%- for code in size_codes -%}
+                {%- liquid
+                  assign idx = forloop.index0
+                  assign label = size_labels[idx]
+
+                  assign body_length_key = code | append: '_body_length'
+                  assign chest_key = code | append: '_chest'
+                  assign shoulder_key = code | append: '_shoulder'
+                  assign sleeve_key = code | append: '_sleeve_length'
+
+                  assign body_length_in = chart[body_length_key].value
+                  assign chest_in = chart[chest_key].value
+                  assign shoulder_in = chart[shoulder_key].value
+                  assign sleeve_in = chart[sleeve_key].value
+
+                  assign body_length_cm = body_length_in | times: 2.54 | round: 1
+                  assign chest_cm = chest_in | times: 2.54 | round: 1
+                  assign shoulder_cm = shoulder_in | times: 2.54 | round: 1
+                  if sleeve_in != blank
+                    assign sleeve_cm = sleeve_in | times: 2.54 | round: 1
+                  endif
+
+                  assign body_length_display = body_length_in
+                  assign chest_display = chest_in
+                  assign shoulder_display = shoulder_in
+                  assign sleeve_display = sleeve_in
+                  if unit_display == 'cm'
+                    assign body_length_display = body_length_cm
+                    assign chest_display = chest_cm
+                    assign shoulder_display = shoulder_cm
+                    assign sleeve_display = sleeve_cm
+                  endif
+                -%}
+                <tr>
+                  <th scope="row">{{ label }}</th>
+                  {%- if show_toggle -%}
+                    <td>
+                      <span class="size-fit-guide__value size-fit-guide__value--in">{{ body_length_in }}</span>
+                      <span class="size-fit-guide__value size-fit-guide__value--cm">{{ body_length_cm }}</span>
+                    </td>
+                    <td>
+                      <span class="size-fit-guide__value size-fit-guide__value--in">{{ chest_in }}</span>
+                      <span class="size-fit-guide__value size-fit-guide__value--cm">{{ chest_cm }}</span>
+                    </td>
+                    <td>
+                      <span class="size-fit-guide__value size-fit-guide__value--in">{{ shoulder_in }}</span>
+                      <span class="size-fit-guide__value size-fit-guide__value--cm">{{ shoulder_cm }}</span>
+                    </td>
+                    {%- if has_sleeve -%}
+                      <td>
+                        <span class="size-fit-guide__value size-fit-guide__value--in">{{ sleeve_in }}</span>
+                        <span class="size-fit-guide__value size-fit-guide__value--cm">{{ sleeve_cm }}</span>
+                      </td>
+                    {%- endif -%}
+                  {%- else -%}
+                    <td>{{ body_length_display }}</td>
+                    <td>{{ chest_display }}</td>
+                    <td>{{ shoulder_display }}</td>
+                    {%- if has_sleeve -%}
+                      <td>{{ sleeve_display }}</td>
+                    {%- endif -%}
+                  {%- endif -%}
+                </tr>
+              {%- endfor -%}
+            </tbody>
+          </table>
+        </div>
+        {%- if model_height != blank or model_size != blank or fit_type != blank -%}
+          <p class="size-fit-guide__note">
+            {%- if model_height != blank -%}Model height: {{ model_height }}.{% endif -%}
+            {%- if model_size != blank %} Wearing size {{ model_size }}.{% endif -%}
+            {%- if fit_type != blank %} Fit: {{ fit_type }}.{% endif -%}
+          </p>
+        {%- endif -%}
       </div>
-      {%- if model_height != blank or model_size != blank or fit_type != blank -%}
-        <p class="size-fit-guide__note">
-          {%- if model_height != blank -%}Model height: {{ model_height }}.{% endif -%}
-          {%- if model_size != blank %} Wearing size {{ model_size }}.{% endif -%}
-          {%- if fit_type != blank %} Fit: {{ fit_type }}.{% endif -%}
-        </p>
-      {%- endif -%}
-    </div>
-  </details>
-</div>
+    </details>
+  </div>
 
-{% style %}
-  .size-fit-guide summary {
-    transition: color 0.2s ease, opacity 0.2s ease;
-  }
+  {% style %}
+    .size-fit-guide summary {
+      transition: color 0.2s ease, opacity 0.2s ease;
+    }
 
-  .size-fit-guide summary:hover {
-    color: rgba(var(--color-foreground), 0.75);
-  }
+    .size-fit-guide summary:hover {
+      color: rgba(var(--color-foreground), 0.75);
+    }
 
-  .size-fit-guide__table-wrapper {
-    overflow-x: auto;
-  }
+    .size-fit-guide__unit-toggle {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
 
-  .size-fit-guide__table {
-    width: 100%;
-    min-width: 40rem;
-    border-collapse: collapse;
-    font-size: 1.4rem;
-  }
+    .size-fit-guide__unit-toggle input {
+      position: absolute;
+      opacity: 0;
+      width: 0.1rem;
+      height: 0.1rem;
+    }
 
-  .size-fit-guide__table th,
-  .size-fit-guide__table td {
-    padding: 0.8rem 1.2rem;
-    border: 0.1rem solid rgba(var(--color-foreground), 0.08);
-    text-align: left;
-  }
+    .size-fit-guide__unit-toggle label {
+      cursor: pointer;
+      padding: 0.4rem 1.2rem;
+      border: 0.1rem solid rgb(var(--color-button));
+      border-radius: 0;
+      font-size: 1.2rem;
+      letter-spacing: 0.05rem;
+      color: rgb(var(--color-button));
+      transition: background-color 0.2s ease, color 0.2s ease;
+      user-select: none;
+    }
 
-  .size-fit-guide__table thead th {
-    background: rgba(var(--color-foreground), 0.03);
-    font-weight: 600;
-  }
+    .size-fit-guide__unit-toggle input:checked + label {
+      background: rgb(var(--color-button));
+      color: rgb(var(--color-button-text));
+    }
 
-  .size-fit-guide__table tbody th {
-    font-weight: 600;
-  }
+    .size-fit-guide__unit-toggle input:focus-visible + label {
+      outline: 0.2rem solid rgba(var(--color-button), 0.5);
+      outline-offset: 0.2rem;
+    }
 
-  .size-fit-guide__note {
-    margin: 1.2rem 0 0;
-    font-size: 1.3rem;
-    color: rgba(var(--color-foreground), 0.75);
-  }
-{% endstyle %}
+    .size-fit-guide__value--cm {
+      display: none;
+    }
+
+    .accordion__content:has(#size-fit-guide-unit-cm-{{ block.id }}:checked) .size-fit-guide__value--in {
+      display: none;
+    }
+
+    .accordion__content:has(#size-fit-guide-unit-cm-{{ block.id }}:checked) .size-fit-guide__value--cm {
+      display: inline;
+    }
+
+    .size-fit-guide__table-wrapper {
+      overflow-x: auto;
+    }
+
+    .size-fit-guide__table {
+      width: 100%;
+      min-width: 46rem;
+      border-collapse: collapse;
+      font-size: 1.4rem;
+    }
+
+    .size-fit-guide__table th,
+    .size-fit-guide__table td {
+      padding: 0.8rem 1.2rem;
+      border: 0.1rem solid rgba(var(--color-foreground), 0.08);
+      text-align: left;
+    }
+
+    .size-fit-guide__table thead th {
+      background: rgba(var(--color-foreground), 0.03);
+      font-weight: 600;
+    }
+
+    .size-fit-guide__table tbody th {
+      font-weight: 600;
+    }
+
+    .size-fit-guide__note {
+      margin: 1.2rem 0 0;
+      font-size: 1.3rem;
+      color: rgba(var(--color-foreground), 0.75);
+    }
+  {% endstyle %}
+{%- endif -%}

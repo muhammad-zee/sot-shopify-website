@@ -60,11 +60,10 @@ variant-selects {
 
 /* Custom styles for Pill display type */
 .product-form__input--pill input[type='radio'] + label {
-  border: var(--variant-pills-border-width) solid rgba(var(--color-foreground), var(--variant-pills-border-opacity));
+  border: var(--variant-pills-border-width) solid rgb(var(--color-button));
   background-color: rgb(var(--color-background));
-  color: rgba(var(--color-foreground));
-  border-radius: var(--variant-pills-radius);
-  color: rgb(var(--color-foreground));
+  color: rgb(var(--color-button));
+  border-radius: 0;
   display: inline-block;
   margin: 0.7rem 0.5rem 0.2rem 0;
   padding: 1rem 2rem;
@@ -72,7 +71,8 @@ variant-selects {
   letter-spacing: 0.1rem;
   line-height: 1;
   text-align: center;
-  transition: border var(--duration-short) ease;
+  transition: border var(--duration-short) ease, background-color var(--duration-short) ease,
+    color var(--duration-short) ease;
   cursor: pointer;
   position: relative;
 }
@@ -85,18 +85,19 @@ variant-selects {
   bottom: calc(var(--variant-pills-border-width) * -1);
   left: calc(var(--variant-pills-border-width) * -1);
   z-index: -1;
-  border-radius: var(--variant-pills-radius);
+  border-radius: 0;
   box-shadow: var(--variant-pills-shadow-horizontal-offset) var(--variant-pills-shadow-vertical-offset)
     var(--variant-pills-shadow-blur-radius) rgba(var(--color-shadow), var(--variant-pills-shadow-opacity));
 }
 
 .product-form__input--pill input[type='radio'] + label:hover {
-  border-color: rgb(var(--color-foreground));
+  border-color: rgb(var(--color-button));
 }
 
 .product-form__input--pill input[type='radio']:checked + label {
-  background-color: rgb(var(--color-foreground));
-  color: rgb(var(--color-background));
+  background-color: rgb(var(--color-button));
+  color: rgb(var(--color-button-text));
+  border-color: rgb(var(--color-button));
 }
 
 @media screen and (forced-colors: active) {

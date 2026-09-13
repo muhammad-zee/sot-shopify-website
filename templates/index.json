@@ -13,6 +13,7 @@
       "type": "video-hero",
       "name": "Hero Video Section",
       "settings": {
+        "video": "shopify://files/videos/download_4e6c2176-3064-4fc8-8987-46273a981325.mp4",
         "video_url": "",
         "fallback_image": "shopify://shop_images/DSC06382_1.jpg",
         "fallback_image_alt": "",

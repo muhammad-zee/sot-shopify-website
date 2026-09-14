@@ -44,7 +44,7 @@
         "slide_display_duration": 4,
         "slide_transition_duration": 1,
         "image_fit": "cover",
-        "image_position_desktop": "center bottom",
+        "image_position_desktop": "center center",
         "image_position_mobile": "center center",
         "background_color": "#f7f4ee",
         "overlay_style": "solid",

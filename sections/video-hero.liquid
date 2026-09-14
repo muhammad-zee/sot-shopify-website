@@ -26,6 +26,32 @@
   endunless
   assign height_mobile_small = height_mobile | replace: 'vh', 'svh'
   assign height_desktop_small = height_desktop | replace: 'vh', 'svh'
+
+  assign heading_rem_mobile = 3
+  case section.settings.heading_size_mobile
+    when 'h2'
+      assign heading_rem_mobile = 2
+    when 'h1'
+      assign heading_rem_mobile = 3
+    when 'h0'
+      assign heading_rem_mobile = 4
+    when 'hxl'
+      assign heading_rem_mobile = 5
+  endcase
+
+  assign heading_rem_desktop = 4
+  case section.settings.heading_size_desktop
+    when 'h2'
+      assign heading_rem_desktop = 2.4
+    when 'h1'
+      assign heading_rem_desktop = 4
+    when 'h0'
+      assign heading_rem_desktop = 5.2
+    when 'hxl'
+      assign heading_rem_desktop = 6.2
+  endcase
+
+  assign video_position_mobile = section.settings.video_position_mobile | default: 'center center'
 -%}
 
 {%- style -%}
@@ -70,8 +96,16 @@
     max-height: none;
     min-width: 0;
     min-height: 0;
-    object-fit: cover;
-    object-position: {{ section.settings.video_position }};
+    object-fit: {{ section.settings.video_fit }};
+    object-position: {{ video_position_mobile }};
+  }
+
+  @media screen and (min-width: 750px) {
+    .video-hero__media-{{ section.id }} video,
+    .video-hero__media-{{ section.id }} img,
+    .video-hero__media-{{ section.id }} svg {
+      object-position: {{ section.settings.video_position }};
+    }
   }
 
   /* The video paints on top of the fallback image, which stays underneath
@@ -111,6 +145,13 @@
     margin: 0;
     color: {{ section.settings.text_color }};
     word-break: break-word;
+    font-size: calc(var(--font-heading-scale) * {{ heading_rem_mobile }}rem);
+  }
+
+  @media screen and (min-width: 750px) {
+    .video-hero__heading-{{ section.id }} {
+      font-size: calc(var(--font-heading-scale) * {{ heading_rem_desktop }}rem);
+    }
   }
 
   .video-hero__text-{{ section.id }} {
@@ -232,7 +273,7 @@
 
   <div class="video-hero__content-{{ section.id }}">
     {%- if section.settings.heading != blank -%}
-      <{{ heading_tag }} class="video-hero__heading-{{ section.id }} inline-richtext {{ section.settings.heading_size }}">
+      <{{ heading_tag }} class="video-hero__heading-{{ section.id }} inline-richtext">
         {{ section.settings.heading }}
       </{{ heading_tag }}>
     {%- endif -%}
@@ -350,9 +391,38 @@
     },
     {
       "type": "select",
+      "id": "video_fit",
+      "label": "Video fit",
+      "info": "Crop to fill always fills the section but may crop the edges of the video. Show full video never crops, but can show empty bars filled with the Background fill color below.",
+      "options": [
+        { "value": "cover", "label": "Crop to fill" },
+        { "value": "contain", "label": "Show full video" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
       "id": "video_position",
-      "label": "Video focal point",
+      "label": "Desktop video focal point",
       "info": "Which part of the video stays in frame when it is cropped to the hero size.",
+      "options": [
+        { "value": "left top", "label": "Top left" },
+        { "value": "center top", "label": "Top center" },
+        { "value": "right top", "label": "Top right" },
+        { "value": "left center", "label": "Middle left" },
+        { "value": "center center", "label": "Middle center" },
+        { "value": "right center", "label": "Middle right" },
+        { "value": "left bottom", "label": "Bottom left" },
+        { "value": "center bottom", "label": "Bottom center" },
+        { "value": "right bottom", "label": "Bottom right" }
+      ],
+      "default": "center center"
+    },
+    {
+      "type": "select",
+      "id": "video_position_mobile",
+      "label": "Mobile video focal point",
+      "info": "Portrait screens often need a different crop than desktop — e.g. tighter on the subject.",
       "options": [
         { "value": "left top", "label": "Top left" },
         { "value": "center top", "label": "Top center" },
@@ -387,7 +457,7 @@
       "step": 5,
       "unit": "%",
       "label": "Overlay opacity",
-      "default": 35
+      "default": 45
     },
     { "type": "header", "content": "Content" },
     { "type": "inline_richtext", "id": "heading", "label": "Heading", "default": "Built for the ride ahead" },
@@ -405,8 +475,20 @@
     },
     {
       "type": "select",
-      "id": "heading_size",
-      "label": "Heading size",
+      "id": "heading_size_mobile",
+      "label": "Mobile heading size",
+      "options": [
+        { "value": "h2", "label": "Small" },
+        { "value": "h1", "label": "Medium" },
+        { "value": "h0", "label": "Large" },
+        { "value": "hxl", "label": "Extra large" }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "select",
+      "id": "heading_size_desktop",
+      "label": "Desktop heading size",
       "options": [
         { "value": "h2", "label": "Small" },
         { "value": "h1", "label": "Medium" },

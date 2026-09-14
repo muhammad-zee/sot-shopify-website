@@ -12,6 +12,13 @@
     "image_slideshow_hero_EgqXrN": {
       "type": "image-slideshow-hero",
       "blocks": {
+        "slideshow_image_mobile_N6akKD": {
+          "type": "slideshow_image_mobile",
+          "settings": {
+            "image": "shopify://shop_images/DSC06748_5c8d29b7-5b33-4f92-94f9-fb2132e73ebc.jpg",
+            "alt": ""
+          }
+        },
         "slideshow_image_FwM4JJ": {
           "type": "slideshow_image",
           "settings": {
@@ -35,6 +42,7 @@
         }
       },
       "block_order": [
+        "slideshow_image_mobile_N6akKD",
         "slideshow_image_FwM4JJ",
         "slideshow_image_LUeXbD",
         "slideshow_image_ghXUQd"

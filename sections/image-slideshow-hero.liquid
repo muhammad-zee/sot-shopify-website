@@ -44,8 +44,21 @@
 
   assign slide_display_seconds = section.settings.slide_display_duration
   assign slide_transition_seconds = section.settings.slide_transition_duration
+  # Transition must be meaningfully shorter than the display time, or the
+  # fade-in and fade-out of the SAME image would overlap each other instead
+  # of leaving a clean hold. Clamp it defensively.
+  assign max_transition = slide_display_seconds | times: 0.5
+  if slide_transition_seconds > max_transition
+    assign slide_transition_seconds = max_transition
+  endif
+
   assign slide_count = section.blocks.size
-  assign slot_seconds = slide_display_seconds | plus: slide_transition_seconds
+  # Slot spacing between consecutive images is display time only (not
+  # display + transition) — each image's fade-out is timed to land exactly
+  # on top of the next image's fade-in, so they cross-fade simultaneously
+  # instead of one finishing before the other starts (which is what caused
+  # a blank flash of the background color between images).
+  assign slot_seconds = slide_display_seconds
   assign total_cycle_seconds = slot_seconds | times: slide_count
 
   assign fade_pct = 0
@@ -53,8 +66,8 @@
   assign fadeout_end_pct = 0
   if slide_count > 0
     assign fade_pct = slide_transition_seconds | times: 1.0 | divided_by: total_cycle_seconds | times: 100
-    assign hold_end_pct = slide_transition_seconds | plus: slide_display_seconds | times: 1.0 | divided_by: total_cycle_seconds | times: 100
-    assign fadeout_end_pct = slide_transition_seconds | times: 2 | plus: slide_display_seconds | times: 1.0 | divided_by: total_cycle_seconds | times: 100
+    assign hold_end_pct = slide_display_seconds | times: 1.0 | divided_by: total_cycle_seconds | times: 100
+    assign fadeout_end_pct = slide_display_seconds | plus: slide_transition_seconds | times: 1.0 | divided_by: total_cycle_seconds | times: 100
   endif
 -%}
 
@@ -148,15 +161,7 @@
     {%- if block.type == 'slideshow_image' -%}
       .slideshow-hero__slide-{{ section.id }}-{{ forloop.index0 }} {
         z-index: {{ forloop.index }};
-        {%- if forloop.index0 == 0 -%}
-          /* Negative delay: starts already past its own fade-in, so the
-             first slide is visible immediately on page load instead of
-             fading in from a blank box. Every later loop still fades it
-             in normally, the same as the rest. */
-          animation-delay: -{{ slide_transition_seconds }}s;
-        {%- else -%}
-          animation-delay: {{ forloop.index0 | times: slot_seconds }}s;
-        {%- endif -%}
+        animation-delay: {{ forloop.index0 | times: slot_seconds }}s;
       }
     {%- endif -%}
   {%- endfor -%}

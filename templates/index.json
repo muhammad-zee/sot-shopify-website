@@ -92,94 +92,6 @@
         "padding_bottom": 60
       }
     },
-    "video_hero_B8C3EG": {
-      "type": "video-hero",
-      "disabled": true,
-      "name": "Hero Video Section",
-      "settings": {
-        "video": "shopify://files/videos/download (1)_333ec379-3fbf-4c26-9855-8f924d28c5b2.mp4",
-        "video_url": "",
-        "fallback_image": "shopify://shop_images/DSC06382_1.jpg",
-        "fallback_image_alt": "",
-        "video_fit": "cover",
-        "video_position": "center center",
-        "video_position_mobile": "center center",
-        "background_color": "#f7f4ee",
-        "overlay_style": "solid",
-        "overlay_color": "#b8542c",
-        "overlay_opacity": 45,
-        "heading": "THE ENGINEER'S WARDROBE",
-        "heading_tag": "h1",
-        "heading_size_mobile": "hxl",
-        "heading_size_desktop": "h0",
-        "text": "<p>Premium everyday wear, obsessively built by three<br/>engineers. Eleven months on a single fit. Three hundred<br/>units in the first run.</p>",
-        "text_size": 14,
-        "text_color": "#f7f4ee",
-        "enable_video_schema": false,
-        "video_upload_date": "",
-        "video_description": "",
-        "button_label": "Shop Now",
-        "button_link": "shopify://collections/all",
-        "button_color": "#f7f4ee",
-        "button_hover_text_color": "#b8542c",
-        "button_border_width": 2,
-        "button_corner_radius": 0,
-        "color_scheme": "scheme-1",
-        "height_desktop": "75vh",
-        "height_mobile": "25vh",
-        "content_position_mobile": "flex-end",
-        "content_position_desktop": "center",
-        "content_alignment_mobile": "center",
-        "content_alignment_desktop": "center",
-        "text_alignment": "center",
-        "content_max_width": 700,
-        "padding_top": 60,
-        "padding_bottom": 60
-      }
-    },
-    "image_with_text_WexcFG": {
-      "type": "image-with-text",
-      "blocks": {
-        "heading_peNxJ4": {
-          "type": "heading",
-          "settings": {
-            "heading": "<strong>THE ENGINEER'S WARDROBE</strong>",
-            "heading_size": "h0"
-          }
-        },
-        "text_qtB6wV": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Premium everyday wear, obsessively built by three engineers. Eleven months on a single fit. Three hundred units in the first run. <em>Worth the wait.</em></p>",
-            "text_style": "subtitle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_peNxJ4",
-        "text_qtB6wV"
-      ],
-      "disabled": true,
-      "custom_css": [],
-      "name": "Hero Image Section",
-      "settings": {
-        "image": "shopify://shop_images/bearded-young-man.jpg",
-        "full_screen": false,
-        "custom_height_mobile": 660,
-        "custom_height_desktop": 700,
-        "content_position": "center",
-        "content_alignment": "left",
-        "overlay_opacity": 10,
-        "overlay_color": "#b8542c",
-        "text_color": "#f7f4ee",
-        "badge_color": "#f7f4ee",
-        "badge_text_color": "#b8542c",
-        "button_bg_color": "#b8542c",
-        "button_text_color": "#f7f4ee",
-        "button_secondary_text_color": "#f7f4ee",
-        "sticky_mobile_cta": false
-      }
-    },
     "collection_list_jcDEdA": {
       "type": "collection-list",
       "blocks": {
@@ -635,8 +547,6 @@
   },
   "order": [
     "image_slideshow_hero_EgqXrN",
-    "video_hero_B8C3EG",
-    "image_with_text_WexcFG",
     "collection_list_jcDEdA",
     "featured_collection",
     "featured_collection_N6PqNd",

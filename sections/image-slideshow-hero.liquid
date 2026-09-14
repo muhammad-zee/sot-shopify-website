@@ -1,0 +1,659 @@
+{%- liquid
+  assign heading_tag = section.settings.heading_tag | default: 'h2'
+  unless heading_tag == 'h1' or heading_tag == 'h2' or heading_tag == 'h3'
+    assign heading_tag = 'h2'
+  endunless
+
+  assign overlay_opacity = section.settings.overlay_opacity | divided_by: 100.0
+
+  assign valid_heights = '25vh,50vh,75vh,100vh' | split: ','
+  assign height_mobile = section.settings.height_mobile
+  unless valid_heights contains height_mobile
+    assign height_mobile = '100vh'
+  endunless
+  assign height_desktop = section.settings.height_desktop
+  unless valid_heights contains height_desktop
+    assign height_desktop = '100vh'
+  endunless
+  assign height_mobile_small = height_mobile | replace: 'vh', 'svh'
+  assign height_desktop_small = height_desktop | replace: 'vh', 'svh'
+
+  assign heading_rem_mobile = 3
+  case section.settings.heading_size_mobile
+    when 'h2'
+      assign heading_rem_mobile = 2
+    when 'h1'
+      assign heading_rem_mobile = 3
+    when 'h0'
+      assign heading_rem_mobile = 4
+    when 'hxl'
+      assign heading_rem_mobile = 5
+  endcase
+
+  assign heading_rem_desktop = 4
+  case section.settings.heading_size_desktop
+    when 'h2'
+      assign heading_rem_desktop = 2.4
+    when 'h1'
+      assign heading_rem_desktop = 4
+    when 'h0'
+      assign heading_rem_desktop = 5.2
+    when 'hxl'
+      assign heading_rem_desktop = 6.2
+  endcase
+
+  assign slide_display_seconds = section.settings.slide_display_duration
+  assign slide_transition_seconds = section.settings.slide_transition_duration
+  assign slide_count = section.blocks.size
+  assign slot_seconds = slide_display_seconds | plus: slide_transition_seconds
+  assign total_cycle_seconds = slot_seconds | times: slide_count
+
+  assign fade_pct = 0
+  assign hold_end_pct = 0
+  assign fadeout_end_pct = 0
+  if slide_count > 0
+    assign fade_pct = slide_transition_seconds | times: 1.0 | divided_by: total_cycle_seconds | times: 100
+    assign hold_end_pct = slide_transition_seconds | plus: slide_display_seconds | times: 1.0 | divided_by: total_cycle_seconds | times: 100
+    assign fadeout_end_pct = slide_transition_seconds | times: 2 | plus: slide_display_seconds | times: 1.0 | divided_by: total_cycle_seconds | times: 100
+  endif
+-%}
+
+{%- style -%}
+  .slideshow-hero-{{ section.id }} {
+    position: relative;
+    display: flex;
+    overflow: hidden;
+    isolation: isolate;
+    align-items: {{ section.settings.content_position_mobile }};
+    justify-content: {{ section.settings.content_alignment_mobile }};
+    min-height: {{ height_mobile }};
+    min-height: {{ height_mobile_small }};
+  }
+
+  @media screen and (min-width: 750px) {
+    .slideshow-hero-{{ section.id }} {
+      align-items: {{ section.settings.content_position_desktop }};
+      justify-content: {{ section.settings.content_alignment_desktop }};
+      min-height: {{ height_desktop }};
+      min-height: {{ height_desktop_small }};
+    }
+  }
+
+  /* --- BACKGROUND MEDIA ---
+     Absolutely positioned and forced to 100%/100% so the source can never
+     render at its native resolution or overflow the hero box. */
+  .slideshow-hero__media-{{ section.id }} {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background-color: {{ section.settings.background_color }};
+  }
+
+  .slideshow-hero__media-{{ section.id }} img,
+  .slideshow-hero__media-{{ section.id }} svg {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    min-width: 0;
+    min-height: 0;
+    object-fit: {{ section.settings.image_fit }};
+    object-position: {{ section.settings.image_position_mobile }};
+  }
+
+  @media screen and (min-width: 750px) {
+    .slideshow-hero__media-{{ section.id }} img,
+    .slideshow-hero__media-{{ section.id }} svg {
+      object-position: {{ section.settings.image_position_desktop }};
+    }
+  }
+
+  /* --- IMAGE SLIDESHOW ---
+     Every slide is stacked full-bleed (via the shared img rule above) and
+     plays the same crossfade keyframes, each started at a different point
+     via animation-delay, so they take turns being the visible layer.
+     Pure CSS — no JavaScript timer involved. */
+  @keyframes slideshow-hero-crossfade-{{ section.id }} {
+    0% {
+      opacity: 0;
+    }
+    {{ fade_pct }}% {
+      opacity: 1;
+    }
+    {{ hold_end_pct }}% {
+      opacity: 1;
+    }
+    {{ fadeout_end_pct }}% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .slideshow-hero__slide-{{ section.id }} {
+    opacity: 0;
+    animation-name: slideshow-hero-crossfade-{{ section.id }};
+    animation-duration: {{ total_cycle_seconds }}s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-fill-mode: backwards;
+  }
+
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'slideshow_image' -%}
+      .slideshow-hero__slide-{{ section.id }}-{{ forloop.index0 }} {
+        z-index: {{ forloop.index }};
+        {%- if forloop.index0 == 0 -%}
+          /* Negative delay: starts already past its own fade-in, so the
+             first slide is visible immediately on page load instead of
+             fading in from a blank box. Every later loop still fades it
+             in normally, the same as the rest. */
+          animation-delay: -{{ slide_transition_seconds }}s;
+        {%- else -%}
+          animation-delay: {{ forloop.index0 | times: slot_seconds }}s;
+        {%- endif -%}
+      }
+    {%- endif -%}
+  {%- endfor -%}
+
+  /* Reduced motion: freeze on the first slide instead of crossfading. */
+  @media (prefers-reduced-motion: reduce) {
+    .slideshow-hero__slide-{{ section.id }} {
+      animation: none;
+      opacity: 0;
+    }
+
+    .slideshow-hero__slide-{{ section.id }}-0 {
+      opacity: 1;
+    }
+  }
+
+  /* Overlay sits between the media and the content */
+  .slideshow-hero__overlay-{{ section.id }} {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    {% if section.settings.overlay_style == 'gradient' %}
+      background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0) 0%,
+        {{ section.settings.overlay_color | color_modify: 'alpha', overlay_opacity }} 100%
+      );
+    {% else %}
+      background-color: {{ section.settings.overlay_color | color_modify: 'alpha', overlay_opacity }};
+    {% endif %}
+  }
+
+  .slideshow-hero__content-{{ section.id }} {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: {{ section.settings.content_max_width }}px;
+    padding: {{ section.settings.padding_top }}px 2rem {{ section.settings.padding_bottom }}px;
+    text-align: {{ section.settings.text_alignment }};
+    color: {{ section.settings.text_color }};
+  }
+
+  .slideshow-hero__heading-{{ section.id }} {
+    margin: 0;
+    color: {{ section.settings.text_color }};
+    word-break: break-word;
+    font-size: calc(var(--font-heading-scale) * {{ heading_rem_mobile }}rem);
+  }
+
+  @media screen and (min-width: 750px) {
+    .slideshow-hero__heading-{{ section.id }} {
+      font-size: calc(var(--font-heading-scale) * {{ heading_rem_desktop }}rem);
+    }
+  }
+
+  .slideshow-hero__text-{{ section.id }} {
+    margin: 1.5rem 0 0;
+    color: {{ section.settings.text_color }};
+    font-size: {{ section.settings.text_size }}px;
+    line-height: 1.6;
+  }
+
+  .slideshow-hero__text-{{ section.id }} > *:first-child {
+    margin-top: 0;
+  }
+
+  .slideshow-hero__text-{{ section.id }} > *:last-child {
+    margin-bottom: 0;
+  }
+
+  .slideshow-hero__text-{{ section.id }} a {
+    color: inherit;
+  }
+
+  /* --- OUTLINE BUTTON ---
+     Deliberately not using .button so the colors stay readable over the
+     slideshow regardless of which colour scheme the section is set to. */
+  .slideshow-hero__button-{{ section.id }} {
+    display: inline-block;
+    margin-top: 2.5rem;
+    padding: 1.2rem 3.2rem;
+    border: {{ section.settings.button_border_width }}px solid {{ section.settings.button_color }};
+    border-radius: {{ section.settings.button_corner_radius }}px;
+    background-color: transparent;
+    color: {{ section.settings.button_color }};
+    font-size: 1.5rem;
+    letter-spacing: 0.06rem;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  .slideshow-hero__button-{{ section.id }}:hover,
+  .slideshow-hero__button-{{ section.id }}:focus-visible {
+    background-color: {{ section.settings.button_color }};
+    color: {{ section.settings.button_hover_text_color }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .slideshow-hero__content-{{ section.id }} {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+
+    .slideshow-hero__button-{{ section.id }} {
+      margin-top: 2rem;
+      padding: 1.1rem 2.6rem;
+    }
+  }
+{%- endstyle -%}
+
+<div class="slideshow-hero-{{ section.id }} color-{{ section.settings.color_scheme }}">
+  <div class="slideshow-hero__media-{{ section.id }}">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'slideshow_image' and block.settings.image != blank -%}
+        {%- liquid
+          assign slide_loading = 'lazy'
+          if forloop.index0 == 0
+            assign slide_loading = 'eager'
+          endif
+          assign slide_class = 'slideshow-hero__slide-' | append: section.id | append: ' slideshow-hero__slide-' | append: section.id | append: '-' | append: forloop.index0
+        -%}
+        {{
+          block.settings.image
+          | image_url: width: 3840
+          | image_tag:
+            loading: slide_loading,
+            sizes: '100vw',
+            widths: '375, 750, 1100, 1500, 1780, 2000, 3000, 3840',
+            alt: block.settings.alt,
+            class: slide_class
+        }}
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- if slide_count == 0 -%}
+      {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+    {%- endif -%}
+  </div>
+
+  {%- if section.settings.overlay_opacity > 0 -%}
+    <div class="slideshow-hero__overlay-{{ section.id }}"></div>
+  {%- endif -%}
+
+  <div class="slideshow-hero__content-{{ section.id }}">
+    {%- if section.settings.heading != blank -%}
+      <{{ heading_tag }} class="slideshow-hero__heading-{{ section.id }} inline-richtext">
+        {{ section.settings.heading }}
+      </{{ heading_tag }}>
+    {%- endif -%}
+
+    {%- if section.settings.text != blank -%}
+      <div class="slideshow-hero__text-{{ section.id }} rte">
+        {{ section.settings.text }}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.button_label != blank -%}
+      <a
+        {% if section.settings.button_link != blank %}
+          href="{{ section.settings.button_link }}"
+        {% else %}
+          role="link" aria-disabled="true"
+        {% endif %}
+        class="slideshow-hero__button-{{ section.id }}"
+      >
+        {{ section.settings.button_label | escape }}
+      </a>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Image Slideshow Hero",
+  "tag": "section",
+  "settings": [
+    { "type": "header", "content": "Slideshow images" },
+    {
+      "type": "paragraph",
+      "content": "Add the images as blocks below, in the order you want them to play. Each dissolves into the next on a loop, like a video."
+    },
+    {
+      "type": "range",
+      "id": "slide_display_duration",
+      "min": 1,
+      "max": 10,
+      "step": 0.5,
+      "unit": "s",
+      "label": "Time per image",
+      "info": "How long each image stays fully visible before dissolving into the next.",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "slide_transition_duration",
+      "min": 0.2,
+      "max": 3,
+      "step": 0.1,
+      "unit": "s",
+      "label": "Dissolve transition length",
+      "default": 1
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Image fit",
+      "info": "Crop to fill always fills the section but may crop the edges of the image. Show full image never crops, but can show empty bars filled with the Background fill color below.",
+      "options": [
+        { "value": "cover", "label": "Crop to fill" },
+        { "value": "contain", "label": "Show full image" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "image_position_desktop",
+      "label": "Desktop focal point",
+      "info": "Which part of each image stays in frame when it is cropped to the hero size.",
+      "options": [
+        { "value": "left top", "label": "Top left" },
+        { "value": "center top", "label": "Top center" },
+        { "value": "right top", "label": "Top right" },
+        { "value": "left center", "label": "Middle left" },
+        { "value": "center center", "label": "Middle center" },
+        { "value": "right center", "label": "Middle right" },
+        { "value": "left bottom", "label": "Bottom left" },
+        { "value": "center bottom", "label": "Bottom center" },
+        { "value": "right bottom", "label": "Bottom right" }
+      ],
+      "default": "center center"
+    },
+    {
+      "type": "select",
+      "id": "image_position_mobile",
+      "label": "Mobile focal point",
+      "info": "Portrait screens often need a different crop than desktop — e.g. tighter on the subject.",
+      "options": [
+        { "value": "left top", "label": "Top left" },
+        { "value": "center top", "label": "Top center" },
+        { "value": "right top", "label": "Top right" },
+        { "value": "left center", "label": "Middle left" },
+        { "value": "center center", "label": "Middle center" },
+        { "value": "right center", "label": "Middle right" },
+        { "value": "left bottom", "label": "Bottom left" },
+        { "value": "center bottom", "label": "Bottom center" },
+        { "value": "right bottom", "label": "Bottom right" }
+      ],
+      "default": "center center"
+    },
+    { "type": "color", "id": "background_color", "label": "Background fill", "default": "#000000" },
+    { "type": "header", "content": "Overlay" },
+    {
+      "type": "select",
+      "id": "overlay_style",
+      "label": "Overlay style",
+      "options": [
+        { "value": "solid", "label": "Solid tint" },
+        { "value": "gradient", "label": "Gradient (fades in at the bottom)" }
+      ],
+      "default": "solid"
+    },
+    { "type": "color", "id": "overlay_color", "label": "Overlay color", "default": "#000000" },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay opacity",
+      "default": 45
+    },
+    { "type": "header", "content": "Content" },
+    { "type": "inline_richtext", "id": "heading", "label": "Heading", "default": "Built for the ride ahead" },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading HTML tag",
+      "info": "Use H1 only if this is the first section on the page and no other section uses H1. One H1 per page.",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "select",
+      "id": "heading_size_mobile",
+      "label": "Mobile heading size",
+      "options": [
+        { "value": "h2", "label": "Small" },
+        { "value": "h1", "label": "Medium" },
+        { "value": "h0", "label": "Large" },
+        { "value": "hxl", "label": "Extra large" }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "select",
+      "id": "heading_size_desktop",
+      "label": "Desktop heading size",
+      "options": [
+        { "value": "h2", "label": "Small" },
+        { "value": "h1", "label": "Medium" },
+        { "value": "h0", "label": "Large" },
+        { "value": "hxl", "label": "Extra large" }
+      ],
+      "default": "h0"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Tell your story in a sentence or two. Keep it short so it stays readable over the slideshow.</p>"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Text size",
+      "default": 16
+    },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#FFFFFF" },
+    { "type": "header", "content": "Outline button" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop the collection" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "color", "id": "button_color", "label": "Border and label color", "default": "#FFFFFF" },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "Label color on hover",
+      "info": "Used when the button fills in on hover.",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "button_border_width",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Border thickness",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "button_corner_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Corner radius",
+      "default": 0
+    },
+    { "type": "header", "content": "Layout" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    {
+      "type": "select",
+      "id": "height_desktop",
+      "label": "Desktop height",
+      "options": [
+        { "value": "25vh", "label": "25% of screen height" },
+        { "value": "50vh", "label": "50% of screen height" },
+        { "value": "75vh", "label": "75% of screen height" },
+        { "value": "100vh", "label": "Full screen height" }
+      ],
+      "default": "100vh"
+    },
+    {
+      "type": "select",
+      "id": "height_mobile",
+      "label": "Mobile height",
+      "options": [
+        { "value": "25vh", "label": "25% of screen height" },
+        { "value": "50vh", "label": "50% of screen height" },
+        { "value": "75vh", "label": "75% of screen height" },
+        { "value": "100vh", "label": "Full screen height" }
+      ],
+      "default": "100vh"
+    },
+    {
+      "type": "select",
+      "id": "content_position_mobile",
+      "label": "Mobile vertical position",
+      "options": [
+        { "value": "flex-start", "label": "Top" },
+        { "value": "center", "label": "Middle" },
+        { "value": "flex-end", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "content_position_desktop",
+      "label": "Desktop vertical position",
+      "options": [
+        { "value": "flex-start", "label": "Top" },
+        { "value": "center", "label": "Middle" },
+        { "value": "flex-end", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment_mobile",
+      "label": "Mobile horizontal position",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment_desktop",
+      "label": "Desktop horizontal position",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 400,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "label": "Content width",
+      "default": 700
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slideshow_image",
+      "name": "Slideshow image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Alt text",
+          "info": "Describes the image for screen readers and search engines. Leave empty only if the image is purely decorative."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image Slideshow Hero",
+      "blocks": [{ "type": "slideshow_image" }, { "type": "slideshow_image" }]
+    }
+  ]
+}
+{% endschema %}

@@ -34,7 +34,7 @@
         "enable_video_schema": false,
         "video_upload_date": "",
         "video_description": "",
-        "button_label": "",
+        "button_label": "Shop Now",
         "button_link": "shopify://collections/all",
         "button_color": "#f7f4ee",
         "button_hover_text_color": "#b8542c",

@@ -60,14 +60,16 @@
     display: flex;
     overflow: hidden;
     isolation: isolate;
-    align-items: {{ section.settings.content_position }};
-    justify-content: {{ section.settings.content_alignment }};
+    align-items: {{ section.settings.content_position_mobile }};
+    justify-content: {{ section.settings.content_alignment_mobile }};
     min-height: {{ height_mobile }};
     min-height: {{ height_mobile_small }};
   }
 
   @media screen and (min-width: 750px) {
     .video-hero-{{ section.id }} {
+      align-items: {{ section.settings.content_position_desktop }};
+      justify-content: {{ section.settings.content_alignment_desktop }};
       min-height: {{ height_desktop }};
       min-height: {{ height_desktop_small }};
     }
@@ -593,8 +595,8 @@
     },
     {
       "type": "select",
-      "id": "content_position",
-      "label": "Vertical position",
+      "id": "content_position_mobile",
+      "label": "Mobile vertical position",
       "options": [
         { "value": "flex-start", "label": "Top" },
         { "value": "center", "label": "Middle" },
@@ -604,8 +606,30 @@
     },
     {
       "type": "select",
-      "id": "content_alignment",
-      "label": "Horizontal position",
+      "id": "content_position_desktop",
+      "label": "Desktop vertical position",
+      "options": [
+        { "value": "flex-start", "label": "Top" },
+        { "value": "center", "label": "Middle" },
+        { "value": "flex-end", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment_mobile",
+      "label": "Mobile horizontal position",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment_desktop",
+      "label": "Desktop horizontal position",
       "options": [
         { "value": "flex-start", "label": "Left" },
         { "value": "center", "label": "Center" },

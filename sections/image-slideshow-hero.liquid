@@ -54,20 +54,21 @@
 
   assign slide_count = section.blocks.size
   # Slot spacing between consecutive images is display time only (not
-  # display + transition) — each image's fade-out is timed to land exactly
-  # on top of the next image's fade-in, so they cross-fade simultaneously
-  # instead of one finishing before the other starts (which is what caused
-  # a blank flash of the background color between images).
+  # display + transition), so each new image starts rising on top of the
+  # previous one exactly display_seconds after that image started rising.
   assign slot_seconds = slide_display_seconds
   assign total_cycle_seconds = slot_seconds | times: slide_count
 
+  # Each image only ever fades IN (0% opacity -> 100%), then holds fully
+  # opaque for the rest of the loop — it never fades back out itself. The
+  # "old image disappearing" effect comes entirely from the NEXT image
+  # rising on top of it (higher z-index), not from this image's own opacity
+  # dropping. That guarantees the background color can never show through
+  # even partially during a transition, since at every instant at least one
+  # full-opacity image is present in the stack.
   assign fade_pct = 0
-  assign hold_end_pct = 0
-  assign fadeout_end_pct = 0
   if slide_count > 0
     assign fade_pct = slide_transition_seconds | times: 1.0 | divided_by: total_cycle_seconds | times: 100
-    assign hold_end_pct = slide_display_seconds | times: 1.0 | divided_by: total_cycle_seconds | times: 100
-    assign fadeout_end_pct = slide_display_seconds | plus: slide_transition_seconds | times: 1.0 | divided_by: total_cycle_seconds | times: 100
   endif
 -%}
 
@@ -126,9 +127,12 @@
   }
 
   /* --- IMAGE SLIDESHOW ---
-     Every slide is stacked full-bleed (via the shared img rule above) and
-     plays the same crossfade keyframes, each started at a different point
-     via animation-delay, so they take turns being the visible layer.
+     Every slide is stacked full-bleed (via the shared img rule above), and
+     each only ever fades IN once (0% -> 100% opacity) at its own delay, then
+     holds fully opaque. Later slides have a higher z-index, so the next
+     image rising covers the previous one — that's what reads as the old
+     image "fading out", without either layer ever being partially
+     transparent over the raw background at the same time.
      Pure CSS — no JavaScript timer involved. */
   @keyframes slideshow-hero-crossfade-{{ section.id }} {
     0% {
@@ -137,14 +141,8 @@
     {{ fade_pct }}% {
       opacity: 1;
     }
-    {{ hold_end_pct }}% {
-      opacity: 1;
-    }
-    {{ fadeout_end_pct }}% {
-      opacity: 0;
-    }
     100% {
-      opacity: 0;
+      opacity: 1;
     }
   }
 

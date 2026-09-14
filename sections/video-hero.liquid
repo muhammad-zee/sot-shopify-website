@@ -14,6 +14,18 @@
 
   assign video_class = 'video-hero__video-' | append: section.id
   assign overlay_opacity = section.settings.overlay_opacity | divided_by: 100.0
+
+  assign valid_heights = '25vh,50vh,75vh,100vh' | split: ','
+  assign height_mobile = section.settings.height_mobile
+  unless valid_heights contains height_mobile
+    assign height_mobile = '100vh'
+  endunless
+  assign height_desktop = section.settings.height_desktop
+  unless valid_heights contains height_desktop
+    assign height_desktop = '100vh'
+  endunless
+  assign height_mobile_small = height_mobile | replace: 'vh', 'svh'
+  assign height_desktop_small = height_desktop | replace: 'vh', 'svh'
 -%}
 
 {%- style -%}
@@ -24,22 +36,14 @@
     isolation: isolate;
     align-items: {{ section.settings.content_position }};
     justify-content: {{ section.settings.content_alignment }};
-    {% if section.settings.full_height %}
-      min-height: 100vh;
-      min-height: 100svh;
-    {% else %}
-      min-height: {{ section.settings.height_mobile }}px;
-    {% endif %}
+    min-height: {{ height_mobile }};
+    min-height: {{ height_mobile_small }};
   }
 
   @media screen and (min-width: 750px) {
     .video-hero-{{ section.id }} {
-      {% if section.settings.full_height %}
-        min-height: 100vh;
-        min-height: 100svh;
-      {% else %}
-        min-height: {{ section.settings.height_desktop }}px;
-      {% endif %}
+      min-height: {{ height_desktop }};
+      min-height: {{ height_desktop_small }};
     }
   }
 
@@ -481,27 +485,29 @@
     },
     { "type": "header", "content": "Layout" },
     { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
-    { "type": "checkbox", "id": "full_height", "label": "Full screen height", "default": false },
     {
-      "type": "range",
+      "type": "select",
       "id": "height_desktop",
-      "min": 300,
-      "max": 1000,
-      "step": 20,
-      "unit": "px",
       "label": "Desktop height",
-      "info": "Ignored when full screen height is turned on.",
-      "default": 640
+      "options": [
+        { "value": "25vh", "label": "25% of screen height" },
+        { "value": "50vh", "label": "50% of screen height" },
+        { "value": "75vh", "label": "75% of screen height" },
+        { "value": "100vh", "label": "Full screen height" }
+      ],
+      "default": "100vh"
     },
     {
-      "type": "range",
+      "type": "select",
       "id": "height_mobile",
-      "min": 200,
-      "max": 800,
-      "step": 20,
-      "unit": "px",
       "label": "Mobile height",
-      "default": 480
+      "options": [
+        { "value": "25vh", "label": "25% of screen height" },
+        { "value": "50vh", "label": "50% of screen height" },
+        { "value": "75vh", "label": "75% of screen height" },
+        { "value": "100vh", "label": "Full screen height" }
+      ],
+      "default": "100vh"
     },
     {
       "type": "select",

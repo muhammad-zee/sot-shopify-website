@@ -17,7 +17,7 @@
         "video_url": "",
         "fallback_image": "shopify://shop_images/DSC06382_1.jpg",
         "fallback_image_alt": "",
-        "video_position": "center top",
+        "video_position": "center center",
         "background_color": "#f7f4ee",
         "overlay_style": "solid",
         "overlay_color": "#B8542C",

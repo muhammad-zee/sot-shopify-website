@@ -12,14 +12,14 @@
     "image_slideshow_hero_EgqXrN": {
       "type": "image-slideshow-hero",
       "blocks": {
-        "slideshow_image_mobile_f8GeqD": {
+        "slideshow_image_mobile_9RCktK": {
           "type": "slideshow_image_mobile",
           "settings": {
             "image": "shopify://shop_images/DSC06916_a08ef573-9b2d-4af6-99a8-38026467d5e7.jpg",
             "alt": ""
           }
         },
-        "slideshow_image_mobile_N6akKD": {
+        "slideshow_image_mobile_kDczQ3": {
           "type": "slideshow_image_mobile",
           "settings": {
             "image": "shopify://shop_images/DSC06748_5c8d29b7-5b33-4f92-94f9-fb2132e73ebc.jpg",
@@ -49,8 +49,8 @@
         }
       },
       "block_order": [
-        "slideshow_image_mobile_f8GeqD",
-        "slideshow_image_mobile_N6akKD",
+        "slideshow_image_mobile_9RCktK",
+        "slideshow_image_mobile_kDczQ3",
         "slideshow_image_FwM4JJ",
         "slideshow_image_LUeXbD",
         "slideshow_image_ghXUQd"

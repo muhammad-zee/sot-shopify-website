@@ -42,6 +42,20 @@
       assign heading_rem_desktop = 6.2
   endcase
 
+  # Desktop and mobile can use entirely different image sets. If either is
+  # left empty, borrow the other one so the section still shows something
+  # sensible on both breakpoints with zero extra setup.
+  assign desktop_blocks = section.blocks | where: 'type', 'slideshow_image'
+  assign mobile_blocks = section.blocks | where: 'type', 'slideshow_image_mobile'
+  if desktop_blocks.size == 0 and mobile_blocks.size > 0
+    assign desktop_blocks = mobile_blocks
+  endif
+  if mobile_blocks.size == 0 and desktop_blocks.size > 0
+    assign mobile_blocks = desktop_blocks
+  endif
+  assign desktop_count = desktop_blocks.size
+  assign mobile_count = mobile_blocks.size
+
   assign slide_display_seconds = section.settings.slide_display_duration
   assign slide_transition_seconds = section.settings.slide_transition_duration
   # Transition must be meaningfully shorter than the display time, or the
@@ -51,24 +65,53 @@
   if slide_transition_seconds > max_transition
     assign slide_transition_seconds = max_transition
   endif
-
-  assign slide_count = section.blocks.size
   # Slot spacing between consecutive images is display time only (not
   # display + transition), so each new image starts rising on top of the
   # previous one exactly display_seconds after that image started rising.
   assign slot_seconds = slide_display_seconds
-  assign total_cycle_seconds = slot_seconds | times: slide_count
 
-  # Each image only ever fades IN (0% opacity -> 100%), then holds fully
-  # opaque for the rest of the loop — it never fades back out itself. The
-  # "old image disappearing" effect comes entirely from the NEXT image
-  # rising on top of it (higher z-index), not from this image's own opacity
-  # dropping. That guarantees the background color can never show through
-  # even partially during a transition, since at every instant at least one
-  # full-opacity image is present in the stack.
-  assign fade_pct = 0
-  if slide_count > 0
-    assign fade_pct = slide_transition_seconds | times: 1.0 | divided_by: total_cycle_seconds | times: 100
+  # Crossfade timing, computed once per stack since desktop/mobile can have
+  # different image counts (and therefore a different total loop length).
+  #
+  # Each image: fades in (0 -> fade_pct%), holds fully opaque through
+  # fadeout_end_pct% (which is exactly when the NEXT image finishes rising
+  # on top of it and has fully covered it), then snaps to 0 immediately
+  # after (snap_pct%) since it's already hidden by then. It stays at 0 for
+  # the remainder of its own loop and rises again cleanly next cycle.
+  #
+  # This explicit reset is what keeps z-index ordering correct across
+  # multiple loops — without it, an old image can stay "stuck" opaque behind
+  # the scenes and wrongly bury a later image's re-entrance, which is what
+  # caused images to appear to skip / stay too long / loop out of order.
+  #
+  # The reset is a near-instant snap (a tiny 0.1 percentage-point step)
+  # rather than a gradual fade, specifically so it never overlaps in time
+  # with the next image's rise — if both were fading at once, the
+  # background color would peek through underneath both for an instant.
+  assign total_cycle_desktop = 0
+  assign fade_pct_desktop = 0
+  assign hold_end_pct_desktop = 0
+  assign fadeout_end_pct_desktop = 0
+  assign snap_pct_desktop = 0
+  if desktop_count > 1
+    assign total_cycle_desktop = slot_seconds | times: desktop_count
+    assign fade_pct_desktop = slide_transition_seconds | times: 1.0 | divided_by: total_cycle_desktop | times: 100
+    assign hold_end_pct_desktop = slide_display_seconds | times: 1.0 | divided_by: total_cycle_desktop | times: 100
+    assign fadeout_end_pct_desktop = slide_display_seconds | plus: slide_transition_seconds | times: 1.0 | divided_by: total_cycle_desktop | times: 100
+    assign snap_pct_desktop = fadeout_end_pct_desktop | plus: 0.1
+  endif
+
+  assign total_cycle_mobile = 0
+  assign fade_pct_mobile = 0
+  assign hold_end_pct_mobile = 0
+  assign fadeout_end_pct_mobile = 0
+  assign snap_pct_mobile = 0
+  if mobile_count > 1
+    assign total_cycle_mobile = slot_seconds | times: mobile_count
+    assign fade_pct_mobile = slide_transition_seconds | times: 1.0 | divided_by: total_cycle_mobile | times: 100
+    assign hold_end_pct_mobile = slide_display_seconds | times: 1.0 | divided_by: total_cycle_mobile | times: 100
+    assign fadeout_end_pct_mobile = slide_display_seconds | plus: slide_transition_seconds | times: 1.0 | divided_by: total_cycle_mobile | times: 100
+    assign snap_pct_mobile = fadeout_end_pct_mobile | plus: 0.1
   endif
 -%}
 
@@ -104,6 +147,32 @@
     background-color: {{ section.settings.background_color }};
   }
 
+  .slideshow-hero__stack-{{ section.id }} {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Two independent image sets: only one is ever in the document flow /
+     visible at a time, switched at the same breakpoint as everything else
+     in this section. */
+  .slideshow-hero__stack--mobile-{{ section.id }} {
+    display: block;
+  }
+
+  .slideshow-hero__stack--desktop-{{ section.id }} {
+    display: none;
+  }
+
+  @media screen and (min-width: 750px) {
+    .slideshow-hero__stack--mobile-{{ section.id }} {
+      display: none;
+    }
+
+    .slideshow-hero__stack--desktop-{{ section.id }} {
+      display: block;
+    }
+  }
+
   .slideshow-hero__media-{{ section.id }} img,
   .slideshow-hero__media-{{ section.id }} svg {
     position: absolute;
@@ -127,54 +196,101 @@
   }
 
   /* --- IMAGE SLIDESHOW ---
-     Every slide is stacked full-bleed (via the shared img rule above), and
-     each only ever fades IN once (0% -> 100% opacity) at its own delay, then
-     holds fully opaque. Later slides have a higher z-index, so the next
-     image rising covers the previous one — that's what reads as the old
-     image "fading out", without either layer ever being partially
-     transparent over the raw background at the same time.
-     Pure CSS — no JavaScript timer involved. */
-  @keyframes slideshow-hero-crossfade-{{ section.id }} {
-    0% {
+     Pure CSS — no JavaScript timer involved. See the timing comment in the
+     Liquid block above for how the keyframe percentages are derived. */
+  {%- if desktop_count > 1 -%}
+    @keyframes slideshow-hero-crossfade-desktop-{{ section.id }} {
+      0% {
+        opacity: 0;
+      }
+      {{ fade_pct_desktop }}% {
+        opacity: 1;
+      }
+      {{ fadeout_end_pct_desktop }}% {
+        opacity: 1;
+      }
+      {{ snap_pct_desktop }}% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .slideshow-hero__slide-desktop-{{ section.id }} {
       opacity: 0;
+      animation-name: slideshow-hero-crossfade-desktop-{{ section.id }};
+      animation-duration: {{ total_cycle_desktop }}s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      animation-fill-mode: backwards;
     }
-    {{ fade_pct }}% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
 
-  .slideshow-hero__slide-{{ section.id }} {
-    opacity: 0;
-    animation-name: slideshow-hero-crossfade-{{ section.id }};
-    animation-duration: {{ total_cycle_seconds }}s;
-    animation-timing-function: ease-in-out;
-    animation-iteration-count: infinite;
-    animation-fill-mode: backwards;
-  }
-
-  {%- for block in section.blocks -%}
-    {%- if block.type == 'slideshow_image' -%}
-      .slideshow-hero__slide-{{ section.id }}-{{ forloop.index0 }} {
+    {%- for block in desktop_blocks -%}
+      .slideshow-hero__slide-desktop-{{ section.id }}-{{ forloop.index0 }} {
         z-index: {{ forloop.index }};
         animation-delay: {{ forloop.index0 | times: slot_seconds }}s;
       }
-    {%- endif -%}
-  {%- endfor -%}
+    {%- endfor -%}
 
-  /* Reduced motion: freeze on the first slide instead of crossfading. */
-  @media (prefers-reduced-motion: reduce) {
-    .slideshow-hero__slide-{{ section.id }} {
-      animation: none;
+    @media (prefers-reduced-motion: reduce) {
+      .slideshow-hero__slide-desktop-{{ section.id }} {
+        animation: none;
+        opacity: 0;
+      }
+
+      .slideshow-hero__slide-desktop-{{ section.id }}-0 {
+        opacity: 1;
+      }
+    }
+  {%- endif -%}
+
+  {%- if mobile_count > 1 -%}
+    @keyframes slideshow-hero-crossfade-mobile-{{ section.id }} {
+      0% {
+        opacity: 0;
+      }
+      {{ fade_pct_mobile }}% {
+        opacity: 1;
+      }
+      {{ fadeout_end_pct_mobile }}% {
+        opacity: 1;
+      }
+      {{ snap_pct_mobile }}% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .slideshow-hero__slide-mobile-{{ section.id }} {
       opacity: 0;
+      animation-name: slideshow-hero-crossfade-mobile-{{ section.id }};
+      animation-duration: {{ total_cycle_mobile }}s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      animation-fill-mode: backwards;
     }
 
-    .slideshow-hero__slide-{{ section.id }}-0 {
-      opacity: 1;
+    {%- for block in mobile_blocks -%}
+      .slideshow-hero__slide-mobile-{{ section.id }}-{{ forloop.index0 }} {
+        z-index: {{ forloop.index }};
+        animation-delay: {{ forloop.index0 | times: slot_seconds }}s;
+      }
+    {%- endfor -%}
+
+    @media (prefers-reduced-motion: reduce) {
+      .slideshow-hero__slide-mobile-{{ section.id }} {
+        animation: none;
+        opacity: 0;
+      }
+
+      .slideshow-hero__slide-mobile-{{ section.id }}-0 {
+        opacity: 1;
+      }
     }
-  }
+  {%- endif -%}
 
   /* Overlay sits between the media and the content */
   .slideshow-hero__overlay-{{ section.id }} {
@@ -275,31 +391,71 @@
 
 <div class="slideshow-hero-{{ section.id }} color-{{ section.settings.color_scheme }}">
   <div class="slideshow-hero__media-{{ section.id }}">
-    {%- for block in section.blocks -%}
-      {%- if block.type == 'slideshow_image' and block.settings.image != blank -%}
-        {%- liquid
-          assign slide_loading = 'lazy'
-          if forloop.index0 == 0
-            assign slide_loading = 'eager'
-          endif
-          assign slide_class = 'slideshow-hero__slide-' | append: section.id | append: ' slideshow-hero__slide-' | append: section.id | append: '-' | append: forloop.index0
-        -%}
-        {{
-          block.settings.image
-          | image_url: width: 3840
-          | image_tag:
-            loading: slide_loading,
-            sizes: '100vw',
-            widths: '375, 750, 1100, 1500, 1780, 2000, 3000, 3840',
-            alt: block.settings.alt,
-            class: slide_class
-        }}
-      {%- endif -%}
-    {%- endfor -%}
+    <div class="slideshow-hero__stack-{{ section.id }} slideshow-hero__stack--desktop-{{ section.id }}">
+      {%- for block in desktop_blocks -%}
+        {%- if block.settings.image != blank -%}
+          {%- liquid
+            assign slide_loading = 'lazy'
+            if forloop.index0 == 0
+              assign slide_loading = 'eager'
+            endif
+            assign slide_class = 'slideshow-hero__slide-desktop-' | append: section.id
+            if desktop_count > 1
+              assign slide_class = slide_class | append: ' slideshow-hero__slide-desktop-' | append: section.id | append: '-' | append: forloop.index0
+            else
+              assign slide_class = slide_class | append: '-static'
+            endif
+          -%}
+          {{
+            block.settings.image
+            | image_url: width: 3840
+            | image_tag:
+              loading: slide_loading,
+              sizes: '100vw',
+              widths: '375, 750, 1100, 1500, 1780, 2000, 3000, 3840',
+              alt: block.settings.alt,
+              class: slide_class
+          }}
+        {%- endif -%}
+      {%- endfor -%}
 
-    {%- if slide_count == 0 -%}
-      {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
-    {%- endif -%}
+      {%- if desktop_count == 0 -%}
+        {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    </div>
+
+    <div class="slideshow-hero__stack-{{ section.id }} slideshow-hero__stack--mobile-{{ section.id }}">
+      {%- for block in mobile_blocks -%}
+        {%- if block.settings.image != blank -%}
+          {%- liquid
+            assign slide_loading = 'lazy'
+            if forloop.index0 == 0
+              assign slide_loading = 'eager'
+            endif
+            assign slide_class = 'slideshow-hero__slide-mobile-' | append: section.id
+            if mobile_count > 1
+              assign slide_class = slide_class | append: ' slideshow-hero__slide-mobile-' | append: section.id | append: '-' | append: forloop.index0
+            else
+              assign slide_class = slide_class | append: '-static'
+            endif
+          -%}
+          {{
+            block.settings.image
+            | image_url: width: 3840
+            | image_tag:
+              loading: slide_loading,
+              sizes: '100vw',
+              widths: '375, 750, 1100, 1500, 1780, 2000, 3000, 3840',
+              alt: block.settings.alt,
+              class: slide_class
+          }}
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if mobile_count == 0 -%}
+        {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    </div>
   </div>
 
   {%- if section.settings.overlay_opacity > 0 -%}
@@ -342,7 +498,7 @@
     { "type": "header", "content": "Slideshow images" },
     {
       "type": "paragraph",
-      "content": "Add the images as blocks below, in the order you want them to play. Each dissolves into the next on a loop, like a video."
+      "content": "Add Desktop image and Mobile image blocks below, in the order you want each to play. If you only add one type, it's used for both screen sizes."
     },
     {
       "type": "range",
@@ -636,7 +792,24 @@
   "blocks": [
     {
       "type": "slideshow_image",
-      "name": "Slideshow image",
+      "name": "Desktop image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Alt text",
+          "info": "Describes the image for screen readers and search engines. Leave empty only if the image is purely decorative."
+        }
+      ]
+    },
+    {
+      "type": "slideshow_image_mobile",
+      "name": "Mobile image",
       "settings": [
         {
           "type": "image_picker",

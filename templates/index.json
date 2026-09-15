@@ -75,7 +75,7 @@
         "text": "",
         "text_size": 16,
         "text_color": "#f7f4ee",
-        "content_background_color": "#B8542C",
+        "content_background_color": "#b8542c",
         "content_background_opacity": 30,
         "content_color_scheme": "scheme-2",
         "button_label": "",
@@ -100,25 +100,95 @@
     "photo_collage_banner_9fK3xQ": {
       "type": "photo-collage-banner",
       "blocks": {
-        "image_1": { "type": "image", "settings": {} },
-        "image_2": { "type": "image", "settings": {} },
-        "image_3": { "type": "image", "settings": {} },
-        "image_4": { "type": "image", "settings": {} },
-        "eyebrow_1": { "type": "eyebrow", "settings": {} },
-        "heading_1": { "type": "heading", "settings": {} },
-        "text_1": { "type": "text", "settings": {} },
+        "image_1": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Gemini_Generated_Image_1c8qt61c8qt61c8q.jpg",
+            "alt": ""
+          }
+        },
+        "image_2": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Gemini_Generated_Image_6vonia6vonia6von.jpg",
+            "alt": ""
+          }
+        },
+        "image_3": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Gemini_Generated_Image_prafqeprafqepraf.jpg",
+            "alt": ""
+          }
+        },
+        "image_4": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Gemini_Generated_Image_6da8mc6da8mc6da8.jpg",
+            "alt": ""
+          }
+        },
+        "eyebrow_1": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "New Arrival"
+          }
+        },
+        "heading_1": {
+          "type": "heading",
+          "settings": {
+            "heading": "The Everyday Collection",
+            "heading_size": "h0",
+            "italic": true
+          }
+        },
+        "text_1": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Check out our comfortable t-shirts, raglans, trousers and more.</p>"
+          }
+        },
         "button_1": {
           "type": "button",
-          "settings": { "button_label": "New Arrivals", "button_link": "shopify://collections/all" }
+          "settings": {
+            "button_label": "New Arrivals",
+            "button_link": "shopify://collections/all",
+            "button_style_secondary": false
+          }
         },
         "button_2": {
           "type": "button",
-          "settings": { "button_label": "Best Sellers", "button_link": "shopify://collections/best-seller", "button_style_secondary": true }
+          "settings": {
+            "button_label": "Best Sellers",
+            "button_link": "shopify://collections/best-seller",
+            "button_style_secondary": true
+          }
         }
       },
-      "block_order": ["image_1", "image_2", "image_3", "image_4", "eyebrow_1", "heading_1", "text_1", "button_1", "button_2"],
+      "block_order": [
+        "image_1",
+        "image_2",
+        "image_3",
+        "image_4",
+        "eyebrow_1",
+        "heading_1",
+        "text_1",
+        "button_1",
+        "button_2"
+      ],
       "name": "Photo collage banner",
-      "settings": {}
+      "settings": {
+        "top_text": "<p>We design durable <strong>everyday essentials</strong> with a conscience — <strong>100% made in Pakistan.</strong></p>",
+        "top_text_alignment": "center",
+        "color_scheme": "scheme-1",
+        "content_position": "right",
+        "heading_tag": "h2",
+        "padding_top": 60,
+        "padding_bottom": 60,
+        "button_bg_color": "#B8542C",
+        "button_text_color": "#F7F4EE",
+        "button_secondary_text_color": "#B8542C"
+      }
     },
     "collection_list_jcDEdA": {
       "type": "collection-list",

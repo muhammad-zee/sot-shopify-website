@@ -30,27 +30,29 @@
       flex-direction: row-reverse;
     }
 
-    .photo-collage-{{ section.id }} .photo-collage__images,
     .photo-collage-{{ section.id }} .photo-collage__content {
       flex: 1 1 50%;
       min-width: 0;
     }
   }
 
+  /* Scattered/overlapping cluster: the container is a fixed-ratio "table"
+     that each photo is absolutely positioned on top of, at set coordinates
+     per slot (1st through 6th image block). Percentages keep it responsive
+     without needing separate mobile position overrides. Capped max-width
+     so the cluster reads as one compact photo group, not a huge grid. */
   .photo-collage-{{ section.id }} .photo-collage__images {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.6rem;
+    position: relative;
     width: 100%;
+    max-width: 38rem;
+    aspect-ratio: 4 / 4.4;
+    margin: 0 auto;
   }
 
-  .photo-collage-{{ section.id }} .photo-collage__image-item:nth-child(2n) {
-    margin-top: 4rem;
-  }
-
-  @media screen and (max-width: 479px) {
-    .photo-collage-{{ section.id }} .photo-collage__image-item:nth-child(2n) {
-      margin-top: 0;
+  @media screen and (min-width: 750px) {
+    .photo-collage-{{ section.id }} .photo-collage__images {
+      flex: 1 1 42%;
+      margin: 0;
     }
   }
 
@@ -58,12 +60,11 @@
      positioned to fill it completely regardless of the source photo's own
      dimensions — avoids gaps/letterboxing no matter what gets uploaded. */
   .photo-collage-{{ section.id }} .photo-collage__image-item {
-    position: relative;
-    width: 100%;
+    position: absolute;
     aspect-ratio: 3 / 4;
     overflow: hidden;
-    border: 0.6rem solid rgb(var(--color-background));
-    box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.12);
+    border: 0.4rem solid rgb(var(--color-background));
+    box-shadow: 0 0.6rem 1.6rem rgba(0, 0, 0, 0.15);
     border-radius: 0;
   }
 
@@ -77,6 +78,56 @@
     max-width: none;
     max-height: none;
     object-fit: cover;
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__image-item:nth-child(1) {
+    width: 44%;
+    top: 0;
+    left: 0;
+    transform: rotate(-6deg);
+    z-index: 1;
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__image-item:nth-child(2) {
+    width: 40%;
+    top: 4%;
+    right: 0;
+    transform: rotate(5deg);
+    z-index: 1;
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__image-item:nth-child(3) {
+    width: 42%;
+    bottom: 0;
+    left: 4%;
+    transform: rotate(6deg);
+    z-index: 2;
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__image-item:nth-child(4) {
+    width: 40%;
+    bottom: 2%;
+    right: 2%;
+    transform: rotate(-5deg);
+    z-index: 2;
+  }
+
+  /* Bonus 5th photo: a larger centered "front" print laid over the four
+     corner photos. */
+  .photo-collage-{{ section.id }} .photo-collage__image-item:nth-child(5) {
+    width: 52%;
+    top: 22%;
+    left: 24%;
+    transform: rotate(-2deg);
+    z-index: 3;
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__image-item:nth-child(6) {
+    width: 36%;
+    top: -2%;
+    left: 32%;
+    transform: rotate(9deg);
+    z-index: 0;
   }
 
   .photo-collage-{{ section.id }} .photo-collage__eyebrow {

@@ -5,6 +5,7 @@
   endunless
 
   assign overlay_opacity = section.settings.overlay_opacity | divided_by: 100.0
+  assign content_bg_opacity = section.settings.content_background_opacity | divided_by: 100.0
 
   assign valid_heights = '25vh,50vh,75vh,100vh' | split: ','
   assign height_mobile = section.settings.height_mobile
@@ -317,6 +318,12 @@
     padding: {{ section.settings.padding_top }}px 2rem {{ section.settings.padding_bottom }}px;
     text-align: {{ section.settings.text_alignment }};
     color: {{ section.settings.text_color }};
+    border-radius: 0;
+    {%- if section.settings.content_color_scheme != blank -%}
+      background-color: rgba(var(--color-background), {{ content_bg_opacity }});
+    {%- else -%}
+      background-color: {{ section.settings.content_background_color | color_modify: 'alpha', content_bg_opacity }};
+    {%- endif -%}
   }
 
   .slideshow-hero__heading-{{ section.id }} {
@@ -462,7 +469,7 @@
     <div class="slideshow-hero__overlay-{{ section.id }}"></div>
   {%- endif -%}
 
-  <div class="slideshow-hero__content-{{ section.id }}">
+  <div class="slideshow-hero__content-{{ section.id }}{% if section.settings.content_color_scheme != blank %} color-{{ section.settings.content_color_scheme }}{% endif %}">
     {%- if section.settings.heading != blank -%}
       <{{ heading_tag }} class="slideshow-hero__heading-{{ section.id }} inline-richtext">
         {{ section.settings.heading }}
@@ -646,6 +653,35 @@
       "default": 16
     },
     { "type": "color", "id": "text_color", "label": "Text color", "default": "#FFFFFF" },
+    { "type": "header", "content": "Content background" },
+    {
+      "type": "paragraph",
+      "content": "A background box behind the heading, text and button — separate from the overlay over the slideshow images."
+    },
+    {
+      "type": "color",
+      "id": "content_background_color",
+      "label": "Content background color",
+      "info": "Used when no content color scheme is selected below.",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "content_background_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Content background opacity",
+      "default": 0
+    },
+    {
+      "type": "color_scheme",
+      "id": "content_color_scheme",
+      "label": "Content color scheme",
+      "info": "Overrides the content background color above with a theme color scheme. Choose None to use the custom color instead.",
+      "default": "scheme-1"
+    },
     { "type": "header", "content": "Outline button" },
     { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop the collection" },
     { "type": "url", "id": "button_link", "label": "Button link" },

@@ -86,7 +86,7 @@
         "button_corner_radius": 0,
         "color_scheme": "",
         "height_desktop": 100,
-        "height_mobile": 60,
+        "height_mobile": 40,
         "content_position_mobile": "flex-end",
         "content_position_desktop": "flex-end",
         "content_alignment_mobile": "center",

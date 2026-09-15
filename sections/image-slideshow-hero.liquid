@@ -325,8 +325,12 @@
   }
 
   /* Background lives on its own layer behind the content so the fade
-     (when Linear gradient is selected) only ever masks the background —
-     the heading/text/button in the inner wrapper stay fully opaque. */
+     (when Linear gradient is selected) only ever affects the background —
+     the heading/text/button in the inner wrapper stay fully opaque.
+     The fade itself is a plain background gradient from the color at full
+     opacity to the same color at 0% opacity — not a CSS mask — since
+     mask-image gradients on ordinary elements aren't reliable across
+     browsers (notably Firefox). */
   .slideshow-hero__content-{{ section.id }}::before {
     content: '';
     position: absolute;
@@ -335,14 +339,23 @@
     pointer-events: none;
     border-radius: 0;
     {%- if section.settings.content_color_scheme != blank -%}
-      background-color: rgba(var(--color-background), {{ content_bg_opacity }});
+      {%- if section.settings.content_background_style == 'gradient' -%}
+        background: linear-gradient(
+          0deg,
+          rgba(var(--color-background), {{ content_bg_opacity }}) 0%,
+          rgba(var(--color-background), 0) 100%
+        );
+      {%- else -%}
+        background-color: rgba(var(--color-background), {{ content_bg_opacity }});
+      {%- endif -%}
+    {%- elsif section.settings.content_background_style == 'gradient' -%}
+      background: linear-gradient(
+        0deg,
+        {{ section.settings.content_background_color | color_modify: 'alpha', content_bg_opacity }} 0%,
+        {{ section.settings.content_background_color | color_modify: 'alpha', 0 }} 100%
+      );
     {%- else -%}
       background-color: {{ section.settings.content_background_color | color_modify: 'alpha', content_bg_opacity }};
-    {%- endif -%}
-    {%- if section.settings.content_background_style == 'gradient' -%}
-      /* Only the alpha channel of the mask stops matters, not the color. */
-      -webkit-mask-image: linear-gradient(0deg, #000000, transparent);
-      mask-image: linear-gradient(0deg, #000000, transparent);
     {%- endif -%}
   }
 

@@ -43,16 +43,21 @@
             assign meta_description = article.excerpt_or_content | strip_html
           when 'cart'
             assign meta_description = 'Review the items in your bag and check out securely with ' | append: shop.name | append: '.'
-          when 'policy'
-            assign meta_description = page_title | append: ' — read the full details from ' | append: shop.name | append: '.'
         endcase
       endif
       assign meta_description = meta_description | strip_newlines | strip
+
+      # Last resort always folds in page_title (unique per URL) rather than
+      # a flat shop-wide line — a shared generic sentence across every
+      # under-described collection/page reads as duplicate content to
+      # search engines, which defeats the point of having one at all.
       if meta_description == blank
-        assign meta_description = shop.description
-      endif
-      if meta_description == blank
-        assign meta_description = shop.name | append: ' — shop the latest collection.'
+        assign plain_title = page_title | strip_html | strip
+        assign shop_tagline = shop.description | strip_html | strip
+        if shop_tagline == blank
+          assign shop_tagline = 'shop the latest arrivals'
+        endif
+        assign meta_description = plain_title | append: ' — ' | append: shop_tagline | append: ' at ' | append: shop.name | append: '.'
       endif
       assign meta_description = meta_description | truncate: 160
     -%}

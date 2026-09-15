@@ -17,12 +17,15 @@
     flex-direction: column;
     align-items: center;
     gap: 4rem;
+    max-width: 100rem;
+    margin: 0 auto;
   }
 
   @media screen and (min-width: 750px) {
     .photo-collage-{{ section.id }} .photo-collage__row {
       flex-direction: row;
       align-items: center;
+      justify-content: center;
       gap: 6rem;
     }
 
@@ -34,6 +37,14 @@
       flex: 1 1 50%;
       min-width: 0;
     }
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    width: 100%;
   }
 
   /* Scattered/overlapping cluster: the container is a fixed-ratio "table"
@@ -52,7 +63,6 @@
   @media screen and (min-width: 750px) {
     .photo-collage-{{ section.id }} .photo-collage__images {
       flex: 1 1 42%;
-      margin: 0;
     }
   }
 
@@ -155,6 +165,7 @@
   .photo-collage-{{ section.id }} .photo-collage__buttons {
     display: flex;
     flex-wrap: wrap;
+    justify-content: flex-start;
     gap: 1.2rem;
   }
 

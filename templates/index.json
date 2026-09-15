@@ -97,6 +97,29 @@
         "padding_bottom": 12
       }
     },
+    "photo_collage_banner_9fK3xQ": {
+      "type": "photo-collage-banner",
+      "blocks": {
+        "image_1": { "type": "image", "settings": {} },
+        "image_2": { "type": "image", "settings": {} },
+        "image_3": { "type": "image", "settings": {} },
+        "image_4": { "type": "image", "settings": {} },
+        "eyebrow_1": { "type": "eyebrow", "settings": {} },
+        "heading_1": { "type": "heading", "settings": {} },
+        "text_1": { "type": "text", "settings": {} },
+        "button_1": {
+          "type": "button",
+          "settings": { "button_label": "New Arrivals", "button_link": "shopify://collections/all" }
+        },
+        "button_2": {
+          "type": "button",
+          "settings": { "button_label": "Best Sellers", "button_link": "shopify://collections/best-seller", "button_style_secondary": true }
+        }
+      },
+      "block_order": ["image_1", "image_2", "image_3", "image_4", "eyebrow_1", "heading_1", "text_1", "button_1", "button_2"],
+      "name": "Photo collage banner",
+      "settings": {}
+    },
     "collection_list_jcDEdA": {
       "type": "collection-list",
       "blocks": {
@@ -552,6 +575,7 @@
   },
   "order": [
     "image_slideshow_hero_EgqXrN",
+    "photo_collage_banner_9fK3xQ",
     "collection_list_jcDEdA",
     "featured_collection",
     "featured_collection_N6PqNd",

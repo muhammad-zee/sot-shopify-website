@@ -1,0 +1,345 @@
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__tagline {
+    max-width: 76rem;
+    margin: 0 auto {{ section.settings.padding_bottom | divided_by: 2 }}px;
+    text-align: {{ section.settings.top_text_alignment }};
+    font-size: 1.7rem;
+    line-height: 1.5;
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4rem;
+  }
+
+  @media screen and (min-width: 750px) {
+    .photo-collage-{{ section.id }} .photo-collage__row {
+      flex-direction: row;
+      align-items: center;
+      gap: 6rem;
+    }
+
+    .photo-collage-{{ section.id }} .photo-collage__row--text-left {
+      flex-direction: row-reverse;
+    }
+
+    .photo-collage-{{ section.id }} .photo-collage__images,
+    .photo-collage-{{ section.id }} .photo-collage__content {
+      flex: 1 1 50%;
+      min-width: 0;
+    }
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__images {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.6rem;
+    width: 100%;
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__image-item:nth-child(2n) {
+    margin-top: 4rem;
+  }
+
+  @media screen and (max-width: 479px) {
+    .photo-collage-{{ section.id }} .photo-collage__image-item:nth-child(2n) {
+      margin-top: 0;
+    }
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__image-item img,
+  .photo-collage-{{ section.id }} .photo-collage__image-item .placeholder-svg {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border: 0.6rem solid rgb(var(--color-background));
+    box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.12);
+    border-radius: 0;
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__eyebrow {
+    margin: 0 0 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__heading {
+    margin: 0 0 1.6rem;
+    font-weight: 800;
+    line-height: 1.05;
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__heading--italic {
+    font-style: italic;
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__text {
+    margin: 0 0 2.4rem;
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.4rem 2.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 0;
+    background-color: {{ section.settings.button_bg_color }};
+    color: {{ section.settings.button_text_color }};
+    border: 0.1rem solid {{ section.settings.button_bg_color }};
+    transition: opacity 0.2s ease;
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__button:hover {
+    opacity: 0.85;
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__button--secondary {
+    background-color: transparent;
+    color: {{ section.settings.button_secondary_text_color }};
+    border-color: {{ section.settings.button_secondary_text_color }};
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign heading_tag = section.settings.heading_tag | default: 'h2'
+  unless heading_tag == 'h1' or heading_tag == 'h2' or heading_tag == 'h3'
+    assign heading_tag = 'h2'
+  endunless
+-%}
+
+<div class="color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding photo-collage-{{ section.id }}">
+  <div class="page-width">
+    {%- if section.settings.top_text != blank -%}
+      <div class="photo-collage__tagline rte">
+        {{ section.settings.top_text }}
+      </div>
+    {%- endif -%}
+
+    <div class="photo-collage__row{% if section.settings.content_position == 'left' %} photo-collage__row--text-left{% endif %}">
+      <div class="photo-collage__images">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'image' -%}
+            <div class="photo-collage__image-item" {{ block.shopify_attributes }}>
+              {%- if block.settings.image != blank -%}
+                {{
+                  block.settings.image
+                  | image_url: width: 1500
+                  | image_tag: sizes: '(min-width: 750px) 25vw, 45vw', widths: '275, 400, 550, 750, 1100, 1500', alt: block.settings.alt
+                }}
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      <div class="photo-collage__content">
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'eyebrow' -%}
+              {%- if block.settings.text != blank -%}
+                <p class="photo-collage__eyebrow" {{ block.shopify_attributes }}>{{ block.settings.text | escape }}</p>
+              {%- endif -%}
+            {%- when 'heading' -%}
+              {%- if block.settings.heading != blank -%}
+                <{{ heading_tag }}
+                  class="photo-collage__heading inline-richtext {{ block.settings.heading_size }}{% if block.settings.italic %} photo-collage__heading--italic{% endif %}"
+                  {{ block.shopify_attributes }}
+                >
+                  {{ block.settings.heading }}
+                </{{ heading_tag }}>
+              {%- endif -%}
+            {%- when 'text' -%}
+              {%- if block.settings.text != blank -%}
+                <div class="photo-collage__text rte" {{ block.shopify_attributes }}>
+                  {{ block.settings.text }}
+                </div>
+              {%- endif -%}
+          {%- endcase -%}
+        {%- endfor -%}
+
+        {%- assign button_blocks = section.blocks | where: 'type', 'button' -%}
+        {%- if button_blocks.size > 0 -%}
+          <div class="photo-collage__buttons">
+            {%- for block in button_blocks -%}
+              {%- if block.settings.button_label != blank -%}
+                <a
+                  {% if block.settings.button_link != blank %}
+                    href="{{ block.settings.button_link }}"
+                  {% else %}
+                    role="link" aria-disabled="true"
+                  {% endif %}
+                  class="photo-collage__button{% if block.settings.button_style_secondary %} photo-collage__button--secondary{% endif %}"
+                  {{ block.shopify_attributes }}
+                >
+                  {{ block.settings.button_label | escape }}
+                </a>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Photo collage banner",
+  "class": "section",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "top_text",
+      "label": "Top tagline",
+      "info": "Optional line shown above the photo collage, e.g. a brand statement.",
+      "default": "<p>We design durable <strong>everyday essentials</strong> with a conscience — <strong>100% made in Pakistan.</strong></p>"
+    },
+    {
+      "type": "select",
+      "id": "top_text_alignment",
+      "label": "Tagline alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "center"
+    },
+    { "type": "header", "content": "Layout" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "Text position (desktop)",
+      "options": [
+        { "value": "left", "label": "Left (photos on the right)" },
+        { "value": "right", "label": "Right (photos on the left)" }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading HTML tag",
+      "info": "Use H1 only if this is the first section on the page and no other section uses H1.",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" }
+      ],
+      "default": "h2"
+    },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Top padding", "default": 60 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Bottom padding", "default": 60 },
+    { "type": "header", "content": "Buttons" },
+    { "type": "color", "id": "button_bg_color", "label": "Primary button background", "default": "#121212" },
+    { "type": "color", "id": "button_text_color", "label": "Primary button text", "default": "#ffffff" },
+    { "type": "color", "id": "button_secondary_text_color", "label": "Secondary (outline) button text/border", "default": "#121212" }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Alt text",
+          "info": "Describes the image for screen readers and search engines. Leave empty only if the image is purely decorative."
+        }
+      ]
+    },
+    {
+      "type": "eyebrow",
+      "name": "Eyebrow text",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "New Arrival" }
+      ]
+    },
+    {
+      "type": "heading",
+      "name": "Heading",
+      "limit": 1,
+      "settings": [
+        { "type": "inline_richtext", "id": "heading", "label": "Heading", "default": "The Everyday Collection" },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "Heading size",
+          "options": [
+            { "value": "h2", "label": "Small" },
+            { "value": "h1", "label": "Medium" },
+            { "value": "h0", "label": "Large" },
+            { "value": "hxl", "label": "Extra large" }
+          ],
+          "default": "h0"
+        },
+        { "type": "checkbox", "id": "italic", "label": "Italic style", "default": true }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Check out our comfortable t-shirts, raglans, trousers and more.</p>"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "limit": 2,
+      "settings": [
+        { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop Now" },
+        { "type": "url", "id": "button_link", "label": "Button link" },
+        { "type": "checkbox", "id": "button_style_secondary", "label": "Use outline style", "default": false }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Photo collage banner",
+      "blocks": [
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "eyebrow" },
+        { "type": "heading" },
+        { "type": "text" },
+        { "type": "button", "settings": { "button_label": "New Arrivals" } },
+        { "type": "button", "settings": { "button_label": "Best Sellers", "button_style_secondary": true } }
+      ]
+    }
+  ]
+}
+{% endschema %}

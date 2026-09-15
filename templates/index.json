@@ -107,6 +107,13 @@
             "alt": ""
           }
         },
+        "image_rEEbdg": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Gemini_Generated_Image_mbr5wombr5wombr5.jpg",
+            "alt": ""
+          }
+        },
         "image_2": {
           "type": "image",
           "settings": {
@@ -125,13 +132,6 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/Gemini_Generated_Image_6da8mc6da8mc6da8.jpg",
-            "alt": ""
-          }
-        },
-        "image_rEEbdg": {
-          "type": "image",
-          "settings": {
-            "image": "shopify://shop_images/DSC07286.jpg",
             "alt": ""
           }
         },
@@ -174,10 +174,10 @@
       },
       "block_order": [
         "image_1",
+        "image_rEEbdg",
         "image_2",
         "image_3",
         "image_4",
-        "image_rEEbdg",
         "eyebrow_1",
         "heading_1",
         "text_1",

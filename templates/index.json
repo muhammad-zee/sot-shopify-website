@@ -76,7 +76,7 @@
         "text_size": 16,
         "text_color": "#ffffff",
         "content_background_color": "#b8542c",
-        "content_background_opacity": 15,
+        "content_background_opacity": 20,
         "content_color_scheme": "scheme-2",
         "button_label": "",
         "button_link": "shopify://collections/all",

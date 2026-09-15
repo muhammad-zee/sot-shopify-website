@@ -85,7 +85,7 @@
         "button_border_width": 2,
         "button_corner_radius": 0,
         "color_scheme": "",
-        "height_desktop": "75vh",
+        "height_desktop": "100vh",
         "height_mobile": "25vh",
         "content_position_mobile": "flex-end",
         "content_position_desktop": "flex-end",

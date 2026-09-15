@@ -54,15 +54,29 @@
     }
   }
 
-  .photo-collage-{{ section.id }} .photo-collage__image-item img,
-  .photo-collage-{{ section.id }} .photo-collage__image-item .placeholder-svg {
-    display: block;
+  /* The item itself is the fixed-ratio box; the image is absolutely
+     positioned to fill it completely regardless of the source photo's own
+     dimensions — avoids gaps/letterboxing no matter what gets uploaded. */
+  .photo-collage-{{ section.id }} .photo-collage__image-item {
+    position: relative;
     width: 100%;
     aspect-ratio: 3 / 4;
-    object-fit: cover;
+    overflow: hidden;
     border: 0.6rem solid rgb(var(--color-background));
     box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.12);
     border-radius: 0;
+  }
+
+  .photo-collage-{{ section.id }} .photo-collage__image-item img,
+  .photo-collage-{{ section.id }} .photo-collage__image-item .placeholder-svg {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    object-fit: cover;
   }
 
   .photo-collage-{{ section.id }} .photo-collage__eyebrow {

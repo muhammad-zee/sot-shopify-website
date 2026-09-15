@@ -19,17 +19,22 @@
     endif
   endif
 
-  assign valid_heights = '25vh,50vh,75vh,100vh' | split: ','
-  assign height_mobile = section.settings.height_mobile
-  unless valid_heights contains height_mobile
-    assign height_mobile = '100vh'
+  # height_mobile/height_desktop are now a 10-100 range (percent of screen
+  # height), stored as a plain number. Also accepts the old "25vh"-style
+  # string from sections saved before this setting was a select, so
+  # existing sections don't break until re-saved.
+  assign height_mobile_num = section.settings.height_mobile | remove: 'vh' | times: 1
+  unless height_mobile_num >= 10 and height_mobile_num <= 100
+    assign height_mobile_num = 100
   endunless
-  assign height_desktop = section.settings.height_desktop
-  unless valid_heights contains height_desktop
-    assign height_desktop = '100vh'
+  assign height_desktop_num = section.settings.height_desktop | remove: 'vh' | times: 1
+  unless height_desktop_num >= 10 and height_desktop_num <= 100
+    assign height_desktop_num = 100
   endunless
-  assign height_mobile_small = height_mobile | replace: 'vh', 'svh'
-  assign height_desktop_small = height_desktop | replace: 'vh', 'svh'
+  assign height_mobile = height_mobile_num | append: 'vh'
+  assign height_desktop = height_desktop_num | append: 'vh'
+  assign height_mobile_small = height_mobile_num | append: 'svh'
+  assign height_desktop_small = height_desktop_num | append: 'svh'
 
   assign heading_rem_mobile = 3
   case section.settings.heading_size_mobile
@@ -755,28 +760,24 @@
     { "type": "header", "content": "Layout" },
     { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
     {
-      "type": "select",
+      "type": "range",
       "id": "height_desktop",
       "label": "Desktop height",
-      "options": [
-        { "value": "25vh", "label": "25% of screen height" },
-        { "value": "50vh", "label": "50% of screen height" },
-        { "value": "75vh", "label": "75% of screen height" },
-        { "value": "100vh", "label": "Full screen height" }
-      ],
-      "default": "100vh"
+      "min": 10,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "default": 100
     },
     {
-      "type": "select",
+      "type": "range",
       "id": "height_mobile",
       "label": "Mobile height",
-      "options": [
-        { "value": "25vh", "label": "25% of screen height" },
-        { "value": "50vh", "label": "50% of screen height" },
-        { "value": "75vh", "label": "75% of screen height" },
-        { "value": "100vh", "label": "Full screen height" }
-      ],
-      "default": "100vh"
+      "min": 10,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "default": 100
     },
     {
       "type": "select",

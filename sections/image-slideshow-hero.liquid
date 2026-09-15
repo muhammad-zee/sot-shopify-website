@@ -7,6 +7,18 @@
   assign overlay_opacity = section.settings.overlay_opacity | divided_by: 100.0
   assign content_bg_opacity = section.settings.content_background_opacity | divided_by: 100.0
 
+  # Looked up directly (rather than applying the theme's "color-{scheme}"
+  # class to the box) because that class also carries a global rule
+  # (layout/theme.liquid) that paints a fully OPAQUE background on any
+  # element wearing it — which would defeat the opacity slider entirely.
+  assign content_bg_rgb = blank
+  if section.settings.content_color_scheme != blank
+    assign content_scheme = settings.color_schemes[section.settings.content_color_scheme]
+    if content_scheme
+      assign content_bg_rgb = content_scheme.settings.background.red | append: ',' | append: content_scheme.settings.background.green | append: ',' | append: content_scheme.settings.background.blue
+    endif
+  endif
+
   assign valid_heights = '25vh,50vh,75vh,100vh' | split: ','
   assign height_mobile = section.settings.height_mobile
   unless valid_heights contains height_mobile
@@ -334,8 +346,8 @@
     z-index: 0;
     pointer-events: none;
     border-radius: 0;
-    {%- if section.settings.content_color_scheme != blank -%}
-      background-color: rgba(var(--color-background), {{ content_bg_opacity }});
+    {%- if content_bg_rgb != blank -%}
+      background-color: rgba({{ content_bg_rgb }}, {{ content_bg_opacity }});
     {%- else -%}
       background-color: {{ section.settings.content_background_color | color_modify: 'alpha', content_bg_opacity }};
     {%- endif -%}
@@ -494,7 +506,7 @@
     <div class="slideshow-hero__overlay-{{ section.id }}"></div>
   {%- endif -%}
 
-  <div class="slideshow-hero__content-{{ section.id }}{% if section.settings.content_color_scheme != blank %} color-{{ section.settings.content_color_scheme }}{% endif %}">
+  <div class="slideshow-hero__content-{{ section.id }}">
     <div class="slideshow-hero__content-inner-{{ section.id }}">
       {%- if section.settings.heading != blank -%}
         <{{ heading_tag }} class="slideshow-hero__heading-{{ section.id }} inline-richtext">

@@ -324,13 +324,9 @@
     }
   }
 
-  /* Background lives on its own layer behind the content so the fade
-     (when Linear gradient is selected) only ever affects the background —
-     the heading/text/button in the inner wrapper stay fully opaque.
-     The fade itself is a plain background gradient from the color at full
-     opacity to the same color at 0% opacity — not a CSS mask — since
-     mask-image gradients on ordinary elements aren't reliable across
-     browsers (notably Firefox). */
+  /* Background lives on its own layer behind the content so the opacity
+     only ever affects the background — the heading/text/button in the
+     inner wrapper stay fully opaque. */
   .slideshow-hero__content-{{ section.id }}::before {
     content: '';
     position: absolute;
@@ -339,21 +335,7 @@
     pointer-events: none;
     border-radius: 0;
     {%- if section.settings.content_color_scheme != blank -%}
-      {%- if section.settings.content_background_style == 'gradient' -%}
-        background: linear-gradient(
-          0deg,
-          rgba(var(--color-background), {{ content_bg_opacity }}) 0%,
-          rgba(var(--color-background), 0) 100%
-        );
-      {%- else -%}
-        background-color: rgba(var(--color-background), {{ content_bg_opacity }});
-      {%- endif -%}
-    {%- elsif section.settings.content_background_style == 'gradient' -%}
-      background: linear-gradient(
-        0deg,
-        {{ section.settings.content_background_color | color_modify: 'alpha', content_bg_opacity }} 0%,
-        {{ section.settings.content_background_color | color_modify: 'alpha', 0 }} 100%
-      );
+      background-color: rgba(var(--color-background), {{ content_bg_opacity }});
     {%- else -%}
       background-color: {{ section.settings.content_background_color | color_modify: 'alpha', content_bg_opacity }};
     {%- endif -%}
@@ -704,17 +686,6 @@
       "content": "A background box behind the heading, text and button — separate from the overlay over the slideshow images."
     },
     {
-      "type": "select",
-      "id": "content_background_style",
-      "label": "Content background style",
-      "info": "Linear gradient fades the background from fully visible at the bottom to transparent at the top. Only the background fades — the heading, text and button stay fully visible.",
-      "options": [
-        { "value": "solid", "label": "Solid color" },
-        { "value": "gradient", "label": "Linear gradient (fade to transparent at top)" }
-      ],
-      "default": "solid"
-    },
-    {
       "type": "color",
       "id": "content_background_color",
       "label": "Content background color",
@@ -735,7 +706,7 @@
       "type": "color_scheme",
       "id": "content_color_scheme",
       "label": "Content color scheme",
-      "info": "Overrides the content background color/gradient above with a theme color scheme. Choose None to use the custom color instead.",
+      "info": "Overrides the content background color above with a theme color scheme. Choose None to use the custom color instead.",
       "default": "scheme-1"
     },
     { "type": "header", "content": "Outline button" },

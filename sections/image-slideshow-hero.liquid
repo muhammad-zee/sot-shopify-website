@@ -313,17 +313,29 @@
   .slideshow-hero__content-{{ section.id }} {
     position: relative;
     z-index: 3;
+    display: flex;
+    justify-content: {{ section.settings.content_alignment_mobile }};
     width: 100%;
-    max-width: {{ section.settings.content_max_width }}px;
-    padding: {{ section.settings.padding_top }}px 2rem {{ section.settings.padding_bottom }}px;
-    text-align: {{ section.settings.text_alignment }};
-    color: {{ section.settings.text_color }};
     border-radius: 0;
     {%- if section.settings.content_color_scheme != blank -%}
       background-color: rgba(var(--color-background), {{ content_bg_opacity }});
     {%- else -%}
       background-color: {{ section.settings.content_background_color | color_modify: 'alpha', content_bg_opacity }};
     {%- endif -%}
+  }
+
+  @media screen and (min-width: 750px) {
+    .slideshow-hero__content-{{ section.id }} {
+      justify-content: {{ section.settings.content_alignment_desktop }};
+    }
+  }
+
+  .slideshow-hero__content-inner-{{ section.id }} {
+    width: 100%;
+    max-width: {{ section.settings.content_max_width }}px;
+    padding: {{ section.settings.padding_top }}px 2rem {{ section.settings.padding_bottom }}px;
+    text-align: {{ section.settings.text_alignment }};
+    color: {{ section.settings.text_color }};
   }
 
   .slideshow-hero__heading-{{ section.id }} {
@@ -384,7 +396,7 @@
   }
 
   @media screen and (max-width: 749px) {
-    .slideshow-hero__content-{{ section.id }} {
+    .slideshow-hero__content-inner-{{ section.id }} {
       padding-left: 1.5rem;
       padding-right: 1.5rem;
     }
@@ -470,30 +482,32 @@
   {%- endif -%}
 
   <div class="slideshow-hero__content-{{ section.id }}{% if section.settings.content_color_scheme != blank %} color-{{ section.settings.content_color_scheme }}{% endif %}">
-    {%- if section.settings.heading != blank -%}
-      <{{ heading_tag }} class="slideshow-hero__heading-{{ section.id }} inline-richtext">
-        {{ section.settings.heading }}
-      </{{ heading_tag }}>
-    {%- endif -%}
+    <div class="slideshow-hero__content-inner-{{ section.id }}">
+      {%- if section.settings.heading != blank -%}
+        <{{ heading_tag }} class="slideshow-hero__heading-{{ section.id }} inline-richtext">
+          {{ section.settings.heading }}
+        </{{ heading_tag }}>
+      {%- endif -%}
 
-    {%- if section.settings.text != blank -%}
-      <div class="slideshow-hero__text-{{ section.id }} rte">
-        {{ section.settings.text }}
-      </div>
-    {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="slideshow-hero__text-{{ section.id }} rte">
+          {{ section.settings.text }}
+        </div>
+      {%- endif -%}
 
-    {%- if section.settings.button_label != blank -%}
-      <a
-        {% if section.settings.button_link != blank %}
-          href="{{ section.settings.button_link }}"
-        {% else %}
-          role="link" aria-disabled="true"
-        {% endif %}
-        class="slideshow-hero__button-{{ section.id }}"
-      >
-        {{ section.settings.button_label | escape }}
-      </a>
-    {%- endif -%}
+      {%- if section.settings.button_label != blank -%}
+        <a
+          {% if section.settings.button_link != blank %}
+            href="{{ section.settings.button_link }}"
+          {% else %}
+            role="link" aria-disabled="true"
+          {% endif %}
+          class="slideshow-hero__button-{{ section.id }}"
+        >
+          {{ section.settings.button_label | escape }}
+        </a>
+      {%- endif -%}
+    </div>
   </div>
 </div>
 

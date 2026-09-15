@@ -54,6 +54,7 @@
      so the cluster reads as one compact photo group, not a huge grid. */
   .photo-collage-{{ section.id }} .photo-collage__images {
     position: relative;
+    isolation: isolate;
     width: 100%;
     max-width: 38rem;
     aspect-ratio: 4 / 4.4;
@@ -223,6 +224,15 @@
   unless heading_tag == 'h1' or heading_tag == 'h2' or heading_tag == 'h3'
     assign heading_tag = 'h2'
   endunless
+
+  # Falls back to the section's heading (then the shop name) so a photo
+  # never ships with an empty alt attribute just because a merchant skipped
+  # the optional per-image alt text field.
+  assign collage_heading_block = section.blocks | where: 'type', 'heading' | first
+  assign collage_alt_fallback = collage_heading_block.settings.heading | strip_html | strip
+  if collage_alt_fallback == blank
+    assign collage_alt_fallback = shop.name
+  endif
 -%}
 
 <div class="color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding photo-collage-{{ section.id }}">
@@ -242,7 +252,7 @@
                 {{
                   block.settings.image
                   | image_url: width: 1500
-                  | image_tag: sizes: '(min-width: 750px) 25vw, 45vw', widths: '275, 400, 550, 750, 1100, 1500', alt: block.settings.alt
+                  | image_tag: sizes: '(min-width: 750px) 25vw, 45vw', widths: '275, 400, 550, 750, 1100, 1500', alt: block.settings.alt | default: collage_alt_fallback
                 }}
               {%- else -%}
                 {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}

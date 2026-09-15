@@ -22,9 +22,41 @@
       {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
     </title>
 
-    {% if page_description %}
-      <meta name="description" content="{{ page_description | escape }}">
-    {% endif %}
+    {%- liquid
+      # page_description only ever exists if a merchant manually filled in a
+      # per-page SEO description. It has no built-in fallback, so most
+      # collection/page/cart URLs ship with no <meta name="description"> at
+      # all unless someone remembers to set one for every single resource.
+      # This fills the gap with a reasonable, still-editable-later default.
+      assign meta_description = page_description
+      if meta_description == blank
+        case template.name
+          when 'collection'
+            assign meta_description = collection.description | strip_html
+          when 'page'
+            assign meta_description = page.content | strip_html
+          when 'product'
+            assign meta_description = product.description | strip_html
+          when 'blog'
+            assign meta_description = blog.title
+          when 'article'
+            assign meta_description = article.excerpt_or_content | strip_html
+          when 'cart'
+            assign meta_description = 'Review the items in your bag and check out securely with ' | append: shop.name | append: '.'
+          when 'policy'
+            assign meta_description = page_title | append: ' — read the full details from ' | append: shop.name | append: '.'
+        endcase
+      endif
+      assign meta_description = meta_description | strip_newlines | strip
+      if meta_description == blank
+        assign meta_description = shop.description
+      endif
+      if meta_description == blank
+        assign meta_description = shop.name | append: ' — shop the latest collection.'
+      endif
+      assign meta_description = meta_description | truncate: 160
+    -%}
+    <meta name="description" content="{{ meta_description | escape }}">
 
     {% render 'meta-tags' %}
 

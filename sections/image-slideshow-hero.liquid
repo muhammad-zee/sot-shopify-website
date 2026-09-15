@@ -7,6 +7,14 @@
   assign overlay_opacity = section.settings.overlay_opacity | divided_by: 100.0
   assign content_bg_opacity = section.settings.content_background_opacity | divided_by: 100.0
 
+  # Falls back to the heading (then the shop name) so slide images never
+  # ship with an empty alt attribute just because a merchant skipped the
+  # optional per-image alt text field.
+  assign hero_alt_fallback = section.settings.heading | strip_html | strip
+  if hero_alt_fallback == blank
+    assign hero_alt_fallback = shop.name
+  endif
+
   # Looked up directly (rather than applying the theme's "color-{scheme}"
   # class to the box) because that class also carries a global rule
   # (layout/theme.liquid) that paints a fully OPAQUE background on any
@@ -462,7 +470,7 @@
               loading: slide_loading,
               sizes: '100vw',
               widths: '375, 750, 1100, 1500, 1780, 2000, 3000, 3840',
-              alt: block.settings.alt,
+              alt: block.settings.alt | default: hero_alt_fallback,
               class: slide_class
           }}
         {%- endif -%}
@@ -495,7 +503,7 @@
               loading: slide_loading,
               sizes: '100vw',
               widths: '375, 750, 1100, 1500, 1780, 2000, 3000, 3840',
-              alt: block.settings.alt,
+              alt: block.settings.alt | default: hero_alt_fallback,
               class: slide_class
           }}
         {%- endif -%}

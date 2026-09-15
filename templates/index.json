@@ -69,7 +69,7 @@
         "overlay_color": "#f7f4ee",
         "overlay_opacity": 45,
         "heading": "THE ENGINEER'S WARDROBE",
-        "heading_tag": "h2",
+        "heading_tag": "h1",
         "heading_size_mobile": "h2",
         "heading_size_desktop": "h1",
         "text": "",

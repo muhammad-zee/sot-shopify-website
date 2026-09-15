@@ -319,6 +319,12 @@
     border-radius: 0;
     {%- if section.settings.content_color_scheme != blank -%}
       background-color: rgba(var(--color-background), {{ content_bg_opacity }});
+    {%- elsif section.settings.content_background_style == 'gradient' -%}
+      background: linear-gradient(
+        90deg,
+        {{ section.settings.content_background_color | color_modify: 'alpha', content_bg_opacity }} 0%,
+        {{ section.settings.content_background_color_2 | color_modify: 'alpha', content_bg_opacity }} 100%
+      );
     {%- else -%}
       background-color: {{ section.settings.content_background_color | color_modify: 'alpha', content_bg_opacity }};
     {%- endif -%}
@@ -673,10 +679,28 @@
       "content": "A background box behind the heading, text and button — separate from the overlay over the slideshow images."
     },
     {
+      "type": "select",
+      "id": "content_background_style",
+      "label": "Content background style",
+      "info": "Gradient applies only when no content color scheme is selected below.",
+      "options": [
+        { "value": "solid", "label": "Solid color" },
+        { "value": "gradient", "label": "Linear gradient" }
+      ],
+      "default": "solid"
+    },
+    {
       "type": "color",
       "id": "content_background_color",
       "label": "Content background color",
-      "info": "Used when no content color scheme is selected below.",
+      "info": "Used when no content color scheme is selected below. The first color when style is set to Linear gradient.",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "content_background_color_2",
+      "label": "Content background gradient color",
+      "info": "Second color, used only when style above is set to Linear gradient.",
       "default": "#000000"
     },
     {
@@ -693,7 +717,7 @@
       "type": "color_scheme",
       "id": "content_color_scheme",
       "label": "Content color scheme",
-      "info": "Overrides the content background color above with a theme color scheme. Choose None to use the custom color instead.",
+      "info": "Overrides the content background color/gradient above with a theme color scheme. Choose None to use the custom color instead.",
       "default": "scheme-1"
     },
     { "type": "header", "content": "Outline button" },

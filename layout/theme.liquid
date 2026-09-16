@@ -19,13 +19,19 @@
       # Cart and policy pages have no admin "Search engine listing" field at
       # all (unlike products/collections/pages), so a short title here can
       # never be fixed by editing content in Shopify admin — lengthening it
-      # has to happen here instead.
+      # has to happen here instead. The /collections/all URL is the same
+      # story when it's Shopify's automatic "all products" route rather
+      # than a real, merchant-managed collection (no edit screen exists).
       assign display_title = page_title
       case template.name
         when 'cart'
           assign display_title = 'Your Shopping Bag – Review Items & Checkout Securely'
         when 'policy'
           assign display_title = page_title | append: ' – Everything You Need to Know'
+        when 'collection'
+          if collection.handle == 'all'
+            assign display_title = 'Shop All Products – Streetwear Essentials'
+          endif
       endcase
     -%}
     <title>
@@ -45,7 +51,11 @@
       if meta_description == blank
         case template.name
           when 'collection'
-            assign meta_description = collection.description | strip_html
+            if collection.handle == 'all'
+              assign meta_description = "Browse SOT's full streetwear collection — unisex tees, shirts and trousers built for everyday wear. 100% made in Pakistan."
+            else
+              assign meta_description = collection.description | strip_html
+            endif
           when 'page'
             assign meta_description = page.content | strip_html
           when 'product'

@@ -85,60 +85,13 @@
   assign slide_display_seconds = section.settings.slide_display_duration
   assign slide_transition_seconds = section.settings.slide_transition_duration
   # Transition must be meaningfully shorter than the display time, or the
-  # fade-in and fade-out of the SAME image would overlap each other instead
-  # of leaving a clean hold. Clamp it defensively.
+  # JS timer would advance to the next slide before the current crossfade
+  # transition has even finished playing.
   assign max_transition = slide_display_seconds | times: 0.5
   if slide_transition_seconds > max_transition
     assign slide_transition_seconds = max_transition
   endif
-  # Slot spacing between consecutive images is display time only (not
-  # display + transition), so each new image starts rising on top of the
-  # previous one exactly display_seconds after that image started rising.
-  assign slot_seconds = slide_display_seconds
-
-  # Crossfade timing, computed once per stack since desktop/mobile can have
-  # different image counts (and therefore a different total loop length).
-  #
-  # Each image: fades in (0 -> fade_pct%), holds fully opaque through
-  # fadeout_end_pct% (which is exactly when the NEXT image finishes rising
-  # on top of it and has fully covered it), then snaps to 0 immediately
-  # after (snap_pct%) since it's already hidden by then. It stays at 0 for
-  # the remainder of its own loop and rises again cleanly next cycle.
-  #
-  # This explicit reset is what keeps z-index ordering correct across
-  # multiple loops — without it, an old image can stay "stuck" opaque behind
-  # the scenes and wrongly bury a later image's re-entrance, which is what
-  # caused images to appear to skip / stay too long / loop out of order.
-  #
-  # The reset is a near-instant snap (a tiny 0.1 percentage-point step)
-  # rather than a gradual fade, specifically so it never overlaps in time
-  # with the next image's rise — if both were fading at once, the
-  # background color would peek through underneath both for an instant.
-  assign total_cycle_desktop = 0
-  assign fade_pct_desktop = 0
-  assign hold_end_pct_desktop = 0
-  assign fadeout_end_pct_desktop = 0
-  assign snap_pct_desktop = 0
-  if desktop_count > 1
-    assign total_cycle_desktop = slot_seconds | times: desktop_count
-    assign fade_pct_desktop = slide_transition_seconds | times: 1.0 | divided_by: total_cycle_desktop | times: 100
-    assign hold_end_pct_desktop = slide_display_seconds | times: 1.0 | divided_by: total_cycle_desktop | times: 100
-    assign fadeout_end_pct_desktop = slide_display_seconds | plus: slide_transition_seconds | times: 1.0 | divided_by: total_cycle_desktop | times: 100
-    assign snap_pct_desktop = fadeout_end_pct_desktop | plus: 0.1
-  endif
-
-  assign total_cycle_mobile = 0
-  assign fade_pct_mobile = 0
-  assign hold_end_pct_mobile = 0
-  assign fadeout_end_pct_mobile = 0
-  assign snap_pct_mobile = 0
-  if mobile_count > 1
-    assign total_cycle_mobile = slot_seconds | times: mobile_count
-    assign fade_pct_mobile = slide_transition_seconds | times: 1.0 | divided_by: total_cycle_mobile | times: 100
-    assign hold_end_pct_mobile = slide_display_seconds | times: 1.0 | divided_by: total_cycle_mobile | times: 100
-    assign fadeout_end_pct_mobile = slide_display_seconds | plus: slide_transition_seconds | times: 1.0 | divided_by: total_cycle_mobile | times: 100
-    assign snap_pct_mobile = fadeout_end_pct_mobile | plus: 0.1
-  endif
+  assign slide_interval_ms = slide_display_seconds | times: 1000 | round
 -%}
 
 {%- style -%}
@@ -222,101 +175,28 @@
   }
 
   /* --- IMAGE SLIDESHOW ---
-     Pure CSS — no JavaScript timer involved. See the timing comment in the
-     Liquid block above for how the keyframe percentages are derived. */
-  {%- if desktop_count > 1 -%}
-    @keyframes slideshow-hero-crossfade-desktop-{{ section.id }} {
-      0% {
-        opacity: 0;
-      }
-      {{ fade_pct_desktop }}% {
-        opacity: 1;
-      }
-      {{ fadeout_end_pct_desktop }}% {
-        opacity: 1;
-      }
-      {{ snap_pct_desktop }}% {
-        opacity: 0;
-      }
-      100% {
-        opacity: 0;
-      }
-    }
+     A tiny JS timer (at the bottom of this section) toggles "is-active" on
+     one slide at a time; this is just the crossfade transition for that
+     class toggle. No @keyframes / animation-delay math — a plain opacity
+     transition can't drift out of sync or get stuck the way staggered
+     per-slide keyframe animations could. */
+  .slideshow-hero__slide-desktop-{{ section.id }},
+  .slideshow-hero__slide-mobile-{{ section.id }} {
+    opacity: 0;
+    transition: opacity {{ slide_transition_seconds }}s linear;
+  }
 
-    .slideshow-hero__slide-desktop-{{ section.id }} {
-      opacity: 0;
-      animation-name: slideshow-hero-crossfade-desktop-{{ section.id }};
-      animation-duration: {{ total_cycle_desktop }}s;
-      animation-timing-function: linear;
-      animation-iteration-count: infinite;
-      animation-fill-mode: backwards;
-    }
+  .slideshow-hero__slide-desktop-{{ section.id }}.is-active,
+  .slideshow-hero__slide-mobile-{{ section.id }}.is-active {
+    opacity: 1;
+  }
 
-    {%- for block in desktop_blocks -%}
-      .slideshow-hero__slide-desktop-{{ section.id }}-{{ forloop.index0 }} {
-        z-index: {{ forloop.index }};
-        animation-delay: {{ forloop.index0 | times: slot_seconds }}s;
-      }
-    {%- endfor -%}
-
-    @media (prefers-reduced-motion: reduce) {
-      .slideshow-hero__slide-desktop-{{ section.id }} {
-        animation: none;
-        opacity: 0;
-      }
-
-      .slideshow-hero__slide-desktop-{{ section.id }}-0 {
-        opacity: 1;
-      }
-    }
-  {%- endif -%}
-
-  {%- if mobile_count > 1 -%}
-    @keyframes slideshow-hero-crossfade-mobile-{{ section.id }} {
-      0% {
-        opacity: 0;
-      }
-      {{ fade_pct_mobile }}% {
-        opacity: 1;
-      }
-      {{ fadeout_end_pct_mobile }}% {
-        opacity: 1;
-      }
-      {{ snap_pct_mobile }}% {
-        opacity: 0;
-      }
-      100% {
-        opacity: 0;
-      }
-    }
-
+  @media (prefers-reduced-motion: reduce) {
+    .slideshow-hero__slide-desktop-{{ section.id }},
     .slideshow-hero__slide-mobile-{{ section.id }} {
-      opacity: 0;
-      animation-name: slideshow-hero-crossfade-mobile-{{ section.id }};
-      animation-duration: {{ total_cycle_mobile }}s;
-      animation-timing-function: linear;
-      animation-iteration-count: infinite;
-      animation-fill-mode: backwards;
+      transition: none;
     }
-
-    {%- for block in mobile_blocks -%}
-      .slideshow-hero__slide-mobile-{{ section.id }}-{{ forloop.index0 }} {
-        z-index: {{ forloop.index }};
-        animation-delay: {{ forloop.index0 | times: slot_seconds }}s;
-      }
-    {%- endfor -%}
-
-    @media (prefers-reduced-motion: reduce) {
-      .slideshow-hero__slide-mobile-{{ section.id }} {
-        animation: none;
-        opacity: 0;
-      }
-
-      .slideshow-hero__slide-mobile-{{ section.id }}-0 {
-        opacity: 1;
-      }
-    }
-  {%- endif -%}
+  }
 
   /* Overlay sits between the media and the content */
   .slideshow-hero__overlay-{{ section.id }} {
@@ -448,66 +328,46 @@
 
 <div class="slideshow-hero-{{ section.id }} color-{{ section.settings.color_scheme }}">
   <div class="slideshow-hero__media-{{ section.id }}">
-    <div class="slideshow-hero__stack-{{ section.id }} slideshow-hero__stack--desktop-{{ section.id }}">
-      {%- for block in desktop_blocks -%}
-        {%- if block.settings.image != blank -%}
-          {%- liquid
+    <div class="slideshow-hero__stack-{{ section.id }} slideshow-hero__stack--desktop-{{ section.id }}" data-slideshow-stack data-slide-interval="{{ slide_interval_ms }}">
+      {%- liquid
+        assign rendered_index = 0
+        for block in desktop_blocks
+          if block.settings.image != blank
             assign slide_loading = 'lazy'
-            if forloop.index0 == 0
-              assign slide_loading = 'eager'
-            endif
             assign slide_class = 'slideshow-hero__slide-desktop-' | append: section.id
-            if desktop_count > 1
-              assign slide_class = slide_class | append: ' slideshow-hero__slide-desktop-' | append: section.id | append: '-' | append: forloop.index0
-            else
-              assign slide_class = slide_class | append: '-static'
+            assign slide_alt = block.settings.alt | default: hero_alt_fallback
+            if rendered_index == 0
+              assign slide_loading = 'eager'
+              assign slide_class = slide_class | append: ' is-active'
             endif
-          -%}
-          {{
-            block.settings.image
-            | image_url: width: 3840
-            | image_tag:
-              loading: slide_loading,
-              sizes: '100vw',
-              widths: '375, 750, 1100, 1500, 1780, 2000, 3000, 3840',
-              alt: block.settings.alt | default: hero_alt_fallback,
-              class: slide_class
-          }}
-        {%- endif -%}
-      {%- endfor -%}
+            echo block.settings.image | image_url: width: 3840 | image_tag: loading: slide_loading, sizes: '100vw', widths: '375, 750, 1100, 1500, 1780, 2000, 3000, 3840', alt: slide_alt, class: slide_class
+            assign rendered_index = rendered_index | plus: 1
+          endif
+        endfor
+      -%}
 
       {%- if desktop_count == 0 -%}
         {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
       {%- endif -%}
     </div>
 
-    <div class="slideshow-hero__stack-{{ section.id }} slideshow-hero__stack--mobile-{{ section.id }}">
-      {%- for block in mobile_blocks -%}
-        {%- if block.settings.image != blank -%}
-          {%- liquid
+    <div class="slideshow-hero__stack-{{ section.id }} slideshow-hero__stack--mobile-{{ section.id }}" data-slideshow-stack data-slide-interval="{{ slide_interval_ms }}">
+      {%- liquid
+        assign rendered_index = 0
+        for block in mobile_blocks
+          if block.settings.image != blank
             assign slide_loading = 'lazy'
-            if forloop.index0 == 0
-              assign slide_loading = 'eager'
-            endif
             assign slide_class = 'slideshow-hero__slide-mobile-' | append: section.id
-            if mobile_count > 1
-              assign slide_class = slide_class | append: ' slideshow-hero__slide-mobile-' | append: section.id | append: '-' | append: forloop.index0
-            else
-              assign slide_class = slide_class | append: '-static'
+            assign slide_alt = block.settings.alt | default: hero_alt_fallback
+            if rendered_index == 0
+              assign slide_loading = 'eager'
+              assign slide_class = slide_class | append: ' is-active'
             endif
-          -%}
-          {{
-            block.settings.image
-            | image_url: width: 3840
-            | image_tag:
-              loading: slide_loading,
-              sizes: '100vw',
-              widths: '375, 750, 1100, 1500, 1780, 2000, 3000, 3840',
-              alt: block.settings.alt | default: hero_alt_fallback,
-              class: slide_class
-          }}
-        {%- endif -%}
-      {%- endfor -%}
+            echo block.settings.image | image_url: width: 3840 | image_tag: loading: slide_loading, sizes: '100vw', widths: '375, 750, 1100, 1500, 1780, 2000, 3000, 3840', alt: slide_alt, class: slide_class
+            assign rendered_index = rendered_index | plus: 1
+          endif
+        endfor
+      -%}
 
       {%- if mobile_count == 0 -%}
         {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
@@ -548,6 +408,33 @@
     </div>
   </div>
 </div>
+
+<script>
+  (function () {
+    var container = document.querySelector('.slideshow-hero-{{ section.id }}');
+    if (!container) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    container.querySelectorAll('[data-slideshow-stack]').forEach(function (stack) {
+      var slides = Array.prototype.slice.call(stack.children).filter(function (el) {
+        return el.tagName === 'IMG' || el.tagName === 'SVG';
+      });
+      if (slides.length < 2) return;
+
+      var interval = parseInt(stack.getAttribute('data-slide-interval'), 10) || 4000;
+      var index = slides.findIndex(function (el) {
+        return el.classList.contains('is-active');
+      });
+      if (index < 0) index = 0;
+
+      setInterval(function () {
+        slides[index].classList.remove('is-active');
+        index = (index + 1) % slides.length;
+        slides[index].classList.add('is-active');
+      }, interval);
+    });
+  })();
+</script>
 
 {% schema %}
 {

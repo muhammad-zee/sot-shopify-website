@@ -27,7 +27,7 @@
         "announcement_tfPk7t": {
           "type": "announcement",
           "settings": {
-            "text": "Batch - 01 Coming Soon",
+            "text": "Batch - 001 Coming Soon",
             "link": "",
             "highlight": true,
             "highlight_color_scheme": "scheme-1",

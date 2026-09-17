@@ -12,14 +12,6 @@
     "main": {
       "type": "main-product",
       "blocks": {
-        "vendor": {
-          "type": "text",
-          "disabled": true,
-          "settings": {
-            "text": "{{ product.vendor }}",
-            "text_style": "uppercase"
-          }
-        },
         "title": {
           "type": "title",
           "settings": {}
@@ -39,6 +31,21 @@
           "type": "quantity_selector",
           "settings": {}
         },
+        "size_fit_guide_whchAk": {
+          "type": "size_fit_guide",
+          "settings": {
+            "heading": "Size & Fit Guide",
+            "unit_display": "both"
+          }
+        },
+        "vendor": {
+          "type": "text",
+          "disabled": true,
+          "settings": {
+            "text": "{{ product.vendor }}",
+            "text_style": "uppercase"
+          }
+        },
         "buy_buttons": {
           "type": "buy_buttons",
           "settings": {
@@ -50,13 +57,6 @@
           "type": "description",
           "settings": {}
         },
-        "size_fit_guide_whchAk": {
-          "type": "size_fit_guide",
-          "settings": {
-            "heading": "Size & Fit Guide",
-            "unit_display": "both"
-          }
-        },
         "share": {
           "type": "share",
           "settings": {
@@ -65,14 +65,14 @@
         }
       },
       "block_order": [
-        "vendor",
         "title",
         "price",
         "variant_picker",
         "quantity_selector",
+        "size_fit_guide_whchAk",
+        "vendor",
         "buy_buttons",
         "description",
-        "size_fit_guide_whchAk",
         "share"
       ],
       "settings": {

@@ -267,6 +267,76 @@
         "padding_bottom": 36
       }
     },
+    "featured_product_C7xeEh": {
+      "type": "featured-product",
+      "blocks": {
+        "text_iraTk8": {
+          "type": "text",
+          "settings": {
+            "text": "{{ section.settings.product.vendor }}",
+            "text_style": "uppercase"
+          }
+        },
+        "title_M8tWtE": {
+          "type": "title",
+          "settings": {
+            "heading_size": "h1"
+          }
+        },
+        "price_9tCfMw": {
+          "type": "price",
+          "settings": {}
+        },
+        "variant_picker_zET3r4": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_type": "button",
+            "swatch_shape": "circle"
+          }
+        },
+        "quantity_selector_m6BrJr": {
+          "type": "quantity_selector",
+          "settings": {}
+        },
+        "buy_buttons_793Bpw": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true,
+            "show_gift_card_recipient": true
+          }
+        },
+        "share_bY8h9w": {
+          "type": "share",
+          "settings": {
+            "share_label": "Share"
+          }
+        }
+      },
+      "block_order": [
+        "text_iraTk8",
+        "title_M8tWtE",
+        "price_9tCfMw",
+        "variant_picker_zET3r4",
+        "quantity_selector_m6BrJr",
+        "buy_buttons_793Bpw",
+        "share_bY8h9w"
+      ],
+      "name": "t:sections.featured-product.presets.name",
+      "settings": {
+        "product": "starboy-pink",
+        "color_scheme": "",
+        "secondary_background": false,
+        "media_size": "medium",
+        "constrain_to_viewport": true,
+        "media_fit": "contain",
+        "media_position": "left",
+        "image_zoom": "lightbox",
+        "hide_variants": false,
+        "enable_video_looping": false,
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
     "featured_collection_N6PqNd": {
       "type": "featured-collection",
       "name": "Sale",
@@ -663,6 +733,7 @@
     "photo_collage_banner_9fK3xQ",
     "collection_list_jcDEdA",
     "featured_collection",
+    "featured_product_C7xeEh",
     "featured_collection_N6PqNd",
     "slideshow_DjrgVJ",
     "collage_FU7DU6",

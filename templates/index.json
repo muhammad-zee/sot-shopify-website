@@ -104,35 +104,40 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/Gemini_Generated_Image_1c8qt61c8qt61c8q.jpg",
-            "alt": ""
+            "alt": "",
+            "link": ""
           }
         },
         "image_rEEbdg": {
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/Gemini_Generated_Image_mbr5wombr5wombr5.jpg",
-            "alt": ""
+            "alt": "",
+            "link": ""
           }
         },
         "image_2": {
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/Gemini_Generated_Image_6vonia6vonia6von.jpg",
-            "alt": ""
+            "alt": "",
+            "link": ""
           }
         },
         "image_3": {
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/Gemini_Generated_Image_prafqeprafqepraf.jpg",
-            "alt": ""
+            "alt": "",
+            "link": ""
           }
         },
         "image_4": {
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/Gemini_Generated_Image_6da8mc6da8mc6da8.jpg",
-            "alt": ""
+            "alt": "",
+            "link": ""
           }
         },
         "eyebrow_1": {
@@ -186,7 +191,7 @@
       ],
       "name": "Photo collage banner",
       "settings": {
-        "top_text": "<p>We design durable <strong>everyday essentials</strong> with a conscience — <strong>100% made in Pakistan.</strong></p>",
+        "top_text": "<p>Built different. <strong>Durable essentials</strong> with a conscience, <strong>100% made in Pakistan.</strong></p>",
         "top_text_alignment": "center",
         "color_scheme": "scheme-1",
         "content_position": "right",

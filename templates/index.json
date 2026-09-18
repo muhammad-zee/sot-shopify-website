@@ -164,12 +164,13 @@
           "type": "button",
           "settings": {
             "button_label": "New Arrivals",
-            "button_link": "shopify://collections/all",
+            "button_link": "shopify://collections/new-arrivals",
             "button_style_secondary": false
           }
         },
         "button_2": {
           "type": "button",
+          "disabled": true,
           "settings": {
             "button_label": "Best Sellers",
             "button_link": "shopify://collections/best-seller",
@@ -189,7 +190,6 @@
         "button_1",
         "button_2"
       ],
-      "disabled": true,
       "name": "Photo collage banner",
       "settings": {
         "top_text": "<p>Built different. <strong>Durable essentials</strong> with a conscience, <strong>100% made in Pakistan.</strong></p>",

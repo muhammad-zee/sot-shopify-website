@@ -189,6 +189,7 @@
         "button_1",
         "button_2"
       ],
+      "disabled": true,
       "name": "Photo collage banner",
       "settings": {
         "top_text": "<p>Built different. <strong>Durable essentials</strong> with a conscience, <strong>100% made in Pakistan.</strong></p>",

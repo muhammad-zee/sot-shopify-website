@@ -1,0 +1,379 @@
+<div class="cc-section-{{ section.id }} cc-wrapper" style="background-color: {{ section.settings.section_bg }}; padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
+  <div class="page-width">
+
+    {% if section.settings.heading != blank %}
+      <h2 class="cc-heading cc-heading-align-{{ section.settings.heading_alignment }}">
+        {{ section.settings.heading }}
+      </h2>
+    {% endif %}
+
+    {% if section.settings.subheading != blank %}
+      <p class="cc-subheading cc-heading-align-{{ section.settings.heading_alignment }}">
+        {{ section.settings.subheading }}
+      </p>
+    {% endif %}
+
+    <div class="cc-grid cc-grid-{{ section.id }}">
+      {% for block in section.blocks %}
+        {% assign collection = collections[block.settings.collection] %}
+        {% assign display_title = block.settings.title | default: collection.title %}
+        {% assign display_link = block.settings.button_link | default: collection.url %}
+
+        <div class="cc-item cc-style-{{ section.settings.content_style }} cc-pos-{{ section.settings.content_position }}" {{ block.shopify_attributes }}>
+          <a href="{{ display_link }}" class="cc-image-wrap">
+            {% if block.settings.image %}
+              {{ block.settings.image | image_url: width: 900 | image_tag: loading: 'lazy', alt: display_title, class: 'cc-image' }}
+            {% elsif collection.image %}
+              {{ collection.image | image_url: width: 900 | image_tag: loading: 'lazy', alt: display_title, class: 'cc-image' }}
+            {% else %}
+              {{ 'collection-1' | placeholder_svg_tag: 'cc-placeholder' }}
+            {% endif %}
+
+            <div class="cc-content">
+              {% if display_title != blank %}
+                <span class="cc-title">{{ display_title }}</span>
+              {% endif %}
+              {% if block.settings.button_label != blank %}
+                <span class="cc-btn">{{ block.settings.button_label }}</span>
+              {% endif %}
+            </div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .cc-wrapper { width: 100%; }
+
+  .cc-heading {
+    font-size: 28px;
+    margin-bottom: 6px;
+  }
+  .cc-subheading {
+    font-size: 16px;
+    opacity: 0.75;
+    margin-bottom: 24px;
+  }
+  .cc-heading-align-left { text-align: left; }
+  .cc-heading-align-center { text-align: center; }
+  .cc-heading-align-right { text-align: right; }
+
+  /* Grid: mobile first */
+  .cc-grid-{{ section.id }} {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_mobile }}, 1fr);
+    gap: {{ section.settings.gap_mobile }}px;
+  }
+
+  /* Desktop override */
+  @media (min-width: 750px) {
+    .cc-grid-{{ section.id }} {
+      grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+      gap: {{ section.settings.gap_desktop }}px;
+    }
+  }
+
+  .cc-item {
+    display: block;
+  }
+
+  .cc-image-wrap {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: {{ section.settings.image_radius }}px;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .cc-image, .cc-placeholder {
+    width: 100%;
+    height: auto;
+    aspect-ratio: {{ section.settings.image_aspect_ratio }};
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
+  }
+
+  .cc-image-wrap:hover .cc-image {
+    transform: scale(1.04);
+  }
+
+  .cc-title {
+    font-size: 16px;
+    font-weight: 600;
+    display: block;
+  }
+
+  .cc-btn {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 8px 18px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* ===== Content Style: BELOW image (plain text under the picture) ===== */
+  .cc-style-below .cc-content {
+    padding-top: 12px;
+  }
+  .cc-style-below.cc-pos-center-center .cc-content,
+  .cc-style-below.cc-pos-top-center .cc-content,
+  .cc-style-below.cc-pos-bottom-center .cc-content {
+    text-align: center;
+  }
+
+  /* ===== Content Style: OVERLAY (box sitting on top of the image) ===== */
+  .cc-style-overlay .cc-image-wrap {
+    display: flex;
+  }
+  .cc-style-overlay .cc-content {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 16px;
+    color: #fff;
+  }
+
+  /* Center Center: content vertically + horizontally centered on the image */
+  .cc-style-overlay.cc-pos-center-center .cc-content {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  /* Top Center: content pinned to top of image */
+  .cc-style-overlay.cc-pos-top-center .cc-content {
+    top: 0;
+  }
+
+  /* Bottom Center: content pinned to bottom of image (like a "Shop Now" box) */
+  .cc-style-overlay.cc-pos-bottom-center .cc-content {
+    bottom: 0;
+  }
+
+  /* Optional dark gradient so text/box stays readable over any image */
+  .cc-style-overlay .cc-image-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.45), rgba(0,0,0,0) 55%);
+    pointer-events: none;
+  }
+  .cc-style-overlay.cc-pos-top-center .cc-image-wrap::after {
+    background: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0) 55%);
+  }
+  .cc-style-overlay.cc-pos-center-center .cc-image-wrap::after {
+    background: rgba(0,0,0,0.25);
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Custom Collection List",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Shop by Collection"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Section Subheading (optional)"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Content Look"
+    },
+    {
+      "type": "select",
+      "id": "content_style",
+      "label": "Content Style",
+      "options": [
+        { "value": "overlay", "label": "Box on top of image (overlay)" },
+        { "value": "below", "label": "Text below image" }
+      ],
+      "default": "overlay"
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "Content Alignment",
+      "options": [
+        { "value": "center-center", "label": "Center Center" },
+        { "value": "top-center", "label": "Top Center" },
+        { "value": "bottom-center", "label": "Bottom Center" }
+      ],
+      "default": "bottom-center",
+      "info": "Only affects 'Box on top of image' style"
+    },
+    {
+      "type": "range",
+      "id": "image_radius",
+      "label": "Image Corner Radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "default": 8
+    },
+    {
+      "type": "select",
+      "id": "image_aspect_ratio",
+      "label": "Image Shape",
+      "options": [
+        { "value": "1/1", "label": "Square" },
+        { "value": "4/5", "label": "Portrait" },
+        { "value": "3/4", "label": "Tall Portrait" },
+        { "value": "16/9", "label": "Wide" }
+      ],
+      "default": "4/5"
+    },
+    {
+      "type": "header",
+      "content": "Desktop Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Items per row (Desktop)",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "gap_desktop",
+      "label": "Spacing between items (Desktop)",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Mobile Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns_mobile",
+      "label": "Items per row (Mobile)",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "gap_mobile",
+      "label": "Spacing between items (Mobile)",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "default": 12,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Section Spacing"
+    },
+    {
+      "type": "color",
+      "id": "section_bg",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding Top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 40,
+      "unit": "px"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection_item",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Custom Image (optional)",
+          "info": "Leave empty to use the collection's own image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Custom Title (optional)",
+          "info": "Leave empty to use the collection's own title"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button / Box Text",
+          "default": "Shop Now"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Custom Link (optional)",
+          "info": "Leave empty to link to the collection page"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Collection List",
+      "blocks": [
+        { "type": "collection_item" },
+        { "type": "collection_item" },
+        { "type": "collection_item" },
+        { "type": "collection_item" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -15,15 +15,29 @@
 
     <div class="cc-grid cc-grid-{{ section.id }}">
       {% for block in section.blocks %}
-        {% assign collection = collections[block.settings.collection] %}
-        {% assign display_title = block.settings.title | default: collection.title %}
-        {% assign display_link = block.settings.button_link | default: collection.url %}
+        {% assign collection = blank %}
+        {% if block.settings.collection != blank %}
+          {% assign collection = collections[block.settings.collection] %}
+        {% endif %}
+
+        {% assign display_title = block.settings.title %}
+        {% if display_title == blank and collection != blank %}
+          {% assign display_title = collection.title %}
+        {% endif %}
+
+        {% assign display_link = block.settings.button_link %}
+        {% if display_link == blank and collection != blank %}
+          {% assign display_link = collection.url %}
+        {% endif %}
+        {% if display_link == blank %}
+          {% assign display_link = '#' %}
+        {% endif %}
 
         <div class="cc-item cc-style-{{ section.settings.content_style }} cc-pos-{{ section.settings.content_position }}" {{ block.shopify_attributes }}>
           <a href="{{ display_link }}" class="cc-image-wrap">
             {% if block.settings.image %}
               {{ block.settings.image | image_url: width: 900 | image_tag: loading: 'lazy', alt: display_title, class: 'cc-image' }}
-            {% elsif collection.image %}
+            {% elsif collection != blank and collection.image %}
               {{ collection.image | image_url: width: 900 | image_tag: loading: 'lazy', alt: display_title, class: 'cc-image' }}
             {% else %}
               {{ 'collection-1' | placeholder_svg_tag: 'cc-placeholder' }}
@@ -49,8 +63,10 @@
   .cc-wrapper { width: 100%; }
 
   .cc-heading {
-    font-size: 28px;
-    margin-bottom: 6px;
+    font-size: {{ section.settings.heading_font_size }}px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 8px;
   }
   .cc-subheading {
     font-size: 16px;
@@ -202,6 +218,16 @@
         { "value": "right", "label": "Right" }
       ],
       "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Heading Font Size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "default": 38,
+      "unit": "px"
     },
     {
       "type": "header",

@@ -12,6 +12,15 @@
     "auto_banner_slider_NwpdWC": {
       "type": "auto-banner-slider",
       "blocks": {
+        "slide_GDnynF": {
+          "type": "slide",
+          "settings": {
+            "image_web": "shopify://shop_images/WEB_TOP.png",
+            "image_mobile": "shopify://shop_images/MOB_Top.png",
+            "link": "shopify://collections/unisex-shirts",
+            "open_new_tab": false
+          }
+        },
         "slide_Rbyp9T": {
           "type": "slide",
           "settings": {
@@ -20,19 +29,11 @@
             "link": "shopify://collections/unisex-bottoms",
             "open_new_tab": false
           }
-        },
-        "slide_GDnynF": {
-          "type": "slide",
-          "disabled": true,
-          "settings": {
-            "link": "",
-            "open_new_tab": false
-          }
         }
       },
       "block_order": [
-        "slide_Rbyp9T",
-        "slide_GDnynF"
+        "slide_GDnynF",
+        "slide_Rbyp9T"
       ],
       "name": "Auto Banner Slider",
       "settings": {

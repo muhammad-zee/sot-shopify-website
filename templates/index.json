@@ -9,6 +9,36 @@
  */
 {
   "sections": {
+    "auto_banner_slider_NwpdWC": {
+      "type": "auto-banner-slider",
+      "blocks": {
+        "slide_Rbyp9T": {
+          "type": "slide",
+          "settings": {
+            "image_web": "shopify://shop_images/WEB_Bottom.png",
+            "image_mobile": "shopify://shop_images/MOB_Bottom.png",
+            "link": "shopify://collections/unisex-bottoms",
+            "open_new_tab": false
+          }
+        },
+        "slide_GDnynF": {
+          "type": "slide",
+          "disabled": true,
+          "settings": {
+            "link": "",
+            "open_new_tab": false
+          }
+        }
+      },
+      "block_order": [
+        "slide_Rbyp9T",
+        "slide_GDnynF"
+      ],
+      "name": "Auto Banner Slider",
+      "settings": {
+        "slide_speed": "4"
+      }
+    },
     "image_slideshow_hero_EgqXrN": {
       "type": "image-slideshow-hero",
       "blocks": {
@@ -57,6 +87,7 @@
         "slideshow_image_LUeXbD",
         "slideshow_image_ghXUQd"
       ],
+      "disabled": true,
       "name": "Image Slideshow Hero",
       "settings": {
         "slide_display_duration": 4,
@@ -729,6 +760,7 @@
     }
   },
   "order": [
+    "auto_banner_slider_NwpdWC",
     "image_slideshow_hero_EgqXrN",
     "photo_collage_banner_9fK3xQ",
     "collection_list_jcDEdA",

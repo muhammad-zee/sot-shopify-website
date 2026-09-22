@@ -8,16 +8,19 @@
           <a href="{{ block.settings.link }}" {% if block.settings.open_new_tab %}target="_blank"{% endif %}>
         {% endif %}
 
-        {% if block.settings.image_web != blank %}
-          {{ block.settings.image_web | image_url: width: 2000 | image_tag: class: 'banner-web', loading: 'lazy', widths: '750,1000,1500,2000' }}
+        {% if block.settings.image_web != blank or block.settings.image_mobile != blank %}
+          <picture>
+            {% if block.settings.image_mobile != blank %}
+              <source media="(max-width: 768px)" srcset="{{ block.settings.image_mobile | image_url: width: 1200 }}">
+            {% endif %}
+            {% if block.settings.image_web != blank %}
+              {{ block.settings.image_web | image_url: width: 2000 | image_tag: loading: 'lazy', widths: '750,1000,1500,2000' }}
+            {% else %}
+              {{ block.settings.image_mobile | image_url: width: 1200 | image_tag: loading: 'lazy' }}
+            {% endif %}
+          </picture>
         {% else %}
-          <div class="banner-placeholder banner-web">Web Banner Image Nahi Lagi</div>
-        {% endif %}
-
-        {% if block.settings.image_mobile != blank %}
-          {{ block.settings.image_mobile | image_url: width: 1200 | image_tag: class: 'banner-mobile', loading: 'lazy', widths: '480,768,1000,1200' }}
-        {% else %}
-          <div class="banner-placeholder banner-mobile">Mobile Banner Image Nahi Lagi</div>
+          <div class="banner-placeholder">Image Nahi Lagi</div>
         {% endif %}
 
         {% if block.settings.link != blank %}
@@ -44,16 +47,11 @@
   .banner-slide { width: 100%; display: none; }
   .banner-slide.active { display: block; }
   .banner-slide a { display: block; width: 100%; line-height: 0; }
+  .banner-slide picture { display: block; width: 100%; line-height: 0; }
   .banner-slide img { width: 100%; height: auto; display: block; object-fit: cover; }
   .banner-placeholder {
     width: 100%; padding: 80px 20px; text-align: center;
     background: #eee; color: #888; font-family: sans-serif;
-  }
-  .banner-mobile { display: none; }
-  .banner-web { display: block; }
-  @media (max-width: 768px) {
-    .banner-web { display: none; }
-    .banner-mobile { display: block; }
   }
   .banner-dots {
     position: absolute; bottom: 15px; left: 0; right: 0;

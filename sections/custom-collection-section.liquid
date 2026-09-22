@@ -68,11 +68,13 @@
     line-height: 1.2;
     margin-bottom: 8px;
   }
+
   .cc-subheading {
     font-size: 16px;
     opacity: 0.75;
     margin-bottom: 24px;
   }
+
   .cc-heading-align-left { text-align: left; }
   .cc-heading-align-center { text-align: center; }
   .cc-heading-align-right { text-align: right; }
@@ -100,7 +102,7 @@
     position: relative;
     display: block;
     overflow: hidden;
-    border-radius: {{ section.settings.image_radius }}px;
+    border-radius: 0;
     text-decoration: none;
     color: inherit;
   }
@@ -129,67 +131,61 @@
     margin-top: 8px;
     padding: 8px 18px;
     border: 1px solid currentColor;
-    border-radius: 0px;
+    border-radius: 0;
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
 
-  /* ===== Content Style: BELOW image (plain text under the picture) ===== */
+  /* ===== Content Style: BELOW image ===== */
   .cc-style-below .cc-content {
     padding-top: 12px;
   }
+
   .cc-style-below.cc-pos-center-center .cc-content,
   .cc-style-below.cc-pos-top-center .cc-content,
   .cc-style-below.cc-pos-bottom-center .cc-content {
     text-align: center;
   }
 
-  /* ===== Content Style: OVERLAY (box sitting on top of the image) ===== */
+  /* ===== Content Style: OVERLAY ===== */
   .cc-style-overlay .cc-image-wrap {
     display: flex;
   }
+
   .cc-style-overlay .cc-content {
     position: absolute;
     left: 0;
     right: 0;
+    top: 50%;
+    transform: translateY(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     text-align: center;
     padding: 16px;
     color: #fff;
+    z-index: 2;
   }
 
-  /* Center Center: content vertically + horizontally centered on the image */
+  /* Force heading + Shop Now to center-center */
+  .cc-style-overlay.cc-pos-top-center .cc-content,
+  .cc-style-overlay.cc-pos-bottom-center .cc-content,
   .cc-style-overlay.cc-pos-center-center .cc-content {
     top: 50%;
+    bottom: auto;
     transform: translateY(-50%);
   }
 
-  /* Top Center: content pinned to top of image */
-  .cc-style-overlay.cc-pos-top-center .cc-content {
-    top: 0;
-  }
-
-  /* Bottom Center: content pinned to bottom of image (like a "Shop Now" box) */
-  .cc-style-overlay.cc-pos-bottom-center .cc-content {
-    bottom: 0;
-  }
-
-  /* Optional dark gradient so text/box stays readable over any image */
+  /* Image overlay for readability */
   .cc-style-overlay .cc-image-wrap::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.45), rgba(0,0,0,0) 55%);
-    pointer-events: none;
-  }
-  .cc-style-overlay.cc-pos-top-center .cc-image-wrap::after {
-    background: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0) 55%);
-  }
-  .cc-style-overlay.cc-pos-center-center .cc-image-wrap::after {
     background: rgba(0,0,0,0.25);
+    pointer-events: none;
+    z-index: 1;
   }
 </style>
 
@@ -253,7 +249,7 @@
         { "value": "bottom-center", "label": "Bottom Center" }
       ],
       "default": "bottom-center",
-      "info": "Only affects 'Box on top of image' style"
+      "info": "Content will remain center-center on the image"
     },
     {
       "type": "range",
@@ -262,7 +258,7 @@
       "min": 0,
       "max": 40,
       "step": 2,
-      "default": 8
+      "default": 0
     },
     {
       "type": "select",

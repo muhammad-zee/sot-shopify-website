@@ -243,7 +243,7 @@
           "type": "collection_item",
           "settings": {
             "collection": "unisex-shirts",
-            "image": "shopify://shop_images/Top-1.png",
+            "image": "shopify://shop_images/collection-tops.jpg",
             "title": "",
             "button_label": "Shop Now",
             "button_link": "shopify://collections/unisex-shirts"

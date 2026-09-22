@@ -258,31 +258,11 @@
             "button_label": "Shop Now",
             "button_link": ""
           }
-        },
-        "collection_item_LMa7D7": {
-          "type": "collection_item",
-          "settings": {
-            "collection": "",
-            "title": "",
-            "button_label": "Shop Now",
-            "button_link": ""
-          }
-        },
-        "collection_item_rgCaaX": {
-          "type": "collection_item",
-          "settings": {
-            "collection": "",
-            "title": "",
-            "button_label": "Shop Now",
-            "button_link": ""
-          }
         }
       },
       "block_order": [
         "collection_item_zePKwm",
-        "collection_item_rMLx4Y",
-        "collection_item_LMa7D7",
-        "collection_item_rgCaaX"
+        "collection_item_rMLx4Y"
       ],
       "name": "Custom Collection List",
       "settings": {
@@ -322,6 +302,7 @@
         "featured_collection_JB8zgV",
         "featured_collection_QpkLhH"
       ],
+      "disabled": true,
       "name": "t:sections.collection-list.presets.name",
       "settings": {
         "title": "Our Collections",

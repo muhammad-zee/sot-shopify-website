@@ -246,7 +246,7 @@
             "image": "shopify://shop_images/Top-1.png",
             "title": "",
             "button_label": "Shop Now",
-            "button_link": ""
+            "button_link": "shopify://collections/unisex-shirts"
           }
         },
         "collection_item_rMLx4Y": {
@@ -256,7 +256,7 @@
             "image": "shopify://shop_images/Bottom.png",
             "title": "",
             "button_label": "Shop Now",
-            "button_link": ""
+            "button_link": "shopify://collections/unisex-bottoms"
           }
         }
       },

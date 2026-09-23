@@ -1,19 +1,32 @@
 {% comment %}
   Renders the "Size & Fit Guide" collapsible accordion block on the product page.
 
-  Data source: the current product's 'custom.size_chart' metafield (a
-  reference to a 'size_chart' metaobject). If the product has no chart
-  assigned, this snippet renders nothing — the accordion is hidden entirely
-  rather than showing a generic/default chart.
+  Two chart types, each backed by its own metaobject definition and product metafield:
 
-  Measurements per size: Body Length, Chest, Shoulder, and Sleeve Length.
-  Sleeve Length is optional per chart — if none of the 4 sizes have a value
-  for it (e.g. a sleeveless garment), the whole column is omitted.
+  - Tops:    product metafield 'custom.size_chart'        -> 'size_chart' metaobject
+             Sizes S, M, L, XL. Columns: Body length, Chest, Shoulder, Sleeve length.
+             Field keys: s_body_length, s_chest, s_shoulder, s_sleeve_length, m_..., l_..., xl_...
 
-  Units: when the chart's "Units to display" is "in" or "cm", the table just
-  shows that one unit. When it's "both", a small IN / CM toggle is rendered
-  above the table (top-right) and the visitor can switch units live via
-  CSS only (:has()), no JavaScript involved.
+  - Bottoms: product metafield 'custom.bottom_size_chart' -> 'bottom_size_chart' metaobject
+             Sizes xs, s, m, l, xl, xxl (shown as letters only).
+             Columns: Body length, Waist, Thigh, Bottom opening.
+             Field keys: xs_body_length, xs_waist, xs_thigh, xs_bottom_openning, s_..., xxl_...
+             (note: "openning" is spelled that way in the metaobject definition, and field keys can't be renamed)
+
+  Units field: the tops chart uses 'unit_display', the bottoms chart uses 'units_to_display'.
+  Optional on either: model_height, model_size, fit_type (ignored when the definition has no such field).
+  All measurements are stored in INCHES; centimetres are calculated here.
+
+  A product with a tops chart shows the tops chart; otherwise a bottoms chart; if it has
+  neither, this snippet renders nothing (no accordion at all).
+
+  Blank data is handled quietly: a column (e.g. Sleeve length) is omitted when no size has a
+  value for it, and a size row is omitted when all of its measurements are blank. So a size that isn't
+  made (or isn't filled in yet) simply doesn't appear.
+
+  Units: when the chart's "Units to display" is "in" or "cm", the table just shows that one
+  unit. When it's "both", a small IN / CM toggle is rendered above the table (top-right) and
+  the visitor can switch units live via CSS only (:has()), no JavaScript involved.
 
   Accepts:
   - block: {Object} the 'size_fit_guide' block from main-product.liquid
@@ -24,24 +37,57 @@
 {% endcomment %}
 
 {%- liquid
+  assign chart_type = 'top'
   assign chart = product.metafields.custom.size_chart.value
+  if chart == blank
+    assign chart_type = 'bottom'
+    assign chart = product.metafields.custom.bottom_size_chart.value
+  endif
 -%}
 
 {%- if chart -%}
   {%- liquid
     assign heading = block.settings.heading
     assign unit_display = block.settings.unit_display
-    if chart.unit_display.value != blank
-      assign unit_display = chart.unit_display.value
+    assign chart_units = chart.unit_display.value | default: chart.units_to_display.value | downcase | strip
+    if chart_units == 'in' or chart_units == 'cm' or chart_units == 'both'
+      assign unit_display = chart_units
     endif
     assign model_height = chart.model_height.value
     assign model_size = chart.model_size.value
     assign fit_type = chart.fit_type.value
 
-    assign has_sleeve = false
-    if chart.s_sleeve_length.value != blank or chart.m_sleeve_length.value != blank or chart.l_sleeve_length.value != blank or chart.xl_sleeve_length.value != blank
-      assign has_sleeve = true
+    if chart_type == 'bottom'
+      assign size_codes = 'xs,s,m,l,xl,xxl' | split: ','
+      assign size_labels = 'XS,S,M,L,XL,XXL' | split: ','
+      assign col_keys = 'body_length,waist,thigh,bottom_openning' | split: ','
+      assign col_labels = 'Body length,Waist,Thigh,Bottom opening' | split: ','
+      assign size_column_label = 'Size'
+    else
+      assign size_codes = 's,m,l,xl' | split: ','
+      assign size_labels = 'S,M,L,XL' | split: ','
+      assign col_keys = 'body_length,chest,shoulder,sleeve_length' | split: ','
+      assign col_labels = 'Body length,Chest,Shoulder,Sleeve length' | split: ','
+      assign size_column_label = 'Size'
     endif
+
+    # Only show columns that have a value for at least one size
+    assign visible_cols = ''
+    for col_key in col_keys
+      assign col_index = forloop.index0
+      assign col_has_data = false
+      for code in size_codes
+        assign lookup_key = code | append: '_' | append: col_key
+        if chart[lookup_key].value != blank
+          assign col_has_data = true
+          break
+        endif
+      endfor
+      if col_has_data
+        assign visible_cols = visible_cols | append: col_index | append: ','
+      endif
+    endfor
+    assign visible_cols = visible_cols | split: ','
 
     assign show_toggle = false
     assign unit_suffix = ' (in)'
@@ -52,211 +98,201 @@
       assign unit_suffix = ''
     endif
   -%}
-  <div class="product__accordion accordion size-fit-guide quick-add-hidden" {{ block.shopify_attributes }}>
-    <details id="Details-{{ block.id }}-{{ section.id }}">
-      <summary>
-        <div class="summary__title">
-          {% render 'icon-accordion', icon: 'ruler' %}
-          <h2 class="h4 accordion__title">
-            {{ heading | escape }}
-          </h2>
-        </div>
-        {% render 'icon-caret' %}
-      </summary>
-      <div class="accordion__content rte" id="ProductAccordion-{{ block.id }}-{{ section.id }}">
-        {%- if show_toggle -%}
-          <div class="size-fit-guide__unit-toggle">
-            <input type="radio" name="size-fit-guide-unit-{{ block.id }}" id="size-fit-guide-unit-in-{{ block.id }}" checked>
-            <label for="size-fit-guide-unit-in-{{ block.id }}">In</label>
-            <input type="radio" name="size-fit-guide-unit-{{ block.id }}" id="size-fit-guide-unit-cm-{{ block.id }}">
-            <label for="size-fit-guide-unit-cm-{{ block.id }}">Cm</label>
+  {%- if visible_cols.size > 0 -%}
+    <div class="product__accordion accordion size-fit-guide quick-add-hidden" {{ block.shopify_attributes }}>
+      <details id="Details-{{ block.id }}-{{ section.id }}">
+        <summary>
+          <div class="summary__title">
+            {% render 'icon-accordion', icon: 'ruler' %}
+            <h2 class="h4 accordion__title">
+              {{ heading | escape }}
+            </h2>
           </div>
-        {%- endif -%}
-        <div class="size-fit-guide__table-wrapper">
-          <table class="size-fit-guide__table">
-            <thead>
-              <tr>
-                <th scope="col">Size</th>
-                <th scope="col">Body length{{ unit_suffix }}</th>
-                <th scope="col">Chest{{ unit_suffix }}</th>
-                <th scope="col">Shoulder{{ unit_suffix }}</th>
-                {%- if has_sleeve -%}
-                  <th scope="col">Sleeve length{{ unit_suffix }}</th>
-                {%- endif -%}
-              </tr>
-            </thead>
-            <tbody>
-              {%- liquid
-                assign size_codes = 's,m,l,xl' | split: ','
-                assign size_labels = 'S,M,L,XL' | split: ','
-              -%}
-              {%- for code in size_codes -%}
-                {%- liquid
-                  assign idx = forloop.index0
-                  assign label = size_labels[idx]
-
-                  assign body_length_key = code | append: '_body_length'
-                  assign chest_key = code | append: '_chest'
-                  assign shoulder_key = code | append: '_shoulder'
-                  assign sleeve_key = code | append: '_sleeve_length'
-
-                  assign body_length_in = chart[body_length_key].value
-                  assign chest_in = chart[chest_key].value
-                  assign shoulder_in = chart[shoulder_key].value
-                  assign sleeve_in = chart[sleeve_key].value
-
-                  assign body_length_cm = body_length_in | times: 2.54 | round: 1
-                  assign chest_cm = chest_in | times: 2.54 | round: 1
-                  assign shoulder_cm = shoulder_in | times: 2.54 | round: 1
-                  if sleeve_in != blank
-                    assign sleeve_cm = sleeve_in | times: 2.54 | round: 1
-                  endif
-
-                  assign body_length_display = body_length_in
-                  assign chest_display = chest_in
-                  assign shoulder_display = shoulder_in
-                  assign sleeve_display = sleeve_in
-                  if unit_display == 'cm'
-                    assign body_length_display = body_length_cm
-                    assign chest_display = chest_cm
-                    assign shoulder_display = shoulder_cm
-                    assign sleeve_display = sleeve_cm
-                  endif
-                -%}
+          {% render 'icon-caret' %}
+        </summary>
+        <div class="accordion__content rte" id="ProductAccordion-{{ block.id }}-{{ section.id }}">
+          {%- if show_toggle -%}
+            <div class="size-fit-guide__unit-toggle">
+              <input type="radio" name="size-fit-guide-unit-{{ block.id }}" id="size-fit-guide-unit-in-{{ block.id }}" checked>
+              <label for="size-fit-guide-unit-in-{{ block.id }}">In</label>
+              <input type="radio" name="size-fit-guide-unit-{{ block.id }}" id="size-fit-guide-unit-cm-{{ block.id }}">
+              <label for="size-fit-guide-unit-cm-{{ block.id }}">Cm</label>
+            </div>
+          {%- endif -%}
+          <div class="size-fit-guide__table-wrapper">
+            <table class="size-fit-guide__table">
+              <thead>
                 <tr>
-                  <th scope="row">{{ label }}</th>
-                  {%- if show_toggle -%}
-                    <td>
-                      <span class="size-fit-guide__value size-fit-guide__value--in">{{ body_length_in }}</span>
-                      <span class="size-fit-guide__value size-fit-guide__value--cm">{{ body_length_cm }}</span>
-                    </td>
-                    <td>
-                      <span class="size-fit-guide__value size-fit-guide__value--in">{{ chest_in }}</span>
-                      <span class="size-fit-guide__value size-fit-guide__value--cm">{{ chest_cm }}</span>
-                    </td>
-                    <td>
-                      <span class="size-fit-guide__value size-fit-guide__value--in">{{ shoulder_in }}</span>
-                      <span class="size-fit-guide__value size-fit-guide__value--cm">{{ shoulder_cm }}</span>
-                    </td>
-                    {%- if has_sleeve -%}
-                      <td>
-                        <span class="size-fit-guide__value size-fit-guide__value--in">{{ sleeve_in }}</span>
-                        <span class="size-fit-guide__value size-fit-guide__value--cm">{{ sleeve_cm }}</span>
-                      </td>
-                    {%- endif -%}
-                  {%- else -%}
-                    <td>{{ body_length_display }}</td>
-                    <td>{{ chest_display }}</td>
-                    <td>{{ shoulder_display }}</td>
-                    {%- if has_sleeve -%}
-                      <td>{{ sleeve_display }}</td>
-                    {%- endif -%}
-                  {%- endif -%}
+                  <th scope="col">{{ size_column_label }}</th>
+                  {%- for col_position in visible_cols -%}
+                    {%- assign col_index = col_position | plus: 0 -%}
+                    <th scope="col">{{ col_labels[col_index] }}{{ unit_suffix }}</th>
+                  {%- endfor -%}
                 </tr>
-              {%- endfor -%}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {%- for code in size_codes -%}
+                  {%- liquid
+                    assign size_index = forloop.index0
+
+                    assign row_has_data = false
+                    for col_position in visible_cols
+                      assign col_index = col_position | plus: 0
+                      assign lookup_key = code | append: '_' | append: col_keys[col_index]
+                      if chart[lookup_key].value != blank
+                        assign row_has_data = true
+                        break
+                      endif
+                    endfor
+                  -%}
+                  {%- if row_has_data -%}
+                    <tr>
+                      <th scope="row">{{ size_labels[size_index] }}</th>
+                      {%- for col_position in visible_cols -%}
+                        {%- liquid
+                          assign col_index = col_position | plus: 0
+                          assign lookup_key = code | append: '_' | append: col_keys[col_index]
+                          assign value_in = chart[lookup_key].value
+
+                          # Reset every cell so a blank measurement can never inherit the previous size's value
+                          assign display_in = ''
+                          assign display_cm = ''
+                          if value_in != blank
+                            # Whole numbers print without a trailing ".0"
+                            assign in_whole = value_in | floor
+                            if value_in == in_whole
+                              assign display_in = in_whole
+                            else
+                              assign display_in = value_in
+                            endif
+
+                            assign value_cm = value_in | times: 2.54 | round: 1
+                            assign cm_whole = value_cm | floor
+                            if value_cm == cm_whole
+                              assign display_cm = cm_whole
+                            else
+                              assign display_cm = value_cm
+                            endif
+                          endif
+                        -%}
+                        <td>
+                          {%- if show_toggle -%}
+                            <span class="size-fit-guide__value size-fit-guide__value--in">{{ display_in }}</span>
+                            <span class="size-fit-guide__value size-fit-guide__value--cm">{{ display_cm }}</span>
+                          {%- elsif unit_display == 'cm' -%}
+                            {{ display_cm }}
+                          {%- else -%}
+                            {{ display_in }}
+                          {%- endif -%}
+                        </td>
+                      {%- endfor -%}
+                    </tr>
+                  {%- endif -%}
+                {%- endfor -%}
+              </tbody>
+            </table>
+          </div>
+          {%- if model_height != blank or model_size != blank or fit_type != blank -%}
+            <p class="size-fit-guide__note">
+              {%- if model_height != blank -%}Model height: {{ model_height }}.{% endif -%}
+              {%- if model_size != blank %} Wearing size {{ model_size }}.{% endif -%}
+              {%- if fit_type != blank %} Fit: {{ fit_type }}.{% endif -%}
+            </p>
+          {%- endif -%}
         </div>
-        {%- if model_height != blank or model_size != blank or fit_type != blank -%}
-          <p class="size-fit-guide__note">
-            {%- if model_height != blank -%}Model height: {{ model_height }}.{% endif -%}
-            {%- if model_size != blank %} Wearing size {{ model_size }}.{% endif -%}
-            {%- if fit_type != blank %} Fit: {{ fit_type }}.{% endif -%}
-          </p>
-        {%- endif -%}
-      </div>
-    </details>
-  </div>
+      </details>
+    </div>
 
-  {% style %}
-    .size-fit-guide summary {
-      transition: color 0.2s ease, opacity 0.2s ease;
-    }
+    {% style %}
+      .size-fit-guide summary {
+        transition: color 0.2s ease, opacity 0.2s ease;
+      }
 
-    .size-fit-guide summary:hover {
-      color: rgba(var(--color-foreground), 0.75);
-    }
+      .size-fit-guide summary:hover {
+        color: rgba(var(--color-foreground), 0.75);
+      }
 
-    .size-fit-guide__unit-toggle {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.6rem;
-      margin-bottom: 1rem;
-    }
+      .size-fit-guide__unit-toggle {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.6rem;
+        margin-bottom: 1rem;
+      }
 
-    .size-fit-guide__unit-toggle input {
-      position: absolute;
-      opacity: 0;
-      width: 0.1rem;
-      height: 0.1rem;
-    }
+      .size-fit-guide__unit-toggle input {
+        position: absolute;
+        opacity: 0;
+        width: 0.1rem;
+        height: 0.1rem;
+      }
 
-    .size-fit-guide__unit-toggle label {
-      cursor: pointer;
-      padding: 0.4rem 1.2rem;
-      border: 0.1rem solid rgb(var(--color-button));
-      border-radius: 0;
-      font-size: 1.2rem;
-      letter-spacing: 0.05rem;
-      color: rgb(var(--color-button));
-      transition: background-color 0.2s ease, color 0.2s ease;
-      user-select: none;
-    }
+      .size-fit-guide__unit-toggle label {
+        cursor: pointer;
+        padding: 0.4rem 1.2rem;
+        border: 0.1rem solid rgb(var(--color-button));
+        border-radius: 0;
+        font-size: 1.2rem;
+        letter-spacing: 0.05rem;
+        color: rgb(var(--color-button));
+        transition: background-color 0.2s ease, color 0.2s ease;
+        user-select: none;
+      }
 
-    .size-fit-guide__unit-toggle input:checked + label {
-      background: rgb(var(--color-button));
-      color: rgb(var(--color-button-text));
-    }
+      .size-fit-guide__unit-toggle input:checked + label {
+        background: rgb(var(--color-button));
+        color: rgb(var(--color-button-text));
+      }
 
-    .size-fit-guide__unit-toggle input:focus-visible + label {
-      outline: 0.2rem solid rgba(var(--color-button), 0.5);
-      outline-offset: 0.2rem;
-    }
+      .size-fit-guide__unit-toggle input:focus-visible + label {
+        outline: 0.2rem solid rgba(var(--color-button), 0.5);
+        outline-offset: 0.2rem;
+      }
 
-    .size-fit-guide__value--cm {
-      display: none;
-    }
+      .size-fit-guide__value--cm {
+        display: none;
+      }
 
-    .accordion__content:has(#size-fit-guide-unit-cm-{{ block.id }}:checked) .size-fit-guide__value--in {
-      display: none;
-    }
+      .accordion__content:has(#size-fit-guide-unit-cm-{{ block.id }}:checked) .size-fit-guide__value--in {
+        display: none;
+      }
 
-    .accordion__content:has(#size-fit-guide-unit-cm-{{ block.id }}:checked) .size-fit-guide__value--cm {
-      display: inline;
-    }
+      .accordion__content:has(#size-fit-guide-unit-cm-{{ block.id }}:checked) .size-fit-guide__value--cm {
+        display: inline;
+      }
 
-    .size-fit-guide__table-wrapper {
-      overflow-x: auto;
-    }
+      .size-fit-guide__table-wrapper {
+        overflow-x: auto;
+      }
 
-    .size-fit-guide__table {
-      width: 100%;
-      table-layout: fixed;
-      border-collapse: collapse;
-      font-size: 1.3rem;
-    }
+      .size-fit-guide__table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        font-size: 1.3rem;
+      }
 
-    .size-fit-guide__table th,
-    .size-fit-guide__table td {
-      padding: 0.6rem 0.5rem;
-      border: 0.1rem solid rgba(var(--color-foreground), 0.08);
-      text-align: left;
-      word-break: break-word;
-    }
+      .size-fit-guide__table th,
+      .size-fit-guide__table td {
+        padding: 0.6rem 0.5rem;
+        border: 0.1rem solid rgba(var(--color-foreground), 0.08);
+        text-align: left;
+        word-break: break-word;
+      }
 
-    .size-fit-guide__table thead th {
-      background: rgba(var(--color-foreground), 0.03);
-      font-weight: 600;
-    }
+      .size-fit-guide__table thead th {
+        background: rgba(var(--color-foreground), 0.03);
+        font-weight: 600;
+      }
 
-    .size-fit-guide__table tbody th {
-      font-weight: 600;
-    }
+      .size-fit-guide__table tbody th {
+        font-weight: 600;
+      }
 
-    .size-fit-guide__note {
-      margin: 1.2rem 0 0;
-      font-size: 1.3rem;
-      color: rgba(var(--color-foreground), 0.75);
-    }
-  {% endstyle %}
+      .size-fit-guide__note {
+        margin: 1.2rem 0 0;
+        font-size: 1.3rem;
+        color: rgba(var(--color-foreground), 0.75);
+      }
+    {% endstyle %}
+  {%- endif -%}
 {%- endif -%}

@@ -65,7 +65,7 @@
         "color_scheme": "scheme-2",
         "show_line_separator": true,
         "show_social": false,
-        "marquee_speed": 6,
+        "marquee_speed": 8,
         "pause_on_hover": true,
         "item_spacing_mobile": 2,
         "item_spacing_desktop": 6,

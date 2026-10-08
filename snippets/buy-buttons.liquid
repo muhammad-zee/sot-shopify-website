@@ -71,7 +71,16 @@
             if product.selected_or_first_available_variant.inventory_management != 'shopify' or product.selected_or_first_available_variant.inventory_policy == 'continue'
               assign check_against_inventory = false
             endif
-            if product.selected_or_first_available_variant.quantity_rule.min > product.selected_or_first_available_variant.inventory_quantity and check_against_inventory
+
+            # theme-check-disable
+            assign buy_buttons_cart_qty = cart | item_count_for_variant: product.selected_or_first_available_variant.id
+            # theme-check-enable
+
+            # Compare the minimum order quantity against what's actually still available, not
+            # the variant's total stock — otherwise a shopper who already has all of it in their
+            # cart would still see an enabled "Add to cart" for one more than exists.
+            assign remaining_quantity = product.selected_or_first_available_variant.inventory_quantity | minus: buy_buttons_cart_qty | at_least: 0
+            if product.selected_or_first_available_variant.quantity_rule.min > remaining_quantity and check_against_inventory
               assign quantity_rule_soldout = true
             endif
           -%}

@@ -225,6 +225,19 @@
                     | item_count_for_variant: product.selected_or_first_available_variant.id
                   -%}
                   {% # theme-check-enable %}
+                  {%- liquid
+                    # Cap "quantity to add" at what's actually left in stock, so a shopper can't
+                    # type/step past it. Only applies when Shopify tracks this variant's stock and
+                    # the merchant hasn't allowed overselling ('continue' policy).
+                    assign selected_variant = product.selected_or_first_available_variant
+                    assign effective_max = selected_variant.quantity_rule.max
+                    if selected_variant.inventory_management == 'shopify' and selected_variant.inventory_policy == 'deny'
+                      assign remaining_stock = selected_variant.inventory_quantity | minus: cart_qty | at_least: 0
+                      if effective_max == blank or remaining_stock < effective_max
+                        assign effective_max = remaining_stock
+                      endif
+                    endif
+                  -%}
                   <label class="quantity__label form__label" for="Quantity-{{ section.id }}">
                     {{ 'products.product.quantity.label' | t }}
                     <span class="quantity__rules-cart no-js-hidden{% if cart_qty == 0 %} hidden{% endif %}">
@@ -252,9 +265,9 @@
                         data-cart-quantity="{{ cart_qty }}"
                         data-min="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
                         min="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
-                        {% if product.selected_or_first_available_variant.quantity_rule.max != null %}
-                          data-max="{{ product.selected_or_first_available_variant.quantity_rule.max }}"
-                          max="{{ product.selected_or_first_available_variant.quantity_rule.max }}"
+                        {% if effective_max != blank %}
+                          data-max="{{ effective_max }}"
+                          max="{{ effective_max }}"
                         {% endif %}
                         step="{{ product.selected_or_first_available_variant.quantity_rule.increment }}"
                         value="{{ product.selected_or_first_available_variant.quantity_rule.min }}"

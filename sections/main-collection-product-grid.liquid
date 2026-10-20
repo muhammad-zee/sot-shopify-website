@@ -40,11 +40,19 @@
     overflow: hidden;
     transition: max-height 0.35s ease;
   }
-  .collection-description__content > *:first-child {
+  .collection-description__inner > *:first-child,
+  .collection-description__full > *:first-child {
     margin-top: 0;
   }
-  .collection-description__content > *:last-child {
+  .collection-description__inner > *:last-child,
+  .collection-description__full > *:last-child {
     margin-bottom: 0;
+  }
+  .collection-description__excerpt p {
+    margin: 0;
+  }
+  .collection-description[data-mode='words'] .collection-description__toggle {
+    display: inline-block;
   }
   .collection-description.is-collapsible:not(.is-expanded) .collection-description__content {
     max-height: var(--collapsed-height, 120px);
@@ -93,21 +101,53 @@
     -%}
 
     {%- if show_desc -%}
+      {%- liquid
+        assign word_limit = section.settings.description_word_count | default: 40 | at_least: 1
+        assign desc_text = collection.description | replace: '<', ' <' | strip_html | strip
+        assign desc_word_total = desc_text | split: ' ' | size
+
+        assign desc_mode = 'none'
+        if section.settings.enable_show_more
+          if section.settings.description_collapse_method == 'words'
+            if desc_word_total > word_limit
+              assign desc_mode = 'words'
+            else
+              assign desc_mode = 'none'
+            endif
+          else
+            assign desc_mode = 'height'
+          endif
+        endif
+      -%}
       {%- capture collection_description_html -%}
         <collection-description
           class="collection-description collection-description--{{ section.settings.description_position }} page-width"
           style="--collapsed-height: {{ section.settings.description_collapsed_height }}px;"
-          data-collapsible="{{ section.settings.enable_show_more }}"
+          data-mode="{{ desc_mode }}"
+          data-collapsible="{% if desc_mode == 'height' %}true{% else %}false{% endif %}"
         >
-          <div
-            class="collection-description__content rte"
-            id="CollectionDescription-{{ section.id }}"
-          >
-            <div class="collection-description__inner">
+          {%- if desc_mode == 'words' -%}
+            <div class="collection-description__excerpt rte">
+              <p>{{ desc_text | truncatewords: word_limit, '...' }}</p>
+            </div>
+            <div
+              class="collection-description__full rte"
+              id="CollectionDescription-{{ section.id }}"
+              hidden
+            >
               {{ collection.description }}
             </div>
-          </div>
-          {%- if section.settings.enable_show_more -%}
+          {%- else -%}
+            <div
+              class="collection-description__content rte"
+              id="CollectionDescription-{{ section.id }}"
+            >
+              <div class="collection-description__inner">
+                {{ collection.description }}
+              </div>
+            </div>
+          {%- endif -%}
+          {%- if desc_mode != 'none' -%}
             <button
               type="button"
               class="collection-description__toggle"
@@ -291,6 +331,10 @@
       'collection-description',
       class CollectionDescription extends HTMLElement {
         connectedCallback() {
+          if (this.dataset.mode === 'words') {
+            this.setupWords();
+            return;
+          }
           if (this.dataset.collapsible !== 'true') return;
 
           this.content = this.querySelector('.collection-description__content');
@@ -307,6 +351,26 @@
             this.observer.observe(this.inner);
           }
           this.check();
+        }
+
+        setupWords() {
+          this.excerpt = this.querySelector('.collection-description__excerpt');
+          this.full = this.querySelector('.collection-description__full');
+          this.button = this.querySelector('.collection-description__toggle');
+          if (!this.excerpt || !this.full || !this.button) return;
+
+          this.expanded = false;
+          this.button.addEventListener('click', () => {
+            this.expanded = !this.expanded;
+            this.excerpt.hidden = this.expanded;
+            this.full.hidden = !this.expanded;
+            this.button.setAttribute('aria-expanded', this.expanded);
+            this.button.textContent = this.expanded ? this.button.dataset.labelLess : this.button.dataset.labelMore;
+
+            if (!this.expanded && this.getBoundingClientRect().top < 0) {
+              this.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
         }
 
         disconnectedCallback() {
@@ -413,6 +477,24 @@
       "label": "Enable show more / show less"
     },
     {
+      "type": "select",
+      "id": "description_collapse_method",
+      "options": [
+        { "value": "words", "label": "Word count" },
+        { "value": "height", "label": "Height" }
+      ],
+      "default": "words",
+      "label": "Collapse by",
+      "info": "Word count shows a plain text preview of the first words. Height keeps the original formatting with a fade."
+    },
+    {
+      "type": "number",
+      "id": "description_word_count",
+      "default": 40,
+      "label": "Words to show before Show more",
+      "info": "Used when Collapse by is set to Word count."
+    },
+    {
       "type": "range",
       "id": "description_collapsed_height",
       "min": 40,
@@ -420,7 +502,8 @@
       "step": 10,
       "unit": "px",
       "default": 120,
-      "label": "Collapsed height"
+      "label": "Collapsed height",
+      "info": "Used when Collapse by is set to Height."
     },
     {
       "type": "text",

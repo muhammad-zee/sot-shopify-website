@@ -27,6 +27,8 @@
         "description_position": "bottom",
         "description_first_page_only": true,
         "enable_show_more": true,
+        "description_collapse_method": "words",
+        "description_word_count": 50,
         "description_collapsed_height": 120,
         "show_more_label": "Show more",
         "show_less_label": "Show less",

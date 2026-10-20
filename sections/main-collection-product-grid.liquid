@@ -41,15 +41,14 @@
     transition: max-height 0.35s ease;
   }
   .collection-description__inner > *:first-child,
-  .collection-description__full > *:first-child {
+  .collection-description__full > *:first-child,
+  .collection-description__excerpt > *:first-child {
     margin-top: 0;
   }
   .collection-description__inner > *:last-child,
-  .collection-description__full > *:last-child {
+  .collection-description__full > *:last-child,
+  .collection-description__excerpt > *:last-child {
     margin-bottom: 0;
-  }
-  .collection-description__excerpt p {
-    margin: 0;
   }
   .collection-description[data-mode='words'] .collection-description__toggle {
     display: inline-block;
@@ -127,13 +126,11 @@
           data-collapsible="{% if desc_mode == 'height' %}true{% else %}false{% endif %}"
         >
           {%- if desc_mode == 'words' -%}
-            <div class="collection-description__excerpt rte">
-              <p>{{ desc_text | truncatewords: word_limit, '...' }}</p>
-            </div>
+            <div class="collection-description__excerpt rte" hidden></div>
             <div
               class="collection-description__full rte"
               id="CollectionDescription-{{ section.id }}"
-              hidden
+              data-word-limit="{{ word_limit }}"
             >
               {{ collection.description }}
             </div>
@@ -358,6 +355,48 @@
           this.full = this.querySelector('.collection-description__full');
           this.button = this.querySelector('.collection-description__toggle');
           if (!this.excerpt || !this.full || !this.button) return;
+
+          // Build a formatted preview: copy the full HTML and cut it after N words
+          const limit = parseInt(this.full.dataset.wordLimit, 10) || 40;
+          const clone = this.full.cloneNode(true);
+          let count = 0;
+          let done = false;
+
+          const walk = (node) => {
+            Array.from(node.childNodes).forEach((child) => {
+              if (done) {
+                child.remove();
+                return;
+              }
+              if (child.nodeType === Node.TEXT_NODE) {
+                const parts = child.textContent.split(/(\s+)/);
+                const kept = [];
+                for (const part of parts) {
+                  if (part.trim() === '') {
+                    kept.push(part);
+                    continue;
+                  }
+                  if (count >= limit) {
+                    done = true;
+                    break;
+                  }
+                  kept.push(part);
+                  count++;
+                }
+                if (done || count >= limit) {
+                  child.textContent = kept.join('').trimEnd() + '...';
+                  done = true;
+                }
+              } else if (child.nodeType === Node.ELEMENT_NODE) {
+                walk(child);
+              }
+            });
+          };
+          walk(clone);
+
+          this.excerpt.innerHTML = clone.innerHTML;
+          this.excerpt.hidden = false;
+          this.full.hidden = true;
 
           this.expanded = false;
           this.button.addEventListener('click', () => {

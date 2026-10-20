@@ -24,10 +24,109 @@
       padding-bottom: {{ section.settings.padding_bottom }}px;
     }
   }
+
+  /* Collection description: show more / show less */
+  .collection-description {
+    display: block;
+  }
+  .collection-description--top {
+    margin-bottom: 3rem;
+  }
+  .collection-description--bottom {
+    margin-top: 4rem;
+  }
+  .collection-description__content {
+    position: relative;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+  }
+  .collection-description__content > *:first-child {
+    margin-top: 0;
+  }
+  .collection-description__content > *:last-child {
+    margin-bottom: 0;
+  }
+  .collection-description.is-collapsible:not(.is-expanded) .collection-description__content {
+    max-height: var(--collapsed-height, 120px);
+  }
+  .collection-description.is-collapsible:not(.is-expanded) .collection-description__content::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 5rem;
+    pointer-events: none;
+    background: linear-gradient(to bottom, rgba(var(--color-background), 0), rgb(var(--color-background)));
+  }
+  .collection-description__toggle {
+    display: none;
+    margin-top: 1.2rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1.4rem;
+    color: rgb(var(--color-foreground));
+    text-decoration: underline;
+    text-underline-offset: 0.3rem;
+  }
+  .collection-description.is-collapsible .collection-description__toggle {
+    display: inline-block;
+  }
+  .collection-description__toggle:hover {
+    text-decoration-thickness: 0.2rem;
+  }
 {%- endstyle -%}
 
 <div class="section-{{ section.id }}-padding gradient color-{{ section.settings.color_scheme }}">
   {%- paginate collection.products by section.settings.products_per_page -%}
+    {%- liquid
+      assign show_desc = false
+      if section.settings.show_description and collection.description != blank
+        assign show_desc = true
+        if section.settings.description_first_page_only and paginate.current_page > 1
+          assign show_desc = false
+        endif
+      endif
+    -%}
+
+    {%- if show_desc -%}
+      {%- capture collection_description_html -%}
+        <collection-description
+          class="collection-description collection-description--{{ section.settings.description_position }} page-width"
+          style="--collapsed-height: {{ section.settings.description_collapsed_height }}px;"
+          data-collapsible="{{ section.settings.enable_show_more }}"
+        >
+          <div
+            class="collection-description__content rte"
+            id="CollectionDescription-{{ section.id }}"
+          >
+            <div class="collection-description__inner">
+              {{ collection.description }}
+            </div>
+          </div>
+          {%- if section.settings.enable_show_more -%}
+            <button
+              type="button"
+              class="collection-description__toggle"
+              aria-controls="CollectionDescription-{{ section.id }}"
+              aria-expanded="false"
+              data-label-more="{{ section.settings.show_more_label | escape }}"
+              data-label-less="{{ section.settings.show_less_label | escape }}"
+            >
+              {{ section.settings.show_more_label | escape }}
+            </button>
+          {%- endif -%}
+        </collection-description>
+      {%- endcapture -%}
+    {%- endif -%}
+
+    {%- if show_desc and section.settings.description_position == 'top' -%}
+      {{ collection_description_html }}
+    {%- endif -%}
+
     {% comment %} Sort is the first tabbable element when filter type is vertical {% endcomment %}
     {%- if section.settings.enable_sorting and section.settings.filter_type == 'vertical' -%}
       <facet-filters-form class="facets facets-vertical-sort page-width small-hide no-js-hidden">
@@ -176,11 +275,78 @@
         {%- endif -%}
       </div>
     </div>
+
+    {%- if show_desc and section.settings.description_position == 'bottom' -%}
+      {{ collection_description_html }}
+    {%- endif -%}
   {%- endpaginate -%}
   {% if section.settings.image_shape == 'arch' %}
     {% render 'mask-arch' %}
   {%- endif -%}
 </div>
+
+<script>
+  if (!customElements.get('collection-description')) {
+    customElements.define(
+      'collection-description',
+      class CollectionDescription extends HTMLElement {
+        connectedCallback() {
+          if (this.dataset.collapsible !== 'true') return;
+
+          this.content = this.querySelector('.collection-description__content');
+          this.inner = this.querySelector('.collection-description__inner');
+          this.button = this.querySelector('.collection-description__toggle');
+          if (!this.content || !this.inner || !this.button) return;
+
+          this.expanded = false;
+          this.button.addEventListener('click', this.toggle.bind(this));
+
+          // Re-check when content size changes (images loading, resizing, editor changes)
+          if ('ResizeObserver' in window) {
+            this.observer = new ResizeObserver(() => this.check());
+            this.observer.observe(this.inner);
+          }
+          this.check();
+        }
+
+        disconnectedCallback() {
+          if (this.observer) this.observer.disconnect();
+        }
+
+        getCollapsedHeight() {
+          return parseInt(getComputedStyle(this).getPropertyValue('--collapsed-height'), 10) || 120;
+        }
+
+        check() {
+          if (this.expanded) {
+            this.content.style.maxHeight = this.inner.scrollHeight + 'px';
+            return;
+          }
+          // Only collapse when the text is actually longer than the collapsed height
+          const needsToggle = this.inner.scrollHeight > this.getCollapsedHeight() + 10;
+          this.classList.toggle('is-collapsible', needsToggle);
+          this.content.style.maxHeight = '';
+        }
+
+        toggle() {
+          this.expanded = !this.expanded;
+          this.classList.toggle('is-expanded', this.expanded);
+          this.button.setAttribute('aria-expanded', this.expanded);
+          this.button.textContent = this.expanded ? this.button.dataset.labelLess : this.button.dataset.labelMore;
+
+          if (this.expanded) {
+            this.content.style.maxHeight = this.inner.scrollHeight + 'px';
+          } else {
+            this.content.style.maxHeight = this.getCollapsedHeight() + 'px';
+            // Keep the reader in view after collapsing a long block
+            const top = this.getBoundingClientRect().top;
+            if (top < 0) this.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      }
+    );
+  }
+</script>
 
 {% schema %}
 {
@@ -211,6 +377,62 @@
       "label": "t:sections.all.colors.label",
       "info": "t:sections.all.colors.has_cards_info",
       "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Collection description"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "default": false,
+      "label": "Show collection description",
+      "info": "Turn off the description in the Collection banner section to avoid showing it twice."
+    },
+    {
+      "type": "select",
+      "id": "description_position",
+      "options": [
+        { "value": "top", "label": "Top of collection" },
+        { "value": "bottom", "label": "Bottom of collection" }
+      ],
+      "default": "top",
+      "label": "Description position"
+    },
+    {
+      "type": "checkbox",
+      "id": "description_first_page_only",
+      "default": true,
+      "label": "Show on first page only",
+      "info": "Hides the description on page 2 and onwards."
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_show_more",
+      "default": true,
+      "label": "Enable show more / show less"
+    },
+    {
+      "type": "range",
+      "id": "description_collapsed_height",
+      "min": 40,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "default": 120,
+      "label": "Collapsed height"
+    },
+    {
+      "type": "text",
+      "id": "show_more_label",
+      "default": "Show more",
+      "label": "Show more button text"
+    },
+    {
+      "type": "text",
+      "id": "show_less_label",
+      "default": "Show less",
+      "label": "Show less button text"
     },
     {
       "type": "header",

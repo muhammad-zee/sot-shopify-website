@@ -68,6 +68,7 @@
         },
         "custom_liquid_YWVCtL": {
           "type": "custom_liquid",
+          "disabled": true,
           "settings": {
             "custom_liquid": "<div class=\"sot-shipping\">\n  <ol class=\"sot-shipping-steps\">\n    <li class=\"sot-shipping-step\">\n      <span class=\"sot-shipping-marker\" aria-hidden=\"true\">1</span>\n      <span class=\"sot-shipping-label\">Ordered</span>\n    </li>\n\n    <li class=\"sot-shipping-step\">\n      <span class=\"sot-shipping-marker\" aria-hidden=\"true\">2</span>\n      <span class=\"sot-shipping-label\">Shipped</span>\n    </li>\n\n    <li class=\"sot-shipping-step\">\n      <span class=\"sot-shipping-marker\" aria-hidden=\"true\">3</span>\n      <span class=\"sot-shipping-label\">Delivered</span>\n    </li>\n  </ol>\n\n \n</div>\n\n<style>\n.sot-shipping {\n  margin: 16px 0;\n  padding: 16px 14px;\n  background: #f5efe6;\n  border: 1px solid #d8c3a5;\n  font-family: inherit;\n}\n\n.sot-shipping-steps {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n\n.sot-shipping-step {\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: 8px;\n  text-align: center;\n}\n\n.sot-shipping-step:not(:last-child)::after {\n  content: \"\";\n  position: absolute;\n  top: 14px;\n  left: calc(50% + 20px);\n  width: calc(100% - 40px);\n  height: 1px;\n  background: #b89f7e;\n}\n\n.sot-shipping-marker {\n  display: flex;"
           }

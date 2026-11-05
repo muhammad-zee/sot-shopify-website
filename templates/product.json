@@ -106,10 +106,10 @@
         "padding_bottom": 12
       }
     },
-    "1787554332f03668fd": {
+    "1793860472c0b578e6": {
       "type": "apps",
       "blocks": {
-        "judge_me_reviews_review_widget_xp9Hbb": {
+        "judge_me_reviews_review_widget_Rakcja": {
           "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
           "settings": {
             "review_data": "real_data",
@@ -120,7 +120,7 @@
         }
       },
       "block_order": [
-        "judge_me_reviews_review_widget_xp9Hbb"
+        "judge_me_reviews_review_widget_Rakcja"
       ],
       "settings": {
         "include_margins": true
@@ -147,7 +147,7 @@
   },
   "order": [
     "main",
-    "1787554332f03668fd",
+    "1793860472c0b578e6",
     "related-products"
   ]
 }

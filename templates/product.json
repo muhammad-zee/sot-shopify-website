@@ -1,1 +1,153 @@
-{"sections":{"main":{"type":"main-product","blocks":{"title":{"type":"title","settings":{}},"price":{"type":"price","settings":{}},"variant_picker":{"type":"variant_picker","settings":{"picker_type":"button","swatch_shape":"square"}},"quantity_selector":{"type":"quantity_selector","settings":{}},"size_fit_guide_whchAk":{"type":"size_fit_guide","settings":{"heading":"Size & Fit Guide","unit_display":"both"}},"vendor":{"type":"text","disabled":true,"settings":{"text":"{{ product.vendor }}","text_style":"uppercase"}},"buy_buttons":{"type":"buy_buttons","settings":{"show_dynamic_checkout":true,"show_gift_card_recipient":true}},"description":{"type":"description","settings":{}}},"block_order":["title","price","variant_picker","quantity_selector","size_fit_guide_whchAk","vendor","buy_buttons","description"],"settings":{"enable_sticky_info":true,"color_scheme":"scheme-1","media_size":"medium","constrain_to_viewport":true,"media_fit":"contain","gallery_layout":"thumbnail_slider","media_position":"left","image_zoom":"hover","mobile_thumbnails":"show","hide_variants":true,"enable_video_looping":true,"padding_top":36,"padding_bottom":12}},"1787554332f03668fd":{"type":"apps","blocks":{"judge_me_reviews_review_widget_xp9Hbb":{"type":"shopify:\/\/apps\/judge-me-reviews\/blocks\/review_widget\/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8","settings":{"review_data":"sample_data","max_width":1200,"show_shop_reviews":false,"empty_state":"empty_widget"}}},"block_order":["judge_me_reviews_review_widget_xp9Hbb"],"settings":{"include_margins":true}},"related-products":{"type":"related-products","settings":{"heading":"You may also like","heading_size":"h2","products_to_show":4,"columns_desktop":4,"color_scheme":"scheme-1","image_ratio":"portrait","image_shape":"default","show_secondary_image":true,"show_vendor":false,"show_rating":false,"columns_mobile":"2","padding_top":36,"padding_bottom":28}}},"order":["main","1787554332f03668fd","related-products"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {}
+        },
+        "price": {
+          "type": "price",
+          "settings": {}
+        },
+        "custom_liquid_ffzf8f": {
+          "type": "custom_liquid",
+          "disabled": true,
+          "settings": {
+            "custom_liquid": "{% assign selected_variant = product.selected_or_first_available_variant %}\n{% assign actual_price = selected_variant.compare_at_price %}\n{% assign discounted_price = selected_variant.price %}\n\n{% if actual_price > discounted_price %}\n  {% assign saved_amount = actual_price | minus: discounted_price %}\n\n  <div class=\"sot-save-badge\">\n    <span class=\"sot-save-amount\">You Save {{ saved_amount | money_without_trailing_zeros }}</span>\n    <span class=\"sot-save-divider\" aria-hidden=\"true\"></span>\n    <span class=\"sot-save-delivery\">Free Delivery</span>\n  </div>\n\n  <style>\n    .sot-save-badge {\n      display: inline-flex;\n      align-items: center;\n      gap: 10px;\n      margin: 8px 0;\n      padding: 9px 14px;\n      background: #000000;\n      border: 1px solid #2b2b2b;\n      color: #ffffff;\n      font-family: inherit;\n      font-size: 12px;\n      font-weight: 500;\n      letter-spacing: 1px;\n      line-height: 1.3;\n      text-transform: uppercase;\n    }\n\n    .sot-save-amount {\n      color: #d8c3a5;\n      font-weight: 700;\n    }\n\n    .sot-save-divider {\n      width: 3px;\n      height: 3px;\n      flex-shrink: 0;\n      background: #d8c3a5;\n    }\n\n    @media screen and (max-width: 749px) {\n      .sot-save-badge {\n        gap: 8px;\n        padding: 8px 10px;\n        font-size: 10px;\n        letter-spacing: 0.6px;\n      }\n    }\n  </style>\n{% endif %}"
+          }
+        },
+        "custom_liquid_7VVL9q": {
+          "type": "custom_liquid",
+          "settings": {
+            "custom_liquid": "<div class=\"sot-benefits\">\n  <div class=\"sot-benefit\">\n    <span class=\"sot-benefit-icon\" aria-hidden=\"true\">📐</span>\n    <p class=\"sot-benefit-text\">Engineered over 11 months for a fit that lasts.</p>\n  </div>\n\n  <div class=\"sot-benefit\">\n    <span class=\"sot-benefit-icon\" aria-hidden=\"true\">🧵</span>\n    <p class=\"sot-benefit-text\">Durable essentials built for everyday wear.</p>\n  </div>\n\n  <div class=\"sot-benefit\">\n    <span class=\"sot-benefit-icon\" aria-hidden=\"true\">🇵🇰</span>\n    <p class=\"sot-benefit-text\">100% made in Pakistan, with a conscience.</p>\n  </div>\n</div>\n\n<style>\n.sot-benefits {\n  display: grid;\n  gap: 10px;\n  margin: 16px 0;\n  font-family: inherit;\n}\n\n.sot-benefit {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  padding: 12px 14px;\n  background: #f5efe6;\n  border: 1px solid #d8c3a5;\n}\n\n.sot-benefit-icon {\n  flex-shrink: 0;\n  font-size: 18px;\n  line-height: 1;\n}\n\n.sot-benefit-text {\n  margin: 0;\n  color: #111111;\n  font-size: 13px;\n  font-weight: 500;\n  letter-spacing: 0.3px;\n  line-height: 1.4;\n}\n\n@media screen and (max-width: 749px) {\n  .sot-benefit {\n    gap: 10px;\n    padding: 10px 12px;\n  }\n\n  .sot-benefit-icon {\n    font-size: 16px;\n  }\n\n  .sot-benefit-text {\n    font-size: 12px;\n  }\n}\n</style>"
+          }
+        },
+        "variant_picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_type": "button",
+            "swatch_shape": "square"
+          }
+        },
+        "quantity_selector": {
+          "type": "quantity_selector",
+          "settings": {}
+        },
+        "size_fit_guide_whchAk": {
+          "type": "size_fit_guide",
+          "settings": {
+            "heading": "Size & Fit Guide",
+            "unit_display": "both"
+          }
+        },
+        "vendor": {
+          "type": "text",
+          "disabled": true,
+          "settings": {
+            "text": "{{ product.vendor }}",
+            "text_style": "uppercase"
+          }
+        },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true,
+            "show_gift_card_recipient": true
+          }
+        },
+        "custom_liquid_YWVCtL": {
+          "type": "custom_liquid",
+          "settings": {
+            "custom_liquid": "<div class=\"sot-shipping\">\n  <ol class=\"sot-shipping-steps\">\n    <li class=\"sot-shipping-step\">\n      <span class=\"sot-shipping-marker\" aria-hidden=\"true\">1</span>\n      <span class=\"sot-shipping-label\">Ordered</span>\n    </li>\n\n    <li class=\"sot-shipping-step\">\n      <span class=\"sot-shipping-marker\" aria-hidden=\"true\">2</span>\n      <span class=\"sot-shipping-label\">Shipped</span>\n    </li>\n\n    <li class=\"sot-shipping-step\">\n      <span class=\"sot-shipping-marker\" aria-hidden=\"true\">3</span>\n      <span class=\"sot-shipping-label\">Delivered</span>\n    </li>\n  </ol>\n\n \n</div>\n\n<style>\n.sot-shipping {\n  margin: 16px 0;\n  padding: 16px 14px;\n  background: #f5efe6;\n  border: 1px solid #d8c3a5;\n  font-family: inherit;\n}\n\n.sot-shipping-steps {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n\n.sot-shipping-step {\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: 8px;\n  text-align: center;\n}\n\n.sot-shipping-step:not(:last-child)::after {\n  content: \"\";\n  position: absolute;\n  top: 14px;\n  left: calc(50% + 20px);\n  width: calc(100% - 40px);\n  height: 1px;\n  background: #b89f7e;\n}\n\n.sot-shipping-marker {\n  display: flex;"
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "title",
+        "price",
+        "custom_liquid_ffzf8f",
+        "custom_liquid_7VVL9q",
+        "variant_picker",
+        "quantity_selector",
+        "size_fit_guide_whchAk",
+        "vendor",
+        "buy_buttons",
+        "custom_liquid_YWVCtL",
+        "description"
+      ],
+      "settings": {
+        "enable_sticky_info": true,
+        "color_scheme": "scheme-1",
+        "media_size": "medium",
+        "constrain_to_viewport": true,
+        "media_fit": "contain",
+        "gallery_layout": "thumbnail_slider",
+        "media_position": "left",
+        "image_zoom": "hover",
+        "mobile_thumbnails": "show",
+        "hide_variants": true,
+        "enable_video_looping": true,
+        "padding_top": 36,
+        "padding_bottom": 12
+      }
+    },
+    "1787554332f03668fd": {
+      "type": "apps",
+      "blocks": {
+        "judge_me_reviews_review_widget_xp9Hbb": {
+          "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {
+            "review_data": "real_data",
+            "max_width": 1200,
+            "show_shop_reviews": false,
+            "empty_state": "empty_widget"
+          }
+        }
+      },
+      "block_order": [
+        "judge_me_reviews_review_widget_xp9Hbb"
+      ],
+      "settings": {
+        "include_margins": true
+      }
+    },
+    "related-products": {
+      "type": "related-products",
+      "settings": {
+        "heading": "You may also like",
+        "heading_size": "h2",
+        "products_to_show": 4,
+        "columns_desktop": 4,
+        "color_scheme": "scheme-1",
+        "image_ratio": "portrait",
+        "image_shape": "default",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": false,
+        "columns_mobile": "2",
+        "padding_top": 36,
+        "padding_bottom": 28
+      }
+    }
+  },
+  "order": [
+    "main",
+    "1787554332f03668fd",
+    "related-products"
+  ]
+}

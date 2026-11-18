@@ -4,13 +4,13 @@
   Two chart types, each backed by its own metaobject definition and product metafield:
 
   - Tops:    product metafield 'custom.size_chart'        -> 'size_chart' metaobject
-             Sizes S, M, L, XL. Columns: Body length, Chest, Shoulder, Sleeve length.
-             Field keys: s_body_length, s_chest, s_shoulder, s_sleeve_length, m_..., l_..., xl_...
+             Sizes XS, S, M, L, XL. Columns: Body length, Chest, Shoulder, Sleeve length.
+             Field keys: xs_body_length, xs_chest, xs_shoulder, xs_sleeve_length, s_..., m_..., l_..., xl_...
 
   - Bottoms: product metafield 'custom.bottom_size_chart' -> 'bottom_size_chart' metaobject
              Sizes xs, s, m, l, xl, xxl (shown as letters only).
-             Columns: Body length, Waist, Thigh, Bottom opening.
-             Field keys: xs_body_length, xs_waist, xs_thigh, xs_bottom_openning, s_..., xxl_...
+             Columns: Body length, Waist, Thigh, Bottom opening, Inseam.
+             Field keys: xs_body_length, xs_waist, xs_thigh, xs_bottom_openning, xs_inseam, s_..., xxl_...
              (note: "openning" is spelled that way in the metaobject definition, and field keys can't be renamed)
 
   Units field: the tops chart uses 'unit_display', the bottoms chart uses 'units_to_display'.
@@ -60,12 +60,12 @@
     if chart_type == 'bottom'
       assign size_codes = 'xs,s,m,l,xl,xxl' | split: ','
       assign size_labels = 'XS,S,M,L,XL,XXL' | split: ','
-      assign col_keys = 'body_length,waist,thigh,bottom_openning' | split: ','
-      assign col_labels = 'Body length,Waist,Thigh,Bottom opening' | split: ','
+      assign col_keys = 'body_length,waist,thigh,bottom_openning,inseam' | split: ','
+      assign col_labels = 'Body length,Waist,Thigh,Bottom opening,Inseam' | split: ','
       assign size_column_label = 'Size'
     else
-      assign size_codes = 's,m,l,xl' | split: ','
-      assign size_labels = 'S,M,L,XL' | split: ','
+      assign size_codes = 'xs,s,m,l,xl' | split: ','
+      assign size_labels = 'XS,S,M,L,XL' | split: ','
       assign col_keys = 'body_length,chest,shoulder,sleeve_length' | split: ','
       assign col_labels = 'Body length,Chest,Shoulder,Sleeve length' | split: ','
       assign size_column_label = 'Size'

@@ -345,6 +345,41 @@
         "padding_bottom": 40
       }
     },
+    "collection_list_jcDEdA": {
+      "type": "collection-list",
+      "blocks": {
+        "featured_collection_JB8zgV": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "unisex-shirts"
+          }
+        },
+        "featured_collection_QpkLhH": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "unisex-bottoms"
+          }
+        }
+      },
+      "block_order": [
+        "featured_collection_JB8zgV",
+        "featured_collection_QpkLhH"
+      ],
+      "disabled": true,
+      "name": "t:sections.collection-list.presets.name",
+      "settings": {
+        "title": "Our Collections",
+        "heading_size": "h1",
+        "image_ratio": "adapt",
+        "columns_desktop": 2,
+        "color_scheme": "",
+        "show_view_all": false,
+        "columns_mobile": "2",
+        "swipe_on_mobile": false,
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
     "17938603594945d36d": {
       "type": "apps",
       "blocks": {
@@ -376,7 +411,7 @@
     },
     "featured_collection_N6PqNd": {
       "type": "featured-collection",
-      "name": "New Arrivals",
+      "name": "Sale",
       "settings": {
         "title": "New Arrivals",
         "heading_size": "h1",
@@ -403,7 +438,7 @@
         "padding_bottom": 36
       }
     },
-    "featured_collection_qwQhCB": {
+    "featured_collection_38BHbc": {
       "type": "featured-collection",
       "name": "Sale",
       "settings": {
@@ -413,6 +448,36 @@
         "show_description": true,
         "description_style": "subtitle",
         "collection": "sale",
+        "products_to_show": 4,
+        "columns_desktop": 4,
+        "full_width": false,
+        "show_view_all": true,
+        "view_all_style": "solid",
+        "enable_desktop_slider": false,
+        "color_scheme": "scheme-1",
+        "image_ratio": "adapt",
+        "image_shape": "default",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": false,
+        "enable_quick_add": true,
+        "columns_mobile": "2",
+        "swipe_on_mobile": false,
+        "padding_top": 44,
+        "padding_bottom": 36
+      }
+    },
+    "featured_collection": {
+      "type": "featured-collection",
+      "disabled": true,
+      "name": "Featured Products",
+      "settings": {
+        "title": "Unisex Wear",
+        "heading_size": "h1",
+        "description": "",
+        "show_description": false,
+        "description_style": "subtitle",
+        "collection": "unisex-wear",
         "products_to_show": 4,
         "columns_desktop": 4,
         "full_width": false,
@@ -880,9 +945,11 @@
     "custom_liquid_6wQV7B",
     "photo_collage_banner_9fK3xQ",
     "custom_collection_section_TUGAi3",
+    "collection_list_jcDEdA",
     "17938603594945d36d",
     "featured_collection_N6PqNd",
-    "featured_collection_qwQhCB",
+    "featured_collection_38BHbc",
+    "featured_collection",
     "featured_product_C7xeEh",
     "custom_liquid_TypHy9",
     "slideshow_DjrgVJ",

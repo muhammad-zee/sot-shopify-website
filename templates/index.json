@@ -12,8 +12,61 @@
     "auto_banner_slider_NwpdWC": {
       "type": "auto-banner-slider",
       "blocks": {
+        "slide_9jLmP3": {
+          "type": "slide",
+          "settings": {
+            "image_web": "shopify://shop_images/SOT-Banner2-Desktop.png",
+            "image_mobile": "shopify://shop_images/SOT-Banner2-Mobile.png",
+            "link": "shopify://collections/new-arrivals",
+            "open_new_tab": false
+          }
+        },
+        "slide_cwWNER": {
+          "type": "slide",
+          "settings": {
+            "image_web": "shopify://shop_images/SOT-Banner6-Desktop.png",
+            "image_mobile": "shopify://shop_images/SOT-Banner6-Mobile.png",
+            "link": "shopify://collections/new-arrivals",
+            "open_new_tab": false
+          }
+        },
+        "slide_YKMqK3": {
+          "type": "slide",
+          "settings": {
+            "image_web": "shopify://shop_images/SOT-Banner4-Desktop.png",
+            "image_mobile": "shopify://shop_images/SOT-Banner4-Mobile.png",
+            "link": "shopify://collections/new-arrivals",
+            "open_new_tab": false
+          }
+        },
+        "slide_GKMyJP": {
+          "type": "slide",
+          "settings": {
+            "image_web": "shopify://shop_images/SOT-Banner3-Desktop.png",
+            "image_mobile": "shopify://shop_images/SOT-Banner3-Mobile.png",
+            "link": "shopify://collections/new-arrivals",
+            "open_new_tab": false
+          }
+        },
+        "slide_P3phgg": {
+          "type": "slide",
+          "settings": {
+            "link": "",
+            "open_new_tab": false
+          }
+        },
+        "slide_yQpm4L": {
+          "type": "slide",
+          "settings": {
+            "image_web": "shopify://shop_images/SOT-Banner1-Desktop.png",
+            "image_mobile": "shopify://shop_images/SOT-Banner1-Mobile.png",
+            "link": "shopify://collections/new-arrivals",
+            "open_new_tab": false
+          }
+        },
         "slide_GDnynF": {
           "type": "slide",
+          "disabled": true,
           "settings": {
             "image_web": "shopify://shop_images/web_top_51e885d0-4312-4382-a629-d839c7838083.png",
             "image_mobile": "shopify://shop_images/MOB_top_jpg.jpg",
@@ -23,6 +76,7 @@
         },
         "slide_Rbyp9T": {
           "type": "slide",
+          "disabled": true,
           "settings": {
             "image_web": "shopify://shop_images/Bottom_web_jpg.png",
             "image_mobile": "shopify://shop_images/Bottom_MOB_jpg.jpg",
@@ -32,6 +86,12 @@
         }
       },
       "block_order": [
+        "slide_9jLmP3",
+        "slide_cwWNER",
+        "slide_YKMqK3",
+        "slide_GKMyJP",
+        "slide_P3phgg",
+        "slide_yQpm4L",
         "slide_GDnynF",
         "slide_Rbyp9T"
       ],

@@ -305,7 +305,7 @@
           "type": "collection_item",
           "settings": {
             "collection": "unisex-shirts",
-            "image": "shopify://shop_images/TOP.png",
+            "image": "shopify://shop_images/DSC09210.jpg",
             "title": "",
             "button_label": "Shop Now",
             "button_link": "shopify://collections/unisex-shirts"
@@ -315,7 +315,7 @@
           "type": "collection_item",
           "settings": {
             "collection": "unisex-bottoms",
-            "image": "shopify://shop_images/Bottom-1.jpg",
+            "image": "shopify://shop_images/beigetrouser2.jpg",
             "title": "",
             "button_label": "Shop Now",
             "button_link": "shopify://collections/unisex-bottoms"

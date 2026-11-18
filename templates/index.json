@@ -197,7 +197,7 @@
         "image_1": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/starboy-blue-2-unisex_streetwear_shirt.jpg",
+            "image": "shopify://shop_images/bluejort6.jpg",
             "alt": "",
             "link": "shopify://products/graphic-unisex-streetwear"
           }
@@ -205,9 +205,9 @@
         "image_rEEbdg": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/DSC06041copy_resized-wide-leg_black_trousers.jpg",
+            "image": "shopify://shop_images/vestie3.jpg",
             "alt": "",
-            "link": "shopify://products/high-waisted-double-pleated-relaxed-pants-in-black"
+            "link": "shopify://products/vestie-sleeveless-quarter-zip-sweatshirt"
           }
         },
         "image_2": {
@@ -229,9 +229,9 @@
         "image_4": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/Starboy-pink-1-short-sleeve-shirt.jpg",
+            "image": "shopify://shop_images/blackjort10.jpg",
             "alt": "",
-            "link": "shopify://products/starboy-pink"
+            "link": "shopify://products/red-velvet-embroidered-zip-jacket"
           }
         },
         "eyebrow_1": {

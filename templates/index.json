@@ -213,7 +213,7 @@
         "image_2": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/DSC06254copy_resized.jpg",
+            "image": "shopify://shop_images/Brewbaby5.jpg",
             "alt": "",
             "link": "shopify://products/slate-gray-belted-wide-leg-pleated-trousers"
           }
@@ -221,17 +221,17 @@
         "image_3": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/DSC06567_resized_casualwear_shirt.jpg",
+            "image": "shopify://shop_images/AiWhoPurple3.jpg",
             "alt": "",
-            "link": "shopify://products/love-letter"
+            "link": "shopify://products/ai-who-purple-human-sweatshirt"
           }
         },
         "image_4": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/blackjort10.jpg",
+            "image": "shopify://shop_images/AIwhoskyblue8.jpg",
             "alt": "",
-            "link": "shopify://products/red-velvet-embroidered-zip-jacket"
+            "link": "shopify://products/ai-who-sky-blue-human-sweatshirt"
           }
         },
         "eyebrow_1": {

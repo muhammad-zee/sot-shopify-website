@@ -19,7 +19,7 @@
               {% endif %}
             </picture>
           {% else %}
-            <div class="banner-placeholder">Image Nahi Lagi</div>
+            <div class="banner-placeholder">No image added</div>
           {% endif %}
 
           {% if block.settings.link != blank %}
@@ -183,12 +183,12 @@
         {
           "type": "url",
           "id": "link",
-          "label": "Banner URL (kahan redirect karna hai)"
+          "label": "Banner URL (where it should redirect)"
         },
         {
           "type": "checkbox",
           "id": "open_new_tab",
-          "label": "New tab mein open karo",
+          "label": "Open in new tab",
           "default": false
         }
       ]

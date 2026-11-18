@@ -1,5 +1,5 @@
-<div class="cc-section-{{ section.id }} cc-wrapper" style="background-color: {{ section.settings.section_bg }}; padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;">
-  <div class="page-width">
+<div class="color-{{ section.settings.color_scheme }} gradient">
+  <div class="cc-section-{{ section.id }} cc-wrapper page-width section-{{ section.id }}-padding">
 
     {% if section.settings.heading != blank %}
       <h2 class="cc-heading cc-heading-align-{{ section.settings.heading_alignment }}">
@@ -48,7 +48,7 @@
                 <span class="cc-title">{{ display_title }}</span>
               {% endif %}
               {% if block.settings.button_label != blank %}
-                <span class="cc-btn">{{ block.settings.button_label }}</span>
+                <span class="button{% if block.settings.button_style_secondary %} button--secondary{% else %} button--primary{% endif %} cc-btn">{{ block.settings.button_label }}</span>
               {% endif %}
             </div>
           </a>
@@ -62,9 +62,20 @@
 <style>
   .cc-wrapper { width: 100%; }
 
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
   .cc-heading {
-    font-size: {{ section.settings.heading_font_size }}px;
-    font-weight: 700;
+    font-size: calc(var(--font-heading-scale) * {{ section.settings.heading_font_size }}px);
     line-height: 1.2;
     margin-bottom: 8px;
   }
@@ -102,6 +113,8 @@
     position: relative;
     display: block;
     overflow: hidden;
+    border: 0.4rem solid rgb(var(--color-background));
+    box-shadow: 0 0.6rem 1.6rem rgba(0, 0, 0, 0.15);
     border-radius: 0;
     text-decoration: none;
     color: inherit;
@@ -124,17 +137,20 @@
     font-size: 16px;
     font-weight: 600;
     display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  @media (min-width: 750px) {
+    .cc-title {
+      font-size: 22px;
+    }
   }
 
   .cc-btn {
-    display: inline-block;
-    margin-top: 8px;
-    padding: 8px 18px;
-    border: 1px solid currentColor;
-    border-radius: 0;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    margin-top: 10px;
+    background-color: transparent;
+    --color-button: var(--color-button-text);
   }
 
   /* ===== Content Style: BELOW image ===== */
@@ -164,7 +180,7 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 16px;
+    padding: 16px 10px;
     color: #fff;
     z-index: 2;
   }
@@ -323,10 +339,10 @@
       "content": "Section Spacing"
     },
     {
-      "type": "color",
-      "id": "section_bg",
-      "label": "Background Color",
-      "default": "#EDE6D8"
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-1"
     },
     {
       "type": "range",
@@ -376,6 +392,12 @@
           "id": "button_label",
           "label": "Button / Box Text",
           "default": "Shop Now"
+        },
+        {
+          "type": "checkbox",
+          "id": "button_style_secondary",
+          "label": "Use secondary button style",
+          "default": false
         },
         {
           "type": "url",

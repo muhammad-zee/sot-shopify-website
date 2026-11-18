@@ -24,10 +24,10 @@
             "highlight_animate": true
           }
         },
-        "announcement_tfPk7t": {
+        "announcement_W9QU6K": {
           "type": "announcement",
           "settings": {
-            "text": "VOLUME-001 LIVE NOW",
+            "text": "VOLUME-002 LIVE NOW",
             "link": "",
             "highlight": true,
             "highlight_color_scheme": "scheme-1",
@@ -43,23 +43,12 @@
             "highlight_color_scheme": "scheme-1",
             "highlight_animate": true
           }
-        },
-        "announcement_W9QU6K": {
-          "type": "announcement",
-          "settings": {
-            "text": "VOLUME-002 IS ON THE WAY",
-            "link": "",
-            "highlight": true,
-            "highlight_color_scheme": "scheme-1",
-            "highlight_animate": true
-          }
         }
       },
       "block_order": [
         "announcement_Q8qDF7",
-        "announcement_tfPk7t",
-        "announcement_FtHCNH",
-        "announcement_W9QU6K"
+        "announcement_W9QU6K",
+        "announcement_FtHCNH"
       ],
       "settings": {
         "color_scheme": "scheme-2",

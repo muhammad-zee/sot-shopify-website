@@ -12,29 +12,11 @@
     "auto_banner_slider_NwpdWC": {
       "type": "auto-banner-slider",
       "blocks": {
-        "slide_9jLmP3": {
+        "slide_yQpm4L": {
           "type": "slide",
           "settings": {
-            "image_web": "shopify://shop_images/SOT-Banner2-Desktop.png",
-            "image_mobile": "shopify://shop_images/SOT-Banner2-Mobile.png",
-            "link": "shopify://collections/new-arrivals",
-            "open_new_tab": false
-          }
-        },
-        "slide_cwWNER": {
-          "type": "slide",
-          "settings": {
-            "image_web": "shopify://shop_images/SOT-Banner6-Desktop.png",
-            "image_mobile": "shopify://shop_images/SOT-Banner6-Mobile.png",
-            "link": "shopify://collections/new-arrivals",
-            "open_new_tab": false
-          }
-        },
-        "slide_YKMqK3": {
-          "type": "slide",
-          "settings": {
-            "image_web": "shopify://shop_images/SOT-Banner4-Desktop.png",
-            "image_mobile": "shopify://shop_images/SOT-Banner4-Mobile.png",
+            "image_web": "shopify://shop_images/SOT-Banner1-Desktop.png",
+            "image_mobile": "shopify://shop_images/SOT-Banner1-Mobile.png",
             "link": "shopify://collections/new-arrivals",
             "open_new_tab": false
           }
@@ -48,11 +30,29 @@
             "open_new_tab": false
           }
         },
-        "slide_yQpm4L": {
+        "slide_YKMqK3": {
           "type": "slide",
           "settings": {
-            "image_web": "shopify://shop_images/SOT-Banner1-Desktop.png",
-            "image_mobile": "shopify://shop_images/SOT-Banner1-Mobile.png",
+            "image_web": "shopify://shop_images/SOT-Banner4-Desktop.png",
+            "image_mobile": "shopify://shop_images/SOT-Banner4-Mobile.png",
+            "link": "shopify://collections/new-arrivals",
+            "open_new_tab": false
+          }
+        },
+        "slide_cwWNER": {
+          "type": "slide",
+          "settings": {
+            "image_web": "shopify://shop_images/SOT-Banner6-Desktop.png",
+            "image_mobile": "shopify://shop_images/SOT-Banner6-Mobile.png",
+            "link": "shopify://collections/new-arrivals",
+            "open_new_tab": false
+          }
+        },
+        "slide_9jLmP3": {
+          "type": "slide",
+          "settings": {
+            "image_web": "shopify://shop_images/SOT-Banner2-Desktop.png",
+            "image_mobile": "shopify://shop_images/SOT-Banner2-Mobile.png",
             "link": "shopify://collections/new-arrivals",
             "open_new_tab": false
           }
@@ -79,11 +79,11 @@
         }
       },
       "block_order": [
-        "slide_9jLmP3",
-        "slide_cwWNER",
-        "slide_YKMqK3",
-        "slide_GKMyJP",
         "slide_yQpm4L",
+        "slide_GKMyJP",
+        "slide_YKMqK3",
+        "slide_cwWNER",
+        "slide_9jLmP3",
         "slide_GDnynF",
         "slide_Rbyp9T"
       ],

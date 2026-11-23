@@ -185,7 +185,7 @@
       "type": "custom-liquid",
       "name": "t:sections.custom-liquid.presets.name",
       "settings": {
-        "custom_liquid": "<div class=\"sot-trust-bar\">\n  <div class=\"sot-trust-inner\">\n\n    <strong class=\"sot-trust-title\">Built Different</strong>\n\n    <span class=\"sot-trust-item\">Volume-001 Live Now</span>\n\n    <span class=\"sot-trust-item\">100% Made in Pakistan</span>\n\n    <span class=\"sot-trust-item\">Fit Engineered Over 11 Months</span>\n\n    <span class=\"sot-trust-item\">Free Delivery Across Pakistan</span>\n\n  </div>\n</div>\n\n<style>\n.sot-trust-bar {\n  width: 100%;\n  background: #000000;\n  border-top: 1px solid #2b2b2b;\n  border-bottom: 1px solid #2b2b2b;\n  padding: 14px 16px;\n  box-sizing: border-box;\n}\n\n.sot-trust-inner {\n  max-width: 1200px;\n  margin: 0 auto;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-wrap: wrap;\n  gap: 10px 28px;\n  color: #ffffff;\n  font-family: inherit;\n  text-transform: uppercase;\n}\n\n.sot-trust-title {\n  color: #d8c3a5;\n  font-size: 14px;\n  font-weight: 700;\n  letter-spacing: 2px;\n}\n\n.sot-trust-item {\n  position: relative;\n  color: #ffffff;\n  font-size: 12px;\n  font-weight: 500;\n  letter-spacing: 1.2px;\n}\n\n.sot-trust-item::before {\n  content: \"\";\n  position: absolute;\n  left: -15px;\n  top: 50%;\n  width: 3px;\n  height: 3px;\n  background: #d8c3a5;\n  transform: translateY(-50%);\n}\n\n@media screen and (max-width: 749px) {\n  .sot-trust-bar {\n    padding: 12px;\n  }\n\n  .sot-trust-inner {\n    display: grid;\n    grid-template-columns: 1fr 1fr;\n    gap: 8px 10px;\n    text-align: center;\n  }\n\n  .sot-trust-title {\n    grid-column: 1 / -1;\n    font-size: 12px;\n  }\n\n  .sot-trust-item {\n    font-size: 9px;\n    letter-spacing: 0.6px;\n  }\n\n  .sot-trust-item::before {\n    display: none;\n  }\n}\n</style>",
+        "custom_liquid": "<div class=\"sot-trust-bar\">\n  <div class=\"sot-trust-inner\">\n\n    <strong class=\"sot-trust-title\">Built Different</strong>\n\n    <span class=\"sot-trust-item\">Volume-002 Live Now</span>\n\n    <span class=\"sot-trust-item\">100% Made in Pakistan</span>\n\n    <span class=\"sot-trust-item\">Fit Engineered Over 11 Months</span>\n\n    <span class=\"sot-trust-item\">Free Delivery Across Pakistan</span>\n\n  </div>\n</div>\n\n<style>\n.sot-trust-bar {\n  width: 100%;\n  background: #000000;\n  border-top: 1px solid #2b2b2b;\n  border-bottom: 1px solid #2b2b2b;\n  padding: 14px 16px;\n  box-sizing: border-box;\n}\n\n.sot-trust-inner {\n  max-width: 1200px;\n  margin: 0 auto;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-wrap: wrap;\n  gap: 10px 28px;\n  color: #ffffff;\n  font-family: inherit;\n  text-transform: uppercase;\n}\n\n.sot-trust-title {\n  color: #d8c3a5;\n  font-size: 14px;\n  font-weight: 700;\n  letter-spacing: 2px;\n}\n\n.sot-trust-item {\n  position: relative;\n  color: #ffffff;\n  font-size: 12px;\n  font-weight: 500;\n  letter-spacing: 1.2px;\n}\n\n.sot-trust-item::before {\n  content: \"\";\n  position: absolute;\n  left: -15px;\n  top: 50%;\n  width: 3px;\n  height: 3px;\n  background: #d8c3a5;\n  transform: translateY(-50%);\n}\n\n@media screen and (max-width: 749px) {\n  .sot-trust-bar {\n    padding: 12px;\n  }\n\n  .sot-trust-inner {\n    display: grid;\n    grid-template-columns: 1fr 1fr;\n    gap: 8px 10px;\n    text-align: center;\n  }\n\n  .sot-trust-title {\n    grid-column: 1 / -1;\n    font-size: 12px;\n  }\n\n  .sot-trust-item {\n    font-size: 9px;\n    letter-spacing: 0.6px;\n  }\n\n  .sot-trust-item::before {\n    display: none;\n  }\n}\n</style>",
         "color_scheme": "",
         "padding_top": 0,
         "padding_bottom": 0
@@ -308,6 +308,7 @@
             "image": "shopify://shop_images/DSC09210.jpg",
             "title": "",
             "button_label": "Shop Now",
+            "button_style_secondary": false,
             "button_link": "shopify://collections/unisex-shirts"
           }
         },
@@ -318,6 +319,7 @@
             "image": "shopify://shop_images/beigetrouser2.jpg",
             "title": "",
             "button_label": "Shop Now",
+            "button_style_secondary": false,
             "button_link": "shopify://collections/unisex-bottoms"
           }
         }
@@ -340,7 +342,7 @@
         "gap_desktop": 20,
         "columns_mobile": 2,
         "gap_mobile": 12,
-        "section_bg": "#ede6d8",
+        "color_scheme": "",
         "padding_top": 40,
         "padding_bottom": 40
       }

@@ -793,30 +793,7 @@
               "availability" : "http://schema.org/{% if variant.available %}InStock{% else %}OutOfStock{% endif %}",
               "price" : {{ variant.price | divided_by: 100.00 | json }},
               "priceCurrency" : {{ cart.currency.iso_code | json }},
-              "url" : {{ request.origin | append: variant.url | json }},
-              "itemCondition": "https://schema.org/NewCondition",
-              "shippingDetails": {
-                "@type": "OfferShippingDetails",
-                "shippingRate": { "@type": "MonetaryAmount", "value": 0, "currency": "PKR" },
-                "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "PK" },
-                "deliveryTime": {
-                  "@type": "ShippingDeliveryTime",
-                  "handlingTime": { "@type": "QuantitativeValue", "minValue": 0, "maxValue": 2, "unitCode": "DAY" },
-                  "transitTime": { "@type": "QuantitativeValue", "minValue": 2, "maxValue": 3, "unitCode": "DAY" }
-                }
-              },
-              {%- comment -%} Mirrors the Refund policy: 7-day returns by mail; sale items are final sale. {%- endcomment -%}
-              "hasMerchantReturnPolicy": {
-                "@type": "MerchantReturnPolicy",
-                "applicableCountry": "PK",
-                {%- if variant.compare_at_price > variant.price %}
-                "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted"
-                {%- else %}
-                "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-                "merchantReturnDays": 7,
-                "returnMethod": "https://schema.org/ReturnByMail"
-                {%- endif %}
-              }
+              "url" : {{ request.origin | append: variant.url | json }}
             }{% unless forloop.last %},{% endunless %}
           {%- endfor -%}
         ]

@@ -63,7 +63,7 @@
           "settings": {
             "image_web": "shopify://shop_images/web_top_51e885d0-4312-4382-a629-d839c7838083.png",
             "image_mobile": "shopify://shop_images/MOB_top_jpg.jpg",
-            "link": "shopify://collections/unisex-shirts",
+            "link": "shopify://collections/unisex-tops",
             "open_new_tab": false
           }
         },
@@ -304,12 +304,12 @@
         "collection_item_zePKwm": {
           "type": "collection_item",
           "settings": {
-            "collection": "unisex-shirts",
+            "collection": "unisex-tops",
             "image": "shopify://shop_images/DSC09210.jpg",
             "title": "",
             "button_label": "Shop Now",
             "button_style_secondary": false,
-            "button_link": "shopify://collections/unisex-shirts"
+            "button_link": "shopify://collections/unisex-tops"
           }
         },
         "collection_item_rMLx4Y": {
@@ -353,7 +353,7 @@
         "featured_collection_JB8zgV": {
           "type": "featured_collection",
           "settings": {
-            "collection": "unisex-shirts"
+            "collection": "unisex-tops"
           }
         },
         "featured_collection_QpkLhH": {

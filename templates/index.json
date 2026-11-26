@@ -12,14 +12,27 @@
     "auto_banner_slider_NwpdWC": {
       "type": "auto-banner-slider",
       "blocks": {
-        "slide_Ck7rKc": {
+        "slide_yQpm4L": {
           "type": "slide",
+          "name": "BLESSED FRIDAY",
           "settings": {
-            "link": "",
+            "image_web": "shopify://shop_images/SOT-WhiteFriday-1-Desktop.jpg",
+            "image_mobile": "shopify://shop_images/SOT-WhiteFriday-1-Mobile.jpg",
+            "link": "shopify://collections/new-arrivals",
             "open_new_tab": false
           }
         },
-        "slide_yQpm4L": {
+        "slide_prUKVr": {
+          "type": "slide",
+          "name": "BLESSED FRIDAY",
+          "settings": {
+            "image_web": "shopify://shop_images/SOT-WhiteFriday-3-Desktop.jpg",
+            "image_mobile": "shopify://shop_images/SOT-WhiteFriday-3-Mobile.jpg",
+            "link": "shopify://collections/new-arrivals",
+            "open_new_tab": false
+          }
+        },
+        "slide_zJKg4f": {
           "type": "slide",
           "name": "VOL-002",
           "disabled": true,
@@ -98,8 +111,9 @@
         }
       },
       "block_order": [
-        "slide_Ck7rKc",
         "slide_yQpm4L",
+        "slide_prUKVr",
+        "slide_zJKg4f",
         "slide_GKMyJP",
         "slide_YKMqK3",
         "slide_cwWNER",

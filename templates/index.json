@@ -12,8 +12,17 @@
     "auto_banner_slider_NwpdWC": {
       "type": "auto-banner-slider",
       "blocks": {
+        "slide_Ck7rKc": {
+          "type": "slide",
+          "settings": {
+            "link": "",
+            "open_new_tab": false
+          }
+        },
         "slide_yQpm4L": {
           "type": "slide",
+          "name": "VOL-002",
+          "disabled": true,
           "settings": {
             "image_web": "shopify://shop_images/SOT-Banner1-Desktop.png",
             "image_mobile": "shopify://shop_images/SOT-Banner1-Mobile.png",
@@ -23,6 +32,8 @@
         },
         "slide_GKMyJP": {
           "type": "slide",
+          "name": "VOL-002",
+          "disabled": true,
           "settings": {
             "image_web": "shopify://shop_images/SOT-Banner3-Desktop.png",
             "image_mobile": "shopify://shop_images/SOT-Banner3-Mobile.png",
@@ -32,6 +43,8 @@
         },
         "slide_YKMqK3": {
           "type": "slide",
+          "name": "VOL-002",
+          "disabled": true,
           "settings": {
             "image_web": "shopify://shop_images/SOT-Banner4-Desktop.png",
             "image_mobile": "shopify://shop_images/SOT-Banner4-Mobile.png",
@@ -41,6 +54,8 @@
         },
         "slide_cwWNER": {
           "type": "slide",
+          "name": "VOL-002",
+          "disabled": true,
           "settings": {
             "image_web": "shopify://shop_images/SOT-Banner6-Desktop.png",
             "image_mobile": "shopify://shop_images/SOT-Banner6-Mobile.png",
@@ -50,6 +65,8 @@
         },
         "slide_9jLmP3": {
           "type": "slide",
+          "name": "VOL-002",
+          "disabled": true,
           "settings": {
             "image_web": "shopify://shop_images/SOT-Banner2-Desktop.png",
             "image_mobile": "shopify://shop_images/SOT-Banner2-Mobile.png",
@@ -59,6 +76,7 @@
         },
         "slide_GDnynF": {
           "type": "slide",
+          "name": "VOL-001",
           "disabled": true,
           "settings": {
             "image_web": "shopify://shop_images/web_top_51e885d0-4312-4382-a629-d839c7838083.png",
@@ -69,6 +87,7 @@
         },
         "slide_Rbyp9T": {
           "type": "slide",
+          "name": "VOL-001",
           "disabled": true,
           "settings": {
             "image_web": "shopify://shop_images/Bottom_web_jpg.png",
@@ -79,6 +98,7 @@
         }
       },
       "block_order": [
+        "slide_Ck7rKc",
         "slide_yQpm4L",
         "slide_GKMyJP",
         "slide_YKMqK3",

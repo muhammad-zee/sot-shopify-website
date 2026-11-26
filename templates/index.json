@@ -55,10 +55,9 @@
         "slide_ym34Pw": {
           "type": "slide",
           "name": "BLESSED FRIDAY",
-          "disabled": true,
           "settings": {
-            "image_web": "shopify://shop_images/SOT-Banner2-Desktop.png",
-            "image_mobile": "shopify://shop_images/SOT-Banner2-Mobile.png",
+            "image_web": "shopify://shop_images/SOT-WhiteFriday-2-Desktop.jpg",
+            "image_mobile": "shopify://shop_images/SOT-WhiteFriday-2-Mobile.jpg",
             "link": "shopify://collections/new-arrivals",
             "open_new_tab": false
           }

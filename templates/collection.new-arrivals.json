@@ -1,0 +1,142 @@
+{
+  "sections": {
+    "sale_strip": {
+      "type": "sot-sale-strip",
+      "settings": {
+        "text": "Blessed Friday · 30% off everything",
+        "link": "",
+        "show_countdown": true,
+        "countdown_label": "Ends in",
+        "end_datetime": "2026-11-29T23:59:00+05:00",
+        "color_scheme": "scheme-2"
+      }
+    },
+    "banner": {
+      "type": "main-collection-banner",
+      "settings": {
+        "show_collection_description": false,
+        "show_collection_image": false,
+        "color_scheme": "scheme-1"
+      }
+    },
+    "trust_chips": {
+      "type": "sot-trust-chips",
+      "blocks": {
+        "chip_cod": {
+          "type": "chip",
+          "settings": {
+            "text": "Cash on delivery"
+          }
+        },
+        "chip_pk": {
+          "type": "chip",
+          "settings": {
+            "text": "100% made in Pakistan"
+          }
+        },
+        "chip_fit": {
+          "type": "chip",
+          "settings": {
+            "text": "Fit tested over 11 months"
+          }
+        },
+        "chip_size": {
+          "type": "chip",
+          "settings": {
+            "text": "Size guide on every piece"
+          }
+        },
+        "chip_days": {
+          "type": "chip",
+          "settings": {
+            "text": "Delivered in 2–3 days"
+          }
+        }
+      },
+      "block_order": [
+        "chip_cod",
+        "chip_pk",
+        "chip_fit",
+        "chip_size",
+        "chip_days"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "padding_top": 0,
+        "padding_bottom": 8
+      }
+    },
+    "product-grid": {
+      "type": "main-collection-product-grid",
+      "settings": {
+        "products_per_page": 24,
+        "columns_desktop": 4,
+        "color_scheme": "scheme-1",
+        "show_description": true,
+        "description_position": "bottom",
+        "description_first_page_only": true,
+        "enable_show_more": true,
+        "description_collapse_method": "words",
+        "description_word_count": 50,
+        "description_collapsed_height": 120,
+        "show_more_label": "Show more",
+        "show_less_label": "Show less",
+        "image_ratio": "adapt",
+        "image_shape": "default",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": false,
+        "enable_quick_add": true,
+        "enable_filtering": true,
+        "filter_type": "horizontal",
+        "enable_sorting": true,
+        "columns_mobile": "2",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "instagram_reels": {
+      "type": "apps",
+      "blocks": {
+        "instareel_ig_reels_instagram_reels_feed_qn7jdH": {
+          "type": "shopify://apps/instareel-ig-reels/blocks/instagram-reels-feed/6399ee9c-54c8-4f76-97d7-8f02f7662aa1",
+          "settings": {
+            "playlist_id": "",
+            "hide_when_no_product_playlist": false,
+            "show_background": false,
+            "background_color": "#ffffff",
+            "customize_text": false,
+            "heading_font_size": 28,
+            "heading_color": "#000000",
+            "subheading_font_size": 16,
+            "subheading_color": "#000000",
+            "customize_spacing": false,
+            "padding_top": 0,
+            "padding_bottom": 16,
+            "padding_horizontal": 0
+          }
+        }
+      },
+      "block_order": [
+        "instareel_ig_reels_instagram_reels_feed_qn7jdH"
+      ],
+      "settings": {
+        "include_margins": true
+      }
+    },
+    "faq": {
+      "type": "custom-liquid",
+      "settings": {
+        "custom_liquid": "<section class=\"sot-faq\">\n  <div class=\"sot-faq-inner\">\n    <h2 class=\"sot-faq-heading\">Before you order</h2>\n\n    <details class=\"sot-faq-item\" open>\n      <summary>Can I pay cash on delivery?</summary>\n      <div class=\"sot-faq-answer\">\n        <p>Yes. We offer cash on delivery anywhere in Pakistan. We call every customer to confirm the order before we dispatch it.</p>\n      </div>\n    </details>\n\n    <details class=\"sot-faq-item\">\n      <summary>How long does delivery take?</summary>\n      <div class=\"sot-faq-answer\">\n        <p>Orders are dispatched within 2 working days and arrive 2 to 3 working days after dispatch, with tracking via Leopards, TCS or PostEx. See our <a href=\"/pages/shipping-policy\">Shipping Policy</a> for current delivery charges.</p>\n      </div>\n    </details>\n\n    <details class=\"sot-faq-item\">\n      <summary>How do I find my size?</summary>\n      <div class=\"sot-faq-answer\">\n        <p>Every product page has a Size &amp; Fit Guide with exact measurements in inches and centimetres. All pieces are unisex, so order the size you normally wear.</p>\n      </div>\n    </details>\n\n    <details class=\"sot-faq-item\">\n      <summary>Can I return or exchange an item?</summary>\n      <div class=\"sot-faq-answer\">\n        <p>Please read our <a href=\"/pages/return-and-refund-policy\">Return and Refund Policy</a> before ordering. Questions? Call <a href=\"tel:03196336294\">0319-6336294</a> or email <a href=\"mailto:support@sotstudio.pk\">support@sotstudio.pk</a>.</p>\n      </div>\n    </details>\n  </div>\n</section>\n\n<style>\n.sot-faq {\n  width: 100%;\n  padding: 48px 16px;\n  background: #f5efe6;\n  box-sizing: border-box;\n  font-family: inherit;\n}\n\n.sot-faq-inner {\n  max-width: 800px;\n  margin: 0 auto;\n}\n\n.sot-faq-heading {\n  margin: 0 0 24px;\n  color: #111111;\n  font-size: 28px;\n  font-weight: 700;\n  letter-spacing: 1.5px;\n  line-height: 1.2;\n  text-align: center;\n  text-transform: uppercase;\n}\n\n.sot-faq-item {\n  border-bottom: 1px solid #d8c3a5;\n}\n\n.sot-faq-item:first-of-type {\n  border-top: 1px solid #d8c3a5;\n}\n\n.sot-faq-item summary {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 16px;\n  padding: 16px 0;\n  color: #111111;\n  cursor: pointer;\n  font-size: 15px;\n  font-weight: 600;\n  line-height: 1.4;\n  list-style: none;\n}\n\n.sot-faq-item summary::-webkit-details-marker {\n  display: none;\n}\n\n.sot-faq-item summary::after {\n  content: \"+\";\n  flex-shrink: 0;\n  color: #111111;\n  font-size: 20px;\n  font-weight: 400;\n  line-height: 1;\n}\n\n.sot-faq-item[open] summary::after {\n  content: \"\\2212\";\n}\n\n.sot-faq-answer {\n  padding: 0 32px 16px 0;\n}\n\n.sot-faq-answer p {\n  margin: 0;\n  color: #3d3a35;\n  font-size: 14px;\n  line-height: 1.6;\n}\n\n.sot-faq-answer a {\n  color: #111111;\n  font-weight: 600;\n  text-decoration: underline;\n}\n\n@media screen and (max-width: 749px) {\n  .sot-faq {\n    padding: 32px 16px;\n  }\n\n  .sot-faq-heading {\n    margin-bottom: 18px;\n    font-size: 20px;\n    letter-spacing: 1px;\n  }\n\n  .sot-faq-item summary {\n    padding: 14px 0;\n    font-size: 14px;\n  }\n\n  .sot-faq-answer {\n    padding-right: 0;\n  }\n\n  .sot-faq-answer p {\n    font-size: 13px;\n  }\n}\n</style>"
+      }
+    }
+  },
+  "order": [
+    "sale_strip",
+    "banner",
+    "trust_chips",
+    "product-grid",
+    "instagram_reels",
+    "faq"
+  ]
+}

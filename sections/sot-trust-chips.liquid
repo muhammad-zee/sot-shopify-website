@@ -1,0 +1,129 @@
+{%- comment -%}
+  Row of short trust points. Wraps and centres on desktop, scrolls sideways on mobile so it stays one line tall.
+{%- endcomment -%}
+{%- if section.blocks.size > 0 -%}
+  <div class="sot-trust-chips color-{{ section.settings.color_scheme }}" id="SotTrustChips-{{ section.id }}">
+    <ul class="sot-trust-chips__list page-width" role="list">
+      {%- for block in section.blocks -%}
+        {%- if block.settings.text != blank -%}
+          <li class="sot-trust-chips__chip" {{ block.shopify_attributes }}>
+            <span class="sot-trust-chips__dot" aria-hidden="true"></span>
+            {{- block.settings.text -}}
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+
+  <style>
+    #SotTrustChips-{{ section.id }} {
+      background: rgb(var(--color-background));
+      color: rgb(var(--color-foreground));
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+    #SotTrustChips-{{ section.id }} .sot-trust-chips__list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.8rem;
+      margin: 0 auto;
+      list-style: none;
+    }
+    #SotTrustChips-{{ section.id }} .sot-trust-chips__chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex: 0 0 auto;
+      padding: 0.6rem 1.2rem;
+      border: 1px solid rgba(var(--color-foreground), 0.25);
+      font-size: 1.2rem;
+      letter-spacing: 0.08rem;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    #SotTrustChips-{{ section.id }} .sot-trust-chips__dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      background: rgb(var(--color-button));
+      flex-shrink: 0;
+    }
+    @media screen and (max-width: 749px) {
+      #SotTrustChips-{{ section.id }} .sot-trust-chips__list {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+      #SotTrustChips-{{ section.id }} .sot-trust-chips__list::-webkit-scrollbar {
+        display: none;
+      }
+      #SotTrustChips-{{ section.id }} .sot-trust-chips__chip {
+        font-size: 1.05rem;
+        padding: 0.5rem 1rem;
+      }
+    }
+  </style>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "SOT trust chips",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 8
+    }
+  ],
+  "blocks": [
+    {
+      "type": "chip",
+      "name": "Trust point",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Cash on delivery"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "SOT trust chips",
+      "blocks": [
+        { "type": "chip", "settings": { "text": "Cash on delivery" } },
+        { "type": "chip", "settings": { "text": "100% made in Pakistan" } },
+        { "type": "chip", "settings": { "text": "Fit tested over 11 months" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

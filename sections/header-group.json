@@ -17,7 +17,7 @@
         "announcement_AUEEBt": {
           "type": "announcement",
           "settings": {
-            "text": "BLESSED FRIDAY SALE: FLAT 30% OFF · FREE DELIVERY",
+            "text": "BLESSED FRIDAY SALE: FLAT 30% OFF ON ALL STOCK",
             "link": "",
             "highlight": true,
             "highlight_color_scheme": "scheme-1",
@@ -47,7 +47,7 @@
         "announcement_FtHCNH": {
           "type": "announcement",
           "settings": {
-            "text": "FREE Delivery Across All of Pakistan! Limited Time Only",
+            "text": "Delivery Across All of Pakistan",
             "link": "",
             "highlight": false,
             "highlight_color_scheme": "scheme-1",

@@ -14,6 +14,16 @@
     "announcement-bar": {
       "type": "announcement-bar",
       "blocks": {
+        "announcement_AUEEBt": {
+          "type": "announcement",
+          "settings": {
+            "text": "BLESSED FRIDAY SALE: FLAT 30% OFF · FREE DELIVERY",
+            "link": "",
+            "highlight": true,
+            "highlight_color_scheme": "scheme-1",
+            "highlight_animate": true
+          }
+        },
         "announcement_Q8qDF7": {
           "type": "announcement",
           "settings": {
@@ -46,6 +56,7 @@
         }
       },
       "block_order": [
+        "announcement_AUEEBt",
         "announcement_Q8qDF7",
         "announcement_W9QU6K",
         "announcement_FtHCNH"

@@ -23,7 +23,7 @@
         "products_per_page": 16,
         "columns_desktop": 4,
         "color_scheme": "scheme-1",
-        "show_description": true,
+        "show_description": false,
         "description_position": "bottom",
         "description_first_page_only": true,
         "enable_show_more": true,

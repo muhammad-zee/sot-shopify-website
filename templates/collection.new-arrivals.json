@@ -1,5 +1,75 @@
 {
   "sections": {
+    "campaign_banner": {
+      "type": "auto-banner-slider",
+      "blocks": {
+        "slide_zJKg4f": {
+          "type": "slide",
+          "name": "VOL-002",
+          "disabled": true,
+          "settings": {
+            "image_web": "shopify://shop_images/SOT-Banner1-Desktop.png",
+            "image_mobile": "shopify://shop_images/SOT-Banner1-Desktop.png",
+            "link": "",
+            "open_new_tab": false
+          }
+        },
+        "slide_GKMyJP": {
+          "type": "slide",
+          "name": "VOL-002",
+          "disabled": true,
+          "settings": {
+            "image_web": "shopify://shop_images/SOT-Banner3-Desktop.png",
+            "image_mobile": "shopify://shop_images/SOT-Banner3-Desktop.png",
+            "link": "",
+            "open_new_tab": false
+          }
+        },
+        "slide_YKMqK3": {
+          "type": "slide",
+          "name": "VOL-002",
+          "disabled": true,
+          "settings": {
+            "image_web": "shopify://shop_images/SOT-Banner4-Desktop.png",
+            "image_mobile": "shopify://shop_images/SOT-Banner4-Desktop.png",
+            "link": "",
+            "open_new_tab": false
+          }
+        },
+        "slide_cwWNER": {
+          "type": "slide",
+          "name": "VOL-002",
+          "disabled": true,
+          "settings": {
+            "image_web": "shopify://shop_images/SOT-Banner6-Desktop.png",
+            "image_mobile": "shopify://shop_images/SOT-Banner6-Desktop.png",
+            "link": "",
+            "open_new_tab": false
+          }
+        },
+        "slide_9jLmP3": {
+          "type": "slide",
+          "name": "VOL-002",
+          "disabled": true,
+          "settings": {
+            "image_web": "shopify://shop_images/SOT-Banner2-Desktop.png",
+            "image_mobile": "shopify://shop_images/SOT-Banner2-Desktop.png",
+            "link": "",
+            "open_new_tab": false
+          }
+        }
+      },
+      "block_order": [
+        "slide_zJKg4f",
+        "slide_GKMyJP",
+        "slide_YKMqK3",
+        "slide_cwWNER",
+        "slide_9jLmP3"
+      ],
+      "settings": {
+        "slide_speed": "5"
+      }
+    },
     "banner": {
       "type": "main-collection-banner",
       "settings": {
@@ -68,6 +138,7 @@
     }
   },
   "order": [
+    "campaign_banner",
     "banner",
     "product-grid",
     "instagram_reels"

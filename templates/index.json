@@ -32,6 +32,16 @@
             "open_new_tab": false
           }
         },
+        "slide_R3UWCK": {
+          "type": "slide",
+          "name": "BLESSED FRIDAY",
+          "settings": {
+            "image_web": "shopify://shop_images/SOT-WhiteFriday-4-Desktop.jpg",
+            "image_mobile": "shopify://shop_images/SOT-WhiteFriday-4-Mobile.jpg",
+            "link": "shopify://collections/new-arrivals",
+            "open_new_tab": false
+          }
+        },
         "slide_zJKg4f": {
           "type": "slide",
           "name": "VOL-002",
@@ -113,6 +123,7 @@
       "block_order": [
         "slide_yQpm4L",
         "slide_prUKVr",
+        "slide_R3UWCK",
         "slide_zJKg4f",
         "slide_GKMyJP",
         "slide_YKMqK3",
